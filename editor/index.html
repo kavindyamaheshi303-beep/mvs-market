@@ -362,7 +362,7 @@ function exportJSON(){
   showToast('✓ data.json downloaded! Now upload it to GitHub.');
 }
 
-// ── EXCEL IMPORT - READ FROM CORRECT SHEETS ──
+// ── EXCEL IMPORT - CORRECT STRUCTURE MAPPING ──
 function importExcel(event){
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -371,21 +371,19 @@ function importExcel(event){
       const wb=XLSX.read(e.target.result,{type:'binary'});
       console.log('Found sheets:', wb.SheetNames);
       
-      // Read sheets in order
+      // Read ALL sheets
       const sheets = [];
-      for(let i=0; i<5; i++) {
-        if(wb.SheetNames[i]) {
-          const ws = wb.Sheets[wb.SheetNames[i]];
-          const data = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
-          sheets.push(data);
-          console.log(`Sheet ${i+1} (${wb.SheetNames[i]}):`, data.length, 'rows');
-        }
-      }
+      wb.SheetNames.forEach(sheetName => {
+        const ws = wb.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        sheets.push({name: sheetName, data: data});
+      });
       
-      applyExcelSheets(sheets);
-      showToast('✓ Excel imported from all sheets! Review and click Save data.json');
+      console.log('Total sheets:', sheets.length);
+      applyExcelCorrect(sheets);
+      showToast('✓ Excel imported! Review and click Save data.json');
     }catch(err){ 
-      showToast('⚠ Error reading Excel: '+err.message);
+      showToast('⚠ Error: '+err.message);
       console.error(err);
     }
     event.target.value='';
@@ -393,53 +391,77 @@ function importExcel(event){
   reader.readAsBinaryString(file);
 }
 
-function applyExcelSheets(sheets){
+function applyExcelCorrect(sheets){
+  console.log('Processing Excel sheets...');
+  
   function sv(id,val){ 
-    if(val!==undefined&&val!=='') {
+    if(val!==undefined&&val!==null&&val!=='') {
       const el = document.getElementById(id);
-      if(el) el.value=String(val);
+      if(el) el.value=String(val).trim();
     }
   }
 
-  // ── SHEET 1 (Index 0): Summary / Executive Summary ──
-  // Not needed for main data, skip
+  // Find sheets by index or name
+  let summarySheet = null, fxSheet = null, bondsSheet = null, billsSheet = null, moneySheet = null;
   
-  // ── SHEET 2 (Index 1): Foreign Exchange - USD/LKR ──
-  console.log('Processing Sheet 2: Foreign Exchange');
-  const sheet2 = sheets[1] || [];
-  document.getElementById('fx-rows').innerHTML='';
-  sheet2.forEach((row, idx) => {
-    if(idx < 2) return; // Skip headers
-    if(!row[0]) return;
-    const date = String(row[0]).trim();
-    const rate = row[1];
-    if(date && rate && date !== 'Date') {
-      addRow('fx-rows', [date, rate]);
-    }
+  sheets.forEach((sheet, idx) => {
+    const name = sheet.name.toLowerCase();
+    console.log(`Sheet ${idx}: "${sheet.name}"`);
+    
+    if(name.includes('summary') || name.includes('executive')) summarySheet = sheet.data;
+    else if(name.includes('foreign') || name.includes('exchange')) fxSheet = sheet.data;
+    else if(name.includes('bond') || name.includes('t bond')) bondsSheet = sheet.data;
+    else if(name.includes('bill') || name.includes('t bill')) billsSheet = sheet.data;
+    else if(name.includes('money') || name.includes('repo')) moneySheet = sheet.data;
   });
-
-  // ── SHEET 3 (Index 2): T Bonds ──
-  console.log('Processing Sheet 3: T Bonds');
-  const sheet3 = sheets[2] || [];
-  // Extract headers (dates) from row 1 (B2, C2, D2, E2, F2, G2)
-  const bondHeaderRow = sheet3[1] || [];
-  bondHeaders = [
-    String(bondHeaderRow[1]||'').trim(),
-    String(bondHeaderRow[2]||'').trim(),
-    String(bondHeaderRow[3]||'').trim(),
-    String(bondHeaderRow[4]||'').trim(),
-    String(bondHeaderRow[5]||'').trim(),
-    String(bondHeaderRow[6]||'').trim()
-  ].filter(h=>h);
-  renderBondHeaders();
   
-  // Extract bond data starting from row 2
-  document.getElementById('bond-rows').innerHTML='';
-  sheet3.forEach((row, idx) => {
-    if(idx < 2) return; // Skip headers
-    if(!row[0]) return;
-    const maturity = String(row[0]).trim();
-    if(maturity && maturity !== 'Maturity') {
+  // ── SHEET: Foreign Exchange (USD/LKR) ──
+  if(fxSheet) {
+    console.log('Processing FX sheet:', fxSheet.length, 'rows');
+    document.getElementById('fx-rows').innerHTML='';
+    
+    fxSheet.forEach((row, idx) => {
+      if(idx < 2) return; // Skip headers (rows 0-1)
+      if(!row[0]) return;
+      
+      const date = String(row[0]).trim();
+      const rate = row[1];
+      
+      // Skip if it's a header or empty
+      if(date.toLowerCase().includes('date') || !rate) return;
+      if(isNaN(rate)) return;
+      
+      addRow('fx-rows', [date, rate]);
+    });
+  }
+
+  // ── SHEET: T Bonds ──
+  if(bondsSheet) {
+    console.log('Processing Bonds sheet:', bondsSheet.length, 'rows');
+    
+    // Row 1 has the date headers (B1, C1, D1, E1, F1, G1)
+    if(bondsSheet[1]) {
+      bondHeaders = [
+        String(bondsSheet[1][1]||'').trim(),
+        String(bondsSheet[1][2]||'').trim(),
+        String(bondsSheet[1][3]||'').trim(),
+        String(bondsSheet[1][4]||'').trim(),
+        String(bondsSheet[1][5]||'').trim(),
+        String(bondsSheet[1][6]||'').trim()
+      ].filter(h=>h);
+      renderBondHeaders();
+      console.log('Bond headers:', bondHeaders);
+    }
+    
+    // Data starts from row 2 onwards
+    document.getElementById('bond-rows').innerHTML='';
+    bondsSheet.forEach((row, idx) => {
+      if(idx < 2) return; // Skip header rows
+      if(!row[0]) return;
+      
+      const maturity = String(row[0]).trim();
+      if(maturity.toLowerCase().includes('maturity') || !maturity) return;
+      
       addRow('bond-rows', [
         maturity,
         String(row[1]||'').trim(),
@@ -449,75 +471,96 @@ function applyExcelSheets(sheets){
         String(row[5]||'').trim(),
         String(row[6]||'').trim()
       ]);
-    }
-  });
+    });
+  }
 
-  // ── SHEET 4 (Index 3): T Bills ──
-  console.log('Processing Sheet 4: T Bills');
-  const sheet4 = sheets[3] || [];
-  document.getElementById('tbill-rows').innerHTML='';
-  sheet4.forEach((row, idx) => {
-    if(idx < 1) return; // Skip header
-    if(!row[0]) return;
-    const date = String(row[0]).trim();
-    if(date && date !== 'Auction Date') {
+  // ── SHEET: T Bills ──
+  if(billsSheet) {
+    console.log('Processing T-Bills sheet:', billsSheet.length, 'rows');
+    document.getElementById('tbill-rows').innerHTML='';
+    
+    billsSheet.forEach((row, idx) => {
+      if(idx < 1) return; // Skip header (row 0)
+      if(!row[0]) return;
+      
+      const date = String(row[0]).trim();
+      if(date.toLowerCase().includes('auction') || !date) return;
+      
       addRow('tbill-rows', [
         date,
         String(row[1]||'').trim(),
         String(row[2]||'').trim(),
         String(row[3]||'').trim()
       ]);
-    }
-  });
+    });
+  }
 
-  // ── SHEET 5 (Index 4): Money and Repo ──
-  console.log('Processing Sheet 5: Money and Repo');
-  const sheet5 = sheets[4] || [];
-  
-  document.getElementById('liq-rows').innerHTML='';
-  sheet5.forEach((row, idx) => {
-    if(idx < 2) return; // Skip headers
-    if(!row[0] || !row[1]) return;
-    const date = String(row[0]).trim();
-    const value = row[1];
-    if(date && value && date !== 'Date' && !isNaN(value)) {
-      addRow('liq-rows', [date, value]);
-    }
-  });
-
-  // Extract Money Market data from Sheet 5 (look for specific rows)
-  sheet5.forEach(row => {
-    if(!row[0]) return;
-    const label = String(row[0]).trim().toLowerCase();
+  // ── SHEET: Money and Repo ──
+  if(moneySheet) {
+    console.log('Processing Money & Repo sheet:', moneySheet.length, 'rows');
     
-    // Find Minimum Rate row
-    if(label.includes('minimum') && label.includes('rate')) {
-      sv('cm-min', row[1]);
-      sv('rm-min', row[2]);
-    }
-    // Find Maximum Rate row
-    if(label.includes('maximum') && label.includes('rate')) {
-      sv('cm-max', row[1]);
-      sv('rm-max', row[2]);
-    }
-    // Find W.A. Yield row
-    if(label.includes('w.a') || label.includes('wa')) {
-      sv('cm-wa', row[1]);
-      sv('rm-wa', row[2]);
-    }
-    // Find Volume row
-    if(label.includes('volume') || label.includes('vol')) {
-      sv('cm-vol', row[1]);
-      sv('rm-vol', row[2]);
-    }
-    // Find Liquidity Current/Previous
-    if(label.includes('market liquidity')) {
-      sv('liq-cur', row[1]);
-      sv('liq-prev', row[2]);
-    }
-  });
+    // Extract liquidity trend data (column B = Date, column C = Market Liquidity)
+    document.getElementById('liq-rows').innerHTML='';
+    moneySheet.forEach((row, idx) => {
+      if(idx < 2) return; // Skip headers
+      if(!row[0] || !row[1]) return;
+      
+      const date = String(row[0]).trim();
+      const value = row[1];
+      
+      if(date.toLowerCase().includes('date') || !value) return;
+      if(isNaN(value)) return;
+      
+      addRow('liq-rows', [date, value]);
+    });
+    
+    // Extract Money Market rates from right side of sheet
+    // Looking for Min, Max, W.A columns with Call/Repo values
+    moneySheet.forEach((row, idx) => {
+      if(!row[0]) return;
+      const label = String(row[0]).trim().toLowerCase();
+      
+      // Match different label patterns
+      if(label.includes('minimum') && label.includes('rate')) {
+        sv('cm-min', row[1]);
+        sv('rm-min', row[2]);
+      }
+      if(label.includes('maximum') && label.includes('rate')) {
+        sv('cm-max', row[1]);
+        sv('rm-max', row[2]);
+      }
+      if((label.includes('w.a') || label.includes('yield')) && !label.includes('volume')) {
+        sv('cm-wa', row[1]);
+        sv('rm-wa', row[2]);
+      }
+      if(label.includes('volume') || (label.includes('gross') && label.includes('volume'))) {
+        sv('cm-vol', row[1]);
+        sv('rm-vol', row[2]);
+      }
+    });
+  }
 
-  console.log('Import complete!');
+  // ── SHEET: Summary / Executive Summary ──
+  if(summarySheet) {
+    console.log('Processing Summary sheet');
+    summarySheet.forEach((row) => {
+      if(!row[0]) return;
+      const label = String(row[0]).trim().toLowerCase();
+      
+      if(label.includes('usd/lkr') || label.includes('closed')) {
+        sv('ex-usdlkr', row[1]);
+      }
+      if(label.includes('liquidity') && label.includes('delta')) {
+        sv('ex-delta', row[1]);
+      }
+      if(label.includes('direction') || (label.includes('liquidity') && !label.includes('market'))) {
+        const sel = document.getElementById('ex-dir');
+        if(sel) sel.value = String(row[1]).toLowerCase().includes('inc') ? 'increased' : 'decreased';
+      }
+    });
+  }
+
+  console.log('✓ Import complete!');
 }
 
 // ── DOWNLOAD TEMPLATE ──
