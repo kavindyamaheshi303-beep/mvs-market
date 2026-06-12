@@ -3,307 +3,561 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MVS Daily Market Report</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<title>MVS — Data Editor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;min-height:100vh}
-
-/* LOGIN */
-#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#060f1e,#0d1e38)}
-.login-card{background:#0d1e38;border:2px solid #c8a84b;border-radius:12px;padding:44px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-.login-card h2{color:#c8a84b;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:24px}
-.field{margin-bottom:14px}
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#060f1e,#0d1e38)}
+.card{background:#0d1e38;border:1px solid #4da3e8;border-radius:12px;padding:44px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.card-logo{text-align:center;margin-bottom:18px;font-size:28px}
+.card h2{color:#4da3e8;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:20px}
+.field{margin-bottom:13px}
 .field label{display:block;font-size:10px;color:#7fa3c8;margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
-.field input{width:100%;background:#091525;border:1px solid #1a3050;border-radius:6px;padding:10px;color:#d4e4f4;font-size:13px;outline:none}
-.field input:focus{border-color:#c8a84b}
-.login-btn{width:100%;background:#c8a84b;color:#0a1628;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
-.login-btn:hover{background:#e0c060}
-.login-err{color:#e87a4d;font-size:11px;text-align:center;margin-top:10px;min-height:18px}
+.field input{width:100%;background:#091525;border:1px solid #1a3050;border-radius:6px;padding:10px 13px;color:#d4e4f4;font-size:13px;outline:none;transition:border-color .2s}
+.field input:focus{border-color:#4da3e8}
+.login-btn{width:100%;background:#4da3e8;color:#0a1628;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .2s}
+.login-btn:hover{background:#6ab8f0}
+.err{color:#e87a4d;font-size:11px;text-align:center;margin-top:8px;min-height:16px}
+.foot{text-align:center;font-size:10px;color:#2a4060;margin-top:18px}
 
-/* DASHBOARD */
-#dashboard{display:none;padding:14px;min-height:100vh;background:#060f1e}
-.report-hdr{background:linear-gradient(90deg,#0d1e38,#1a3050);border:2px solid #c8a84b;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-.hdr-left{display:flex;align-items:center;gap:12px}
-.logo{width:48px;height:48px;background:#c8a84b;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#0a1628}
-.hdr-info h1{font-size:16px;font-weight:700;color:#fff}
-.hdr-info p{font-size:11px;color:#7fa3c8}
-.hdr-right{text-align:right}
-.hdr-date{font-size:14px;color:#c8a84b;font-weight:700;margin-bottom:4px}
-.hdr-live{display:inline-block;background:#1a3a1a;border:1px solid #2a5a2a;color:#6dd4a0;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;margin-right:8px}
-.sign-out{background:transparent;color:#7fa3c8;border:1px solid #1a3050;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s}
-.sign-out:hover{border-color:#c8a84b;color:#c8a84b}
+#app{display:none;padding:10px;min-height:100vh}
+.hdr{display:flex;justify-content:space-between;align-items:center;background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:8px 14px;margin-bottom:12px}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo-circle{width:44px;height:44px;background:#4da3e8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#0a1628;flex-shrink:0}
+.hdr-title h1{font-size:16px;font-weight:700;color:#fff}
+.hdr-title p{font-size:11px;color:#7fa3c8}
+.hdr-right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-blue{background:#4da3e8;color:#0a1628;border:none;border-radius:5px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
+.btn-blue:hover{background:#6ab8f0}
+.btn-green{background:#2a7a4a;color:#6dd4a0;border:none;border-radius:5px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
+.btn-green:hover{background:#3a9a5a}
+.btn-gold{background:#c8a84b;color:#0a1628;border:none;border-radius:5px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap}
+.btn-gold:hover{background:#e0c060}
+.btn-ghost{background:transparent;color:#7fa3c8;border:1px solid #1a3050;border-radius:5px;padding:6px 10px;font-size:11px;cursor:pointer}
+.btn-ghost:hover{border-color:#c8a84b;color:#c8a84b}
+.badge-edit{background:#1a2a4a;border:1px solid #2a4a7a;color:#4da3e8;border-radius:10px;padding:2px 10px;font-size:10px;font-weight:700}
 
-/* GRID LAYOUT */
-.grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.grid-3x1{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
-.panel{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:12px 14px}
-.panel-title{font-size:11px;font-weight:700;color:#c8a84b;letter-spacing:1px;text-transform:uppercase;padding-bottom:8px;border-bottom:2px solid #1a3050;margin-bottom:10px}
+.section{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.sec-title{font-size:11px;font-weight:700;color:#4da3e8;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #1a3050}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.fgrid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:10px;color:#7fa3c8;text-transform:uppercase;letter-spacing:.3px}
+.fg input{background:#091525;border:1px solid #1a3050;border-radius:4px;padding:7px 10px;color:#d4e4f4;font-size:12px;outline:none;transition:border-color .2s;width:100%}
+.fg input:focus{border-color:#4da3e8}
+.excel-zone{border:2px dashed #1a4060;border-radius:8px;padding:18px;text-align:center;cursor:pointer;transition:border-color .2s}
+.excel-zone:hover{border-color:#4da3e8}
+.excel-zone p{color:#7fa3c8;font-size:13px;margin-bottom:4px}
+.excel-note{font-size:11px;color:#2a5070}
 
-/* TABLES */
-table{width:100%;border-collapse:collapse;font-size:11px}
-table th{color:#7fa3c8;font-weight:600;text-align:right;padding:5px 6px;font-size:10px;border-bottom:1px solid #1a3050}
-table th:first-child{text-align:left}
-table td{padding:5px 6px;text-align:right;color:#d4e4f4;border-top:1px solid #0d2040}
-table td:first-child{text-align:left;color:#7fa3c8;font-size:10px;font-weight:500}
-table tr:hover td{background:#132540}
+/* Dynamic rows */
+.dyn-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.dyn-table th{background:#091525;color:#7fa3c8;font-size:10px;padding:5px 8px;text-align:left;border-bottom:1px solid #1a3050}
+.dyn-table td{padding:4px 4px;border-top:1px solid #0d2040}
+.dyn-table td input{background:#091525;border:1px solid #0d2040;border-radius:3px;padding:4px 7px;color:#d4e4f4;font-size:11px;width:100%;outline:none}
+.dyn-table td input:focus{border-color:#4da3e8}
+.dyn-table td:last-child{width:30px;text-align:center}
+.rm-btn{background:#2a1010;color:#e87a4d;border:1px solid #5a2020;border-radius:3px;padding:3px 7px;font-size:11px;cursor:pointer}
+.rm-btn:hover{background:#5a1a1a}
+.add-btn{background:#091525;color:#4da3e8;border:1px solid #1a4060;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;margin-top:6px}
+.add-btn:hover{background:#1a3050}
 
-/* LIQUIDITY BOX */
-.liq-box{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.liq-item{background:#091525;border-radius:6px;padding:8px;text-align:center}
-.liq-label{font-size:9px;color:#7fa3c8;margin-bottom:4px;text-transform:uppercase}
-.liq-val{font-size:18px;font-weight:700;color:#4da3e8}
-
-/* FULL WIDTH SECTIONS */
-.full-width{margin-bottom:14px}
-.full-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.exec-summary{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:12px 14px;margin-bottom:14px}
-.exec-summary .panel-title{margin-bottom:8px}
-.exec-summary ul{list-style:disc;padding-left:20px;font-size:13px;color:#d4e4f4;line-height:2.2}
-.exec-summary ul li strong{color:#fff}
-
-/* RESPONSIVE */
-@media(max-width:1024px){.grid-2x2,.full-grid{grid-template-columns:1fr}.grid-3x1{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.grid-3x1{grid-template-columns:1fr}.report-hdr{flex-direction:column;gap:10px;text-align:center}.hdr-right{text-align:center}}
-
-.footer{text-align:center;font-size:9px;color:#2a4060;padding-bottom:14px}
+.status{background:#0a1a0a;border:1px solid #1a3a1a;border-radius:6px;padding:10px 14px;font-size:12px;color:#6dd4a0;display:none;margin-bottom:10px}
+.status.err{background:#1a0a0a;border-color:#3a1a1a;color:#e87a4d}
+.toast{position:fixed;bottom:22px;right:22px;background:#1a5c3a;color:#6dd4a0;border:1px solid #2a7a50;border-radius:6px;padding:10px 18px;font-size:12px;font-weight:600;z-index:2000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:600px){.fgrid,.fgrid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="login">
-  <div class="login-card">
-    <h2>MVS Money Brokers<br>Daily Market Report</h2>
-    <div class="field"><label>Username</label><input id="user" type="text" placeholder="Username"></div>
-    <div class="field"><label>Password</label><input id="pass" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')signin()"></div>
-    <button class="login-btn" onclick="signin()">Sign In</button>
-    <div class="login-err" id="err"></div>
+<div id="login-page">
+  <div class="card">
+    <div class="card-logo">✏️</div>
+    <h2>MVS Money Brokers<br>Data Editor — Staff Access</h2>
+    <div class="field"><label>Username</label><input id="u" type="text" placeholder="Staff username"></div>
+    <div class="field"><label>Password</label><input id="p" type="password" placeholder="Staff password" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="login-btn" onclick="login()">Sign In</button>
+    <div class="err" id="err"></div>
+    <div class="foot">Staff access only — do not share this URL</div>
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-  <!-- HEADER -->
-  <div class="report-hdr">
+<!-- EDITOR -->
+<div id="app">
+  <div class="hdr">
     <div class="hdr-left">
-      <div class="logo">MVS</div>
-      <div class="hdr-info">
-        <h1>Daily Market Report</h1>
-        <p>FX | Government Securities | Money Markets</p>
+      <div class="logo-circle">MVS<br>ED</div>
+      <div class="hdr-title">
+        <h1>Data Editor</h1>
+        <p>Enter today's market data · Import Excel · Export JSON</p>
       </div>
     </div>
     <div class="hdr-right">
-      <div class="hdr-date" id="dateDisplay">12th June 2026</div>
-      <span class="hdr-live">LIVE</span>
-      <button class="sign-out" onclick="signout()">Sign Out</button>
+      <span class="badge-edit">EDITOR MODE</span>
+      <button class="btn-blue" onclick="document.getElementById('xl-input').click()">⬆ Import Excel</button>
+      <input type="file" id="xl-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importExcel(event)">
+      <button class="btn-gold" onclick="downloadTemplate()">⬇ Template</button>
+      <button class="btn-green" onclick="exportJSON()">💾 Save data.json</button>
+      <button class="btn-ghost" onclick="logout()">Sign Out</button>
     </div>
   </div>
 
-  <!-- MONEY & REPO + LIQUIDITY -->
-  <div class="grid-2x2">
-    <div class="panel">
-      <div class="panel-title">Money &amp; Repo Market</div>
-      <table>
-        <thead><tr><th></th><th>Call Market</th><th>Repo Market</th></tr></thead>
-        <tr><td>Minimum Rate(%)</td><td id="cmmin">9.15</td><td id="rmmin">9.23</td></tr>
-        <tr><td>Maximum Rate(%)</td><td id="cmmax">9.25</td><td id="rmmax">9.25</td></tr>
-        <tr><td>W.A Yield (%)</td><td id="cmwa">9.19</td><td id="rmwa">9.24</td></tr>
-        <tr><td>Gross Volume(Rs.Bn)</td><td id="cmvol">34.33</td><td id="rmvol">82.99</td></tr>
-      </table>
-      <div class="liq-box">
-        <div class="liq-item"><div class="liq-label">Current</div><div class="liq-val" id="liqcur">66.62</div></div>
-        <div class="liq-item"><div class="liq-label">Previous</div><div class="liq-val" id="liqprev">57.38</div></div>
+  <div class="status" id="status"></div>
+
+  <!-- HOW TO USE -->
+  <div class="section" style="background:#0a1a0a;border-color:#1a3a1a">
+    <div class="sec-title" style="color:#6dd4a0">📋 How to Update the Dashboard</div>
+    <div style="font-size:12px;color:#7fa3c8;line-height:2">
+      <strong style="color:#fff">Step 1:</strong> Fill in today's data below, OR click <strong style="color:#4da3e8">⬆ Import Excel</strong> to auto-fill from your Excel file.<br>
+      <strong style="color:#fff">Step 2:</strong> Click <strong style="color:#6dd4a0">💾 Save data.json</strong> — this downloads a file called <code style="background:#091525;padding:1px 5px;border-radius:3px">data.json</code> to your computer.<br>
+      <strong style="color:#fff">Step 3:</strong> Go to your GitHub repo → click <code style="background:#091525;padding:1px 5px;border-radius:3px">data.json</code> → click the pencil ✏️ icon → paste the content → Commit. Done!<br>
+      <strong style="color:#fff">OR Step 3 (easier):</strong> In GitHub repo → "Add file" → "Upload files" → drag the downloaded data.json → Commit.
+    </div>
+  </div>
+
+  <!-- DATE -->
+  <div class="section">
+    <div class="sec-title">Report Date</div>
+    <div class="fgrid">
+      <div class="fg"><label>Date Label (shown on dashboard)</label><input id="f-date" value="11th June 2026"></div>
+    </div>
+  </div>
+
+  <!-- MONEY MARKET -->
+  <div class="section">
+    <div class="sec-title">Money &amp; Repo Market</div>
+    <div class="fgrid">
+      <div class="fg"><label>Call Min Rate (%)</label><input id="cm-min" value="9.15"></div>
+      <div class="fg"><label>Call Max Rate (%)</label><input id="cm-max" value="9.25"></div>
+      <div class="fg"><label>Call W.A Yield (%)</label><input id="cm-wa" value="9.19"></div>
+      <div class="fg"><label>Call Gross Vol (Rs.Bn)</label><input id="cm-vol" value="41.25"></div>
+      <div class="fg"><label>Repo Min Rate (%)</label><input id="rm-min" value="9.22"></div>
+      <div class="fg"><label>Repo Max Rate (%)</label><input id="rm-max" value="9.25"></div>
+      <div class="fg"><label>Repo W.A Yield (%)</label><input id="rm-wa" value="9.23"></div>
+      <div class="fg"><label>Repo Gross Vol (Rs.Bn)</label><input id="rm-vol" value="76.81"></div>
+      <div class="fg"><label>Liquidity Current (Rs.Bn)</label><input id="liq-cur" value="57.38"></div>
+      <div class="fg"><label>Liquidity Previous (Rs.Bn)</label><input id="liq-prev" value="59.18"></div>
+    </div>
+  </div>
+
+  <!-- LIQUIDITY TREND -->
+  <div class="section">
+    <div class="sec-title">Liquidity Trend (chart data)</div>
+    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Add one row per date — oldest first, newest last.</div>
+    <table class="dyn-table">
+      <thead><tr><th>Date Label</th><th>Value (Rs.Bn)</th><th></th></tr></thead>
+      <tbody id="liq-rows"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow('liq-rows',['',''])">+ Add Row</button>
+  </div>
+
+  <!-- FX SWAPS -->
+  <div class="section">
+    <div class="sec-title">FX Swaps (per day)</div>
+    <div class="fgrid">
+      <div class="fg"><label>1 Week — Sell/Buy</label><input id="sw-1w-s" value="6.00"></div>
+      <div class="fg"><label>1 Week — Buy/Sell</label><input id="sw-1w-b" value="6.50"></div>
+      <div class="fg"><label>1 Month — Sell/Buy</label><input id="sw-1m-s" value="5.75"></div>
+      <div class="fg"><label>1 Month — Buy/Sell</label><input id="sw-1m-b" value="6.25"></div>
+      <div class="fg"><label>2 Months — Sell/Buy</label><input id="sw-2m-s" value="5.75"></div>
+      <div class="fg"><label>2 Months — Buy/Sell</label><input id="sw-2m-b" value="6.25"></div>
+      <div class="fg"><label>3 Months — Sell/Buy</label><input id="sw-3m-s" value="5.50"></div>
+      <div class="fg"><label>3 Months — Buy/Sell</label><input id="sw-3m-b" value="6.00"></div>
+      <div class="fg"><label>6 Months — Sell/Buy</label><input id="sw-6m-s" value="5.50"></div>
+      <div class="fg"><label>6 Months — Buy/Sell</label><input id="sw-6m-b" value="6.00"></div>
+      <div class="fg"><label>1 Year — Sell/Buy</label><input id="sw-1y-s" value="5.15"></div>
+      <div class="fg"><label>1 Year — Buy/Sell</label><input id="sw-1y-b" value="6.00"></div>
+    </div>
+  </div>
+
+  <!-- USD/LKR -->
+  <div class="section">
+    <div class="sec-title">USD/LKR Movement</div>
+    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Add one row per date for the chart.</div>
+    <table class="dyn-table">
+      <thead><tr><th>Date Label</th><th>Rate</th><th></th></tr></thead>
+      <tbody id="fx-rows"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow('fx-rows',['',''])">+ Add Row</button>
+    <div class="fgrid" style="margin-top:10px">
+      <div class="fg"><label>Closing Rate (shown in summary, e.g. 332.00/333.00)</label><input id="fx-close" value="332.00/333.00"></div>
+    </div>
+  </div>
+
+  <!-- T-BILLS -->
+  <div class="section">
+    <div class="sec-title">Treasury Bills — Auction Data</div>
+    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Latest auction first.</div>
+    <table class="dyn-table">
+      <thead><tr><th>Auction Date</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
+      <tbody id="tbill-rows"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow('tbill-rows',['','','',''])">+ Add Row</button>
+  </div>
+
+  <!-- T-BONDS -->
+  <div class="section">
+    <div class="sec-title">Treasury Bonds</div>
+    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Column headers = dates. Values = bid/offer (e.g. 10.5/11).</div>
+    <div class="fgrid2" style="margin-bottom:10px" id="bond-headers-row">
+      <!-- filled by JS -->
+    </div>
+    <table class="dyn-table">
+      <thead><tr><th>Bond Maturity</th><th id="bh0">—</th><th id="bh1">—</th><th id="bh2">—</th><th id="bh3">—</th><th id="bh4">—</th><th id="bh5">—</th><th></th></tr></thead>
+      <tbody id="bond-rows"></tbody>
+    </table>
+    <button class="add-btn" onclick="addRow('bond-rows',['','','','','','',''])">+ Add Row</button>
+  </div>
+
+  <!-- EXEC SUMMARY -->
+  <div class="section">
+    <div class="sec-title">Executive Summary</div>
+    <div class="fgrid">
+      <div class="fg"><label>USD/LKR Close</label><input id="ex-usdlkr" value="332.00/333.00"></div>
+      <div class="fg"><label>Liquidity Change (Rs.Bn)</label><input id="ex-delta" value="1.80"></div>
+      <div class="fg">
+        <label>Direction</label>
+        <select id="ex-dir" style="background:#091525;border:1px solid #1a3050;border-radius:4px;padding:7px 10px;color:#d4e4f4;font-size:12px;outline:none">
+          <option value="decreased">Decreased</option>
+          <option value="increased">Increased</option>
+        </select>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-title">Market Liquidity</div>
-      <canvas id="liqChart" style="max-height:200px"></canvas>
-    </div>
   </div>
 
-  <!-- FX SWAPS + USD/LKR -->
-  <div class="grid-2x2">
-    <div class="panel">
-      <div class="panel-title">FX Swaps (per day) Sell/Buy Buy/Sell</div>
-      <table>
-        <thead><tr><th>Tenor</th><th>Sell/Buy</th><th>Buy/Sell</th></tr></thead>
-        <tr><td>1 Week</td><td>5.75</td><td>7.25</td></tr>
-        <tr><td>1 month</td><td>6.00</td><td>6.75</td></tr>
-        <tr><td>2 months</td><td>6.00</td><td>6.50</td></tr>
-        <tr><td>3 months</td><td>6.00</td><td>6.40</td></tr>
-        <tr><td>6 months</td><td>5.50</td><td>6.10</td></tr>
-        <tr><td>1 year</td><td>5.15</td><td>6.00</td></tr>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="panel-title">USD/LKR Movement</div>
-      <canvas id="fxChart" style="max-height:200px"></canvas>
-    </div>
+  <div style="text-align:right;margin-bottom:20px;padding-right:4px">
+    <button class="btn-green" style="padding:10px 24px;font-size:13px" onclick="exportJSON()">💾 Save data.json &amp; Upload to GitHub</button>
   </div>
-
-  <!-- GOVERNMENT SECURITIES HEADER -->
-  <div class="panel full-width">
-    <div class="panel-title">Government Securities</div>
-  </div>
-
-  <!-- TREASURY BILLS + BONDS -->
-  <div class="full-grid">
-    <div class="panel">
-      <div class="panel-title">Treasury Bill</div>
-      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas>
-      <table style="font-size:10px">
-        <thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
-        <tbody>
-          <tr><td>6/10/2026</td><td>10.09</td><td>10.27</td><td>10.16</td></tr>
-          <tr><td>6/3/2026</td><td>9.84</td><td>10.01</td><td>10.02</td></tr>
-          <tr><td>5/26/2026</td><td>9.36</td><td>9.68</td><td>9.83</td></tr>
-          <tr><td>5/20/2026</td><td>8.18</td><td>8.25</td><td>8.49</td></tr>
-          <tr><td>5/13/2026</td><td>8.13</td><td>8.23</td><td>8.49</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Treasury Bond (12-Jun Yield Curve)</div>
-      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas>
-      <table style="font-size:9px">
-        <thead><tr><th>Bond</th><th>5-Jun</th><th>8-Jun</th><th>9-Jun</th><th>10-Jun</th><th>11-Jun</th><th>12-Jun</th></tr></thead>
-        <tbody>
-          <tr><td>15.12.2026</td><td>9.70/10.20</td><td>9.75/10</td><td>9.8/10.25</td><td>10.25/10.55</td><td>0</td><td>0</td></tr>
-          <tr><td>15.09.2027</td><td>10.80/11.40</td><td>10.9/11.1</td><td>10.85/11</td><td>11/11.3</td><td>0</td><td>0</td></tr>
-          <tr><td>15.12.2028</td><td>11.50/12.00</td><td>11.75/12</td><td>11.8/12</td><td>11.9/11.95</td><td>0</td><td>0</td></tr>
-          <tr><td>15.12.2029</td><td>11.75/12.25</td><td>12/12.2</td><td>12/12.2</td><td>12/12.15</td><td>0</td><td>0</td></tr>
-          <tr><td>01.07.2030</td><td>11.80/12.30</td><td>12.15/12.2</td><td>12.15/12.25</td><td>12.15/12.3</td><td>0</td><td>0</td></tr>
-          <tr><td>15.03.2031</td><td>12.20/12.60</td><td>12.3/12.7</td><td>12.3/12.7</td><td>12.3/12.7</td><td>0</td><td>0</td></tr>
-          <tr><td>15.12.2032</td><td>12.30/12.70</td><td>12.5/12.9</td><td>12.5/12.9</td><td>12.55/12.9</td><td>0</td><td>0</td></tr>
-          <tr><td>01.11.2033</td><td>12.40/12.80</td><td>12.65/13</td><td>12.65/13</td><td>12.7/13</td><td>0</td><td>0</td></tr>
-          <tr><td>15.06.2034</td><td>12.50/13.00</td><td>12.8/13.15</td><td>12.8/13.1</td><td>13/13.2</td><td>0</td><td>0</td></tr>
-          <tr><td>15.03.2035</td><td>12.50/13.00</td><td>12.85/13.15</td><td>12.8/13.2</td><td>13/13.3</td><td>0</td><td>0</td></tr>
-          <tr><td>01.08.2036</td><td>12.60/13.20</td><td>13/13.5</td><td>13/13.5</td><td>13/13.5</td><td>0</td><td>0</td></tr>
-          <tr><td>01.07.2037</td><td>12.60/13.20</td><td>12.9/13.3</td><td>13.1/13.3</td><td>13.1/13.4</td><td>0</td><td>0</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- EXECUTIVE SUMMARY -->
-  <div class="exec-summary">
-    <div class="panel-title">Executive Summary</div>
-    <ul>
-      <li>USD/LKR Closed at <strong id="exusd">336.50/337.00</strong></li>
-      <li>System liquidity <strong id="exdir">increased</strong> by <strong id="exdelta">9.24</strong> bn.</li>
-    </ul>
-  </div>
-
-  <div class="footer">MVS Money Brokers Limited — Confidential. For authorised recipients only.</div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const USER = 'MVSmoney';
-const PASS = 'MVS1234@';
+// ════════════════════════════════
+// STAFF CREDENTIALS — change these
+// ════════════════════════════════
+const EDIT_USER = 'MVSeditor';
+const EDIT_PASS = 'MVSEdit@2026';
 
-function signin(){
-  const u = document.getElementById('user').value.trim();
-  const p = document.getElementById('pass').value;
-  if(u === USER && p === PASS){
-    sessionStorage.setItem('mvs_auth', '1');
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    loadData();
-    // Auto-refresh every 30 seconds
-    setInterval(loadData, 30000);
+// ── AUTH ──
+function login(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  if(u===EDIT_USER && p===EDIT_PASS){
+    sessionStorage.setItem('mvs_e','1');
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app').style.display='block';
+    initDefaultRows();
   } else {
-    document.getElementById('err').textContent = 'Invalid credentials';
+    document.getElementById('err').textContent='Incorrect username or password.';
   }
 }
-
-function signout(){
-  sessionStorage.removeItem('mvs_auth');
-  location.reload();
+function logout(){ sessionStorage.removeItem('mvs_e'); location.reload(); }
+if(sessionStorage.getItem('mvs_e')==='1'){
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').style.display='block';
+  initDefaultRows();
 }
 
-async function loadData(){
-  try{
-    const res = await fetch('https://raw.githubusercontent.com/kavindyamaheshi303-beep/mvs-market/main/data.json?t=' + Date.now());
-    const d = await res.json();
-    updateDashboard(d);
-  } catch(e){
-    console.log('Loading from GitHub failed, using editor export or waiting...');
+// ── BOND HEADERS ──
+let bondHeaders = ['3-Jun','4-Jun','5-Jun','8-Jun','9-Jun','10-Jun'];
+function renderBondHeaders(){
+  const div=document.getElementById('bond-headers-row');
+  div.innerHTML='<label style="font-size:10px;color:#7fa3c8;text-transform:uppercase;letter-spacing:.3px;grid-column:1/-1">Column Headers (edit dates below):</label>';
+  bondHeaders.forEach((h,i)=>{
+    div.innerHTML+=`<div class="fg"><label>Col ${i+1} Date</label><input value="${h}" oninput="bondHeaders[${i}]=this.value;updateBondHeaderCells()"></div>`;
+  });
+  updateBondHeaderCells();
+}
+function updateBondHeaderCells(){
+  bondHeaders.forEach((h,i)=>{ const el=document.getElementById('bh'+i); if(el) el.textContent=h||'—'; });
+}
+
+// ── DYNAMIC ROWS ──
+function addRow(tbodyId, defaults){
+  const tbody=document.getElementById(tbodyId);
+  const tr=document.createElement('tr');
+  tr.innerHTML=defaults.map(v=>`<td><input value="${v}"></td>`).join('')+`<td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+function getRows(tbodyId){
+  return Array.from(document.getElementById(tbodyId).querySelectorAll('tr')).map(tr=>
+    Array.from(tr.querySelectorAll('input')).map(i=>i.value.trim())
+  );
+}
+
+function initDefaultRows(){
+  // Liquidity trend
+  [['4-Jun','111.94'],['5-Jun','105.04'],['6-Jun','63.25'],['9-Jun','59.18'],['10-Jun','57.38']].forEach(r=>addRow('liq-rows',r));
+  // FX
+  [['2-Jun','332.50'],['3-Jun','334.50'],['4-Jun','337.00'],['5-Jun','336.07'],['6-Jun','335.00'],['8-Jun','337.15'],['10-Jun','332.00']].forEach(r=>addRow('fx-rows',r));
+  // T-Bills
+  [['6/10/2026','10.09','10.27','10.16'],['6/3/2026','9.84','10.01','10.02'],['5/26/2026','9.36','9.68','9.83'],['5/20/2026','8.18','8.25','8.49'],['5/13/2026','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
+  // T-Bonds
+  [['15.12.2026','9.65/10.25','9.65/10.25','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55'],
+   ['15.09.2027','10.5/11','10.5/11','10.80/11.40','10.9/11.1','10.85/11','11/11.3'],
+   ['15.12.2028','11.6/12','11.9/12.1','11.50/12.00','11.75/12','11.8/12','11.9/11.95'],
+   ['15.12.2029','12.1/12.25','12.15/12.35','11.75/12.25','12/12.2','12/12.2','12/12.15'],
+   ['01.07.2030','12.15/12.3','12.25/12.4','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3'],
+   ['15.03.2031','12.2/12.7','12.3/12.7','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7'],
+   ['15.12.2032','12.40/12.80','12.40/12.80','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9'],
+   ['01.11.2033','12.6/13.1','12.6/13.1','12.40/12.80','12.65/13','12.65/13','12.7/13'],
+   ['15.06.2034','13.05/13.15','13.05/13.15','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2'],
+   ['15.03.2035','13.05/13.15','13.2/13.4','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3'],
+   ['01.08.2036','13.1/13.3','13.25/13.45','12.60/13.20','13/13.5','13/13.5','13/13.5'],
+   ['01.07.2037','13.1/13.5','13.3/13.6','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4']].forEach(r=>addRow('bond-rows',r));
+  renderBondHeaders();
+}
+
+// ── COLLECT DATA & EXPORT JSON ──
+function gv(id){ return document.getElementById(id).value.trim(); }
+
+function buildJSON(){
+  const liqR=getRows('liq-rows');
+  const fxR=getRows('fx-rows');
+  const tbR=getRows('tbill-rows');
+  const bdR=getRows('bond-rows');
+  return {
+    date: gv('f-date'),
+    callMarket:{ min:gv('cm-min'), max:gv('cm-max'), wa:gv('cm-wa'), vol:gv('cm-vol') },
+    repoMarket:{ min:gv('rm-min'), max:gv('rm-max'), wa:gv('rm-wa'), vol:gv('rm-vol') },
+    liquidity:{
+      current:gv('liq-cur'), previous:gv('liq-prev'),
+      labels:liqR.map(r=>r[0]), values:liqR.map(r=>parseFloat(r[1])||0)
+    },
+    fxSwaps:{
+      '1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},
+      '1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},
+      '2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},
+      '3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},
+      '6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},
+      '1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}
+    },
+    usdlkr:{
+      labels:fxR.map(r=>r[0]), values:fxR.map(r=>parseFloat(r[1])||0), close:gv('fx-close')
+    },
+    tbills: tbR.map(r=>({ date:r[0], m3:r[1], m6:r[2], m12:r[3] })),
+    bonds:{
+      headers: bondHeaders,
+      rows: bdR.map(r=>({ bond:r[0], values:r.slice(1) }))
+    },
+    execSummary:{
+      usdlkr:gv('ex-usdlkr'),
+      liqDelta:gv('ex-delta'),
+      liqDir:document.getElementById('ex-dir').value
+    }
+  };
+}
+
+function exportJSON(){
+  const json=JSON.stringify(buildJSON(), null, 2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='data.json';
+  a.click();
+  showToast('✓ data.json downloaded! Now upload it to GitHub.');
+}
+
+// ── EXCEL IMPORT - READ FROM CORRECT SHEETS ──
+function importExcel(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      console.log('Found sheets:', wb.SheetNames);
+      
+      // Read sheets in order
+      const sheets = [];
+      for(let i=0; i<5; i++) {
+        if(wb.SheetNames[i]) {
+          const ws = wb.Sheets[wb.SheetNames[i]];
+          const data = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+          sheets.push(data);
+          console.log(`Sheet ${i+1} (${wb.SheetNames[i]}):`, data.length, 'rows');
+        }
+      }
+      
+      applyExcelSheets(sheets);
+      showToast('✓ Excel imported from all sheets! Review and click Save data.json');
+    }catch(err){ 
+      showToast('⚠ Error reading Excel: '+err.message);
+      console.error(err);
+    }
+    event.target.value='';
+  };
+  reader.readAsBinaryString(file);
+}
+
+function applyExcelSheets(sheets){
+  function sv(id,val){ 
+    if(val!==undefined&&val!=='') {
+      const el = document.getElementById(id);
+      if(el) el.value=String(val);
+    }
   }
+
+  // ── SHEET 1 (Index 0): Summary / Executive Summary ──
+  // Not needed for main data, skip
+  
+  // ── SHEET 2 (Index 1): Foreign Exchange - USD/LKR ──
+  console.log('Processing Sheet 2: Foreign Exchange');
+  const sheet2 = sheets[1] || [];
+  document.getElementById('fx-rows').innerHTML='';
+  sheet2.forEach((row, idx) => {
+    if(idx < 2) return; // Skip headers
+    if(!row[0]) return;
+    const date = String(row[0]).trim();
+    const rate = row[1];
+    if(date && rate && date !== 'Date') {
+      addRow('fx-rows', [date, rate]);
+    }
+  });
+
+  // ── SHEET 3 (Index 2): T Bonds ──
+  console.log('Processing Sheet 3: T Bonds');
+  const sheet3 = sheets[2] || [];
+  // Extract headers (dates) from row 1 (B2, C2, D2, E2, F2, G2)
+  const bondHeaderRow = sheet3[1] || [];
+  bondHeaders = [
+    String(bondHeaderRow[1]||'').trim(),
+    String(bondHeaderRow[2]||'').trim(),
+    String(bondHeaderRow[3]||'').trim(),
+    String(bondHeaderRow[4]||'').trim(),
+    String(bondHeaderRow[5]||'').trim(),
+    String(bondHeaderRow[6]||'').trim()
+  ].filter(h=>h);
+  renderBondHeaders();
+  
+  // Extract bond data starting from row 2
+  document.getElementById('bond-rows').innerHTML='';
+  sheet3.forEach((row, idx) => {
+    if(idx < 2) return; // Skip headers
+    if(!row[0]) return;
+    const maturity = String(row[0]).trim();
+    if(maturity && maturity !== 'Maturity') {
+      addRow('bond-rows', [
+        maturity,
+        String(row[1]||'').trim(),
+        String(row[2]||'').trim(),
+        String(row[3]||'').trim(),
+        String(row[4]||'').trim(),
+        String(row[5]||'').trim(),
+        String(row[6]||'').trim()
+      ]);
+    }
+  });
+
+  // ── SHEET 4 (Index 3): T Bills ──
+  console.log('Processing Sheet 4: T Bills');
+  const sheet4 = sheets[3] || [];
+  document.getElementById('tbill-rows').innerHTML='';
+  sheet4.forEach((row, idx) => {
+    if(idx < 1) return; // Skip header
+    if(!row[0]) return;
+    const date = String(row[0]).trim();
+    if(date && date !== 'Auction Date') {
+      addRow('tbill-rows', [
+        date,
+        String(row[1]||'').trim(),
+        String(row[2]||'').trim(),
+        String(row[3]||'').trim()
+      ]);
+    }
+  });
+
+  // ── SHEET 5 (Index 4): Money and Repo ──
+  console.log('Processing Sheet 5: Money and Repo');
+  const sheet5 = sheets[4] || [];
+  
+  document.getElementById('liq-rows').innerHTML='';
+  sheet5.forEach((row, idx) => {
+    if(idx < 2) return; // Skip headers
+    if(!row[0] || !row[1]) return;
+    const date = String(row[0]).trim();
+    const value = row[1];
+    if(date && value && date !== 'Date' && !isNaN(value)) {
+      addRow('liq-rows', [date, value]);
+    }
+  });
+
+  // Extract Money Market data from Sheet 5 (look for specific rows)
+  sheet5.forEach(row => {
+    if(!row[0]) return;
+    const label = String(row[0]).trim().toLowerCase();
+    
+    // Find Minimum Rate row
+    if(label.includes('minimum') && label.includes('rate')) {
+      sv('cm-min', row[1]);
+      sv('rm-min', row[2]);
+    }
+    // Find Maximum Rate row
+    if(label.includes('maximum') && label.includes('rate')) {
+      sv('cm-max', row[1]);
+      sv('rm-max', row[2]);
+    }
+    // Find W.A. Yield row
+    if(label.includes('w.a') || label.includes('wa')) {
+      sv('cm-wa', row[1]);
+      sv('rm-wa', row[2]);
+    }
+    // Find Volume row
+    if(label.includes('volume') || label.includes('vol')) {
+      sv('cm-vol', row[1]);
+      sv('rm-vol', row[2]);
+    }
+    // Find Liquidity Current/Previous
+    if(label.includes('market liquidity')) {
+      sv('liq-cur', row[1]);
+      sv('liq-prev', row[2]);
+    }
+  });
+
+  console.log('Import complete!');
 }
 
-function updateDashboard(d){
-  // Update date
-  document.getElementById('dateDisplay').textContent = d.date || '12th June 2026';
-  
-  // Money & Repo
-  document.getElementById('cmmin').textContent = d.callMarket?.min || '9.15';
-  document.getElementById('cmmax').textContent = d.callMarket?.max || '9.25';
-  document.getElementById('cmwa').textContent = d.callMarket?.wa || '9.19';
-  document.getElementById('cmvol').textContent = d.callMarket?.vol || '34.33';
-  document.getElementById('rmmin').textContent = d.repoMarket?.min || '9.23';
-  document.getElementById('rmmax').textContent = d.repoMarket?.max || '9.25';
-  document.getElementById('rmwa').textContent = d.repoMarket?.wa || '9.24';
-  document.getElementById('rmvol').textContent = d.repoMarket?.vol || '82.99';
-  
-  // Liquidity
-  document.getElementById('liqcur').textContent = d.liquidity?.current || '66.62';
-  document.getElementById('liqprev').textContent = d.liquidity?.previous || '57.38';
-  
-  // Exec summary
-  document.getElementById('exusd').textContent = d.execSummary?.usdlkr || '336.50/337.00';
-  document.getElementById('exdir').textContent = d.execSummary?.liqDir || 'increased';
-  document.getElementById('exdelta').textContent = d.execSummary?.liqDelta || '9.24';
-  
-  // Render charts with new data
-  render(d);
+// ── DOWNLOAD TEMPLATE ──
+function downloadTemplate(){
+  const rows=[
+    ['Field','Value1','Value2','Value3','Value4','Value5','Value6','Value7'],
+    ['Date','11th June 2026'],
+    ['Call Min Rate','9.15','9.22'],
+    ['Call Max Rate','9.25','9.25'],
+    ['Call WA Yield','9.19','9.23'],
+    ['Call Vol','41.25','76.81'],
+    ['Liquidity Cur','57.38','59.18'],
+    ['Liq Values','111.94','105.04','63.25','59.18','57.38'],
+    ['Liq Labels','4-Jun','5-Jun','6-Jun','9-Jun','10-Jun'],
+    ['FX 1W','6.00','6.50'],['FX 1M','5.75','6.25'],['FX 2M','5.75','6.25'],
+    ['FX 3M','5.50','6.00'],['FX 6M','5.50','6.00'],['FX 1Y','5.15','6.00'],
+    ['USDLKR Values','332.50','334.50','337.00','336.07','335.00','337.15','332.00'],
+    ['USDLKR Labels','2-Jun','3-Jun','4-Jun','5-Jun','6-Jun','8-Jun','10-Jun'],
+    ['FX Close','332.00/333.00'],
+    ['Bond Headers','3-Jun','4-Jun','5-Jun','8-Jun','9-Jun','10-Jun'],
+    ['TBILL_1','6/10/2026','10.09','10.27','10.16'],
+    ['TBILL_2','6/3/2026','9.84','10.01','10.02'],
+    ['TBILL_3','5/26/2026','9.36','9.68','9.83'],
+    ['BOND_1','15.12.2026','9.65/10.25','9.65/10.25','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55'],
+    ['BOND_2','15.09.2027','10.5/11','10.5/11','10.80/11.40','10.9/11.1','10.85/11','11/11.3'],
+    ['BOND_3','15.12.2028','11.6/12','11.9/12.1','11.50/12.00','11.75/12','11.8/12','11.9/11.95'],
+    ['Exec USDLKR','332.00/333.00'],
+    ['Exec Liq Delta','1.80'],
+    ['Exec Liq Dir','decreased'],
+  ];
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols']=[{wch:18},...Array(7).fill({wch:14})];
+  XLSX.utils.book_append_sheet(wb,ws,'MVS Data');
+  XLSX.writeFile(wb,'MVS_Data_Template.xlsx');
 }
 
-function render(d){
-  const liq = d?.liquidity || {labels:['4-Jun','5-Jun','6-Jun','9-Jun','10-Jun','12-Jun'], values:[105.04,63.25,59.18,57.38,66.62]};
-  const fx = d?.usdlkr || {labels:['4-Jun','5-Jun','6-Jun','7-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'], values:[336.07,337.15,338.00,332.00,335.00,335.00,337.00,337.15,336.50]};
-  const tbills = d?.tbills || [{m3:10.09,m6:10.27,m12:10.16},{m3:9.84,m6:10.01,m12:10.02},{m3:9.36,m6:9.68,m12:9.83},{m3:8.18,m6:8.25,m12:8.49},{m3:8.13,m6:8.23,m12:8.49}];
-  
-  // Charts
-  new Chart(document.getElementById('liqChart'), {
-    type:'line',
-    data:{labels:liq.labels,
-          datasets:[{label:'Rs.Bn',data:liq.values,borderColor:'#c8a84b',backgroundColor:'rgba(200,168,75,0.2)',tension:0.4,pointRadius:3,borderWidth:2,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
-  });
-
-  new Chart(document.getElementById('fxChart'), {
-    type:'line',
-    data:{labels:fx.labels,
-          datasets:[{label:'LKR',data:fx.values,borderColor:'#4da3e8',backgroundColor:'rgba(77,163,232,0.1)',tension:0.3,pointRadius:2,borderWidth:2,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'},min:330,max:340},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
-  });
-
-  new Chart(document.getElementById('tbillChart'), {
-    type:'line',
-    data:{labels:['6/10/2026','6/3/2026','5/26/2026','5/20/2026','5/13/2026'],
-          datasets:[
-            {label:'3M',data:tbills.map(t=>t.m3),borderColor:'#4da3e8',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false},
-            {label:'6M',data:tbills.map(t=>t.m6),borderColor:'#c8a84b',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false},
-            {label:'12M',data:tbills.map(t=>t.m12),borderColor:'#6dd4a0',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false}
-          ]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:'#7fa3c8',font:{size:9},boxWidth:8}}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}},x:{ticks:{color:'#7fa3c8',font:{size:9}},grid:{color:'rgba(26,48,80,.5)'}}}}
-  });
-
-  new Chart(document.getElementById('yieldChart'), {
-    type:'line',
-    data:{labels:['6M','1Y','2Y','3Y','5Y'],
-          datasets:[{label:'Avg Yield %',data:[10.40,11.15,11.93,12.08,12.23],borderColor:'#c8a84b',backgroundColor:'rgba(200,168,75,0.2)',tension:0.4,pointRadius:4,pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:'#7fa3c8',font:{size:9}}}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'},min:10,max:12.5},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
-  });
-}
-
-if(sessionStorage.getItem('mvs_auth') === '1'){
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  loadData();
-  // Auto-refresh every 30 seconds
-  setInterval(loadData, 30000);
+function showToast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
 }
 </script>
 </body>
