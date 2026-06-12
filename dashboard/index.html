@@ -3,53 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MVS Money Brokers — Daily Market Report</title>
+<title>MVS Daily Market Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;min-height:100vh}
-#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#060f1e,#0d1e38)}
-.login-card{background:#0d1e38;border:1px solid #c8a84b;border-radius:12px;padding:44px 36px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.login-card h2{color:#c8a84b;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:20px}
-.login-card .field{margin-bottom:14px}
-.login-card .field label{display:block;font-size:10px;color:#7fa3c8;margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
-.login-card .field input{width:100%;background:#091525;border:1px solid #1a3050;border-radius:6px;padding:10px;color:#d4e4f4;font-size:13px;outline:none}
-.login-card .field input:focus{border-color:#c8a84b}
-.login-btn{width:100%;background:#c8a84b;color:#0a1628;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;transition:background .2s}
-.login-btn:hover{background:#e0c060}
-.login-err{color:#e87a4d;font-size:11px;text-align:center;margin-top:8px}
 
-#dashboard{display:none;padding:10px;min-height:100vh}
-.hdr{display:flex;justify-content:space-between;align-items:center;background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:10px 14px;margin-bottom:12px}
-.hdr-left{display:flex;align-items:center;gap:10px}
-.logo{width:44px;height:44px;background:#c8a84b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#0a1628}
-.hdr-title h1{font-size:16px;font-weight:700;color:#fff}
-.hdr-title p{font-size:11px;color:#7fa3c8}
-.hdr-right{display:flex;gap:8px;align-items:center}
-.hdr-date{font-size:12px;color:#c8a84b;font-weight:700}
-.btn{background:transparent;color:#7fa3c8;border:1px solid #1a3050;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer}
-.btn:hover{border-color:#c8a84b;color:#c8a84b}
-.badge{background:#1a3a1a;border:1px solid #2a5a2a;color:#6dd4a0;border-radius:10px;padding:2px 10px;font-size:10px;font-weight:700}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.panel{background:#0d1e38;border:1px solid #1a3050;border-radius:7px;padding:10px 12px}
-.ptitle{font-size:10px;font-weight:700;color:#c8a84b;letter-spacing:1px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid #1a3050;margin-bottom:8px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-table th{color:#7fa3c8;font-weight:500;text-align:right;padding:3px 6px;font-size:10px}
+/* LOGIN */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#060f1e,#0d1e38)}
+.login-card{background:#0d1e38;border:2px solid #c8a84b;border-radius:12px;padding:44px 36px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.login-card h2{color:#c8a84b;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;color:#7fa3c8;margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
+.field input{width:100%;background:#091525;border:1px solid #1a3050;border-radius:6px;padding:10px;color:#d4e4f4;font-size:13px;outline:none}
+.field input:focus{border-color:#c8a84b}
+.login-btn{width:100%;background:#c8a84b;color:#0a1628;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s}
+.login-btn:hover{background:#e0c060}
+.login-err{color:#e87a4d;font-size:11px;text-align:center;margin-top:10px;min-height:18px}
+
+/* DASHBOARD */
+#dashboard{display:none;padding:14px;min-height:100vh;background:#060f1e}
+.report-hdr{background:linear-gradient(90deg,#0d1e38,#1a3050);border:2px solid #c8a84b;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;background:#c8a84b;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#0a1628}
+.hdr-info h1{font-size:16px;font-weight:700;color:#fff}
+.hdr-info p{font-size:11px;color:#7fa3c8}
+.hdr-right{text-align:right}
+.hdr-date{font-size:14px;color:#c8a84b;font-weight:700;margin-bottom:4px}
+.hdr-live{display:inline-block;background:#1a3a1a;border:1px solid #2a5a2a;color:#6dd4a0;border-radius:12px;padding:2px 10px;font-size:10px;font-weight:700;margin-right:8px}
+.sign-out{background:transparent;color:#7fa3c8;border:1px solid #1a3050;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer;transition:all .2s}
+.sign-out:hover{border-color:#c8a84b;color:#c8a84b}
+
+/* GRID LAYOUT */
+.grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3x1{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.panel{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:12px 14px}
+.panel-title{font-size:11px;font-weight:700;color:#c8a84b;letter-spacing:1px;text-transform:uppercase;padding-bottom:8px;border-bottom:2px solid #1a3050;margin-bottom:10px}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:11px}
+table th{color:#7fa3c8;font-weight:600;text-align:right;padding:5px 6px;font-size:10px;border-bottom:1px solid #1a3050}
 table th:first-child{text-align:left}
-table td{padding:4px 6px;text-align:right;color:#d4e4f4;border-top:1px solid #1a3050}
-table td:first-child{text-align:left;color:#7fa3c8;font-size:11px}
-.liq-box{display:flex;justify-content:space-around;background:#091525;border-radius:5px;padding:8px;margin-top:8px}
-.liq-item{text-align:center}
-.liq-label{font-size:10px;color:#7fa3c8;margin-bottom:2px}
-.liq-val{font-size:16px;font-weight:700;color:#4da3e8}
-.exec{background:#0d1e38;border:1px solid #1a3050;border-radius:7px;padding:10px 16px;margin-bottom:10px}
-.exec ul{list-style:disc;padding-left:20px;font-size:13px;color:#d4e4f4;line-height:2.3}
-.exec ul li strong{color:#fff}
-@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+table td{padding:5px 6px;text-align:right;color:#d4e4f4;border-top:1px solid #0d2040}
+table td:first-child{text-align:left;color:#7fa3c8;font-size:10px;font-weight:500}
+table tr:hover td{background:#132540}
+
+/* LIQUIDITY BOX */
+.liq-box{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.liq-item{background:#091525;border-radius:6px;padding:8px;text-align:center}
+.liq-label{font-size:9px;color:#7fa3c8;margin-bottom:4px;text-transform:uppercase}
+.liq-val{font-size:18px;font-weight:700;color:#4da3e8}
+
+/* FULL WIDTH SECTIONS */
+.full-width{margin-bottom:14px}
+.full-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.exec-summary{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.exec-summary .panel-title{margin-bottom:8px}
+.exec-summary ul{list-style:disc;padding-left:20px;font-size:13px;color:#d4e4f4;line-height:2.2}
+.exec-summary ul li strong{color:#fff}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.grid-2x2,.full-grid{grid-template-columns:1fr}.grid-3x1{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid-3x1{grid-template-columns:1fr}.report-hdr{flex-direction:column;gap:10px;text-align:center}.hdr-right{text-align:center}}
+
+.footer{text-align:center;font-size:9px;color:#2a4060;padding-bottom:14px}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login">
   <div class="login-card">
     <h2>MVS Money Brokers<br>Daily Market Report</h2>
@@ -60,132 +82,132 @@ table td:first-child{text-align:left;color:#7fa3c8;font-size:11px}
   </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard">
-  <div class="hdr">
+  <!-- HEADER -->
+  <div class="report-hdr">
     <div class="hdr-left">
       <div class="logo">MVS</div>
-      <div class="hdr-title">
+      <div class="hdr-info">
         <h1>Daily Market Report</h1>
-        <p>FX · Government Securities · Money Markets</p>
+        <p>FX | Government Securities | Money Markets</p>
       </div>
     </div>
     <div class="hdr-right">
-      <span class="badge">LIVE</span>
-      <div class="hdr-date" id="dateDisplay">—</div>
-      <button class="btn" onclick="signout()">Sign Out</button>
+      <div class="hdr-date" id="dateDisplay">12th June 2026</div>
+      <span class="hdr-live">LIVE</span>
+      <button class="sign-out" onclick="signout()">Sign Out</button>
     </div>
   </div>
 
-  <div class="grid2">
+  <!-- MONEY & REPO + LIQUIDITY -->
+  <div class="grid-2x2">
     <div class="panel">
-      <div class="ptitle">Money &amp; Repo Market</div>
+      <div class="panel-title">Money &amp; Repo Market</div>
       <table>
-        <tr><td>Call Min (%)</td><td id="cmmin">9.15</td><td id="rmmin">9.22</td></tr>
-        <tr><td>Call Max (%)</td><td id="cmmax">9.25</td><td id="rmmax">9.25</td></tr>
-        <tr><td>Call W.A (%)</td><td id="cmwa">9.19</td><td id="rmwa">9.23</td></tr>
-        <tr><td>Vol (Rs.Bn)</td><td id="cmvol">41</td><td id="rmvol">76.81</td></tr>
+        <tr><td>Minimum Rate(%)</td><td id="cmmin">9.15</td><td id="rmmin">9.23</td></tr>
+        <tr><td>Maximum Rate(%)</td><td id="cmmax">9.25</td><td id="rmmax">9.25</td></tr>
+        <tr><td>W.A Yield (%)</td><td id="cmwa">9.19</td><td id="rmwa">9.24</td></tr>
+        <tr><td>Gross Volume(Rs.Bn)</td><td id="cmvol">34.33</td><td id="rmvol">82.99</td></tr>
       </table>
       <div class="liq-box">
-        <div class="liq-item"><div class="liq-label">Current (Rs.Bn)</div><div class="liq-val" id="liqcur">57.38</div></div>
-        <div class="liq-item"><div class="liq-label">Previous (Rs.Bn)</div><div class="liq-val" id="liqprev">59.18</div></div>
+        <div class="liq-item"><div class="liq-label">Current</div><div class="liq-val" id="liqcur">66.62</div></div>
+        <div class="liq-item"><div class="liq-label">Previous</div><div class="liq-val" id="liqprev">57.38</div></div>
       </div>
     </div>
     <div class="panel">
-      <div class="ptitle">Market Liquidity</div>
+      <div class="panel-title">Market Liquidity</div>
       <canvas id="liqChart" style="max-height:200px"></canvas>
     </div>
   </div>
 
-  <div class="grid2">
+  <!-- FX SWAPS + USD/LKR -->
+  <div class="grid-2x2">
     <div class="panel">
-      <div class="ptitle">FX Swaps (per day)</div>
+      <div class="panel-title">FX Swaps (per day) Sell/Buy Buy/Sell</div>
       <table>
-        <tr><td>1W</td><td>6.00</td><td>6.50</td></tr>
-        <tr><td>1M</td><td>5.75</td><td>6.25</td></tr>
-        <tr><td>3M</td><td>5.50</td><td>6.00</td></tr>
-        <tr><td>6M</td><td>5.50</td><td>6.00</td></tr>
-        <tr><td>1Y</td><td>5.15</td><td>6.00</td></tr>
+        <tr><td>1 Week</td><td>5.75</td><td>7.25</td></tr>
+        <tr><td>1 month</td><td>6.00</td><td>6.75</td></tr>
+        <tr><td>2 months</td><td>6.00</td><td>6.50</td></tr>
+        <tr><td>3 months</td><td>6.00</td><td>6.40</td></tr>
+        <tr><td>6 months</td><td>5.50</td><td>6.10</td></tr>
+        <tr><td>1 year</td><td>5.15</td><td>6.00</td></tr>
       </table>
     </div>
     <div class="panel">
-      <div class="ptitle">USD/LKR</div>
+      <div class="panel-title">USD/LKR Movement</div>
       <canvas id="fxChart" style="max-height:200px"></canvas>
     </div>
   </div>
 
-  <div class="panel" style="margin-bottom:10px">
-    <div class="ptitle">Government Securities — Treasury Bills</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><canvas id="tbillChart" style="max-height:180px"></canvas></div>
-      <div>
-        <table style="font-size:11px">
-          <thead><tr><th>Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
-          <tbody>
-            <tr><td>6/10/2026</td><td>10.09</td><td>10.27</td><td>10.16</td></tr>
-            <tr><td>6/3/2026</td><td>9.84</td><td>10.01</td><td>10.02</td></tr>
-            <tr><td>5/26/2026</td><td>9.36</td><td>9.68</td><td>9.83</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <!-- GOVERNMENT SECURITIES HEADER -->
+  <div class="panel full-width">
+    <div class="panel-title">Government Securities</div>
+  </div>
+
+  <!-- TREASURY BILLS + BONDS -->
+  <div class="full-grid">
+    <div class="panel">
+      <div class="panel-title">Treasury Bill</div>
+      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas>
+      <table style="font-size:10px">
+        <thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
+        <tbody>
+          <tr><td>6/10/2026</td><td>10.09</td><td>10.27</td><td>10.16</td></tr>
+          <tr><td>6/3/2026</td><td>9.84</td><td>10.01</td><td>10.02</td></tr>
+          <tr><td>5/26/2026</td><td>9.36</td><td>9.68</td><td>9.83</td></tr>
+          <tr><td>5/20/2026</td><td>8.18</td><td>8.25</td><td>8.49</td></tr>
+          <tr><td>5/13/2026</td><td>8.13</td><td>8.23</td><td>8.49</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Treasury Bond (12-Jun Yield Curve)</div>
+      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas>
+      <table style="font-size:9px">
+        <thead><tr><th>Bond</th><th>5-Jun</th><th>8-Jun</th><th>9-Jun</th><th>10-Jun</th><th>11-Jun</th><th>12-Jun</th></tr></thead>
+        <tbody>
+          <tr><td>15.12.2026</td><td>9.70/10.20</td><td>9.75/10</td><td>9.8/10.25</td><td>10.25/10.55</td><td>0</td><td>0</td></tr>
+          <tr><td>15.09.2027</td><td>10.80/11.40</td><td>10.9/11.1</td><td>10.85/11</td><td>11/11.3</td><td>0</td><td>0</td></tr>
+          <tr><td>15.12.2028</td><td>11.50/12.00</td><td>11.75/12</td><td>11.8/12</td><td>11.9/11.95</td><td>0</td><td>0</td></tr>
+          <tr><td>15.12.2029</td><td>11.75/12.25</td><td>12/12.2</td><td>12/12.2</td><td>12/12.15</td><td>0</td><td>0</td></tr>
+          <tr><td>01.07.2030</td><td>11.80/12.30</td><td>12.15/12.2</td><td>12.15/12.25</td><td>12.15/12.3</td><td>0</td><td>0</td></tr>
+          <tr><td>15.03.2031</td><td>12.20/12.60</td><td>12.3/12.7</td><td>12.3/12.7</td><td>12.3/12.7</td><td>0</td><td>0</td></tr>
+          <tr><td>15.12.2032</td><td>12.30/12.70</td><td>12.5/12.9</td><td>12.5/12.9</td><td>12.55/12.9</td><td>0</td><td>0</td></tr>
+          <tr><td>01.11.2033</td><td>12.40/12.80</td><td>12.65/13</td><td>12.65/13</td><td>12.7/13</td><td>0</td><td>0</td></tr>
+          <tr><td>15.06.2034</td><td>12.50/13.00</td><td>12.8/13.15</td><td>12.8/13.1</td><td>13/13.2</td><td>0</td><td>0</td></tr>
+          <tr><td>15.03.2035</td><td>12.50/13.00</td><td>12.85/13.15</td><td>12.8/13.2</td><td>13/13.3</td><td>0</td><td>0</td></tr>
+          <tr><td>01.08.2036</td><td>12.60/13.20</td><td>13/13.5</td><td>13/13.5</td><td>13/13.5</td><td>0</td><td>0</td></tr>
+          <tr><td>01.07.2037</td><td>12.60/13.20</td><td>12.9/13.3</td><td>13.1/13.3</td><td>13.1/13.4</td><td>0</td><td>0</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <div class="panel" style="margin-bottom:10px">
-    <div class="ptitle">Government Securities — Average Yield Curve (Today)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-      <div><canvas id="yieldChart" style="max-height:180px"></canvas></div>
-      <div style="overflow-x:auto">
-        <table style="font-size:10px">
-          <thead><tr><th>Maturity</th><th>Avg Yield (%)</th></tr></thead>
-          <tbody>
-            <tr><td>6 Months</td><td>10.40</td></tr>
-            <tr><td>1 Year</td><td>11.15</td></tr>
-            <tr><td>2 Years</td><td>11.93</td></tr>
-            <tr><td>3 Years</td><td>12.08</td></tr>
-            <tr><td>5 Years</td><td>12.23</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="exec">
-    <div class="ptitle">Executive Summary</div>
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="exec-summary">
+    <div class="panel-title">Executive Summary</div>
     <ul>
-      <li>USD/LKR Closed at <strong id="exusd">332.00/333.00</strong></li>
-      <li>Liquidity <strong id="exdir">decreased</strong> by <strong id="exdelta">1.80</strong> bn</li>
+      <li>USD/LKR Closed at <strong id="exusd">336.50/337.00</strong></li>
+      <li>System liquidity <strong id="exdir">increased</strong> by <strong id="exdelta">9.24</strong> bn.</li>
     </ul>
   </div>
 
-  <div style="text-align:center;font-size:10px;color:#2a4060;padding-bottom:14px">
-    MVS Money Brokers Limited — Confidential
-  </div>
+  <div class="footer">MVS Money Brokers Limited — Confidential. For authorised recipients only.</div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// SIMPLE DASHBOARD — NO EXTERNAL DATA LOADING
-// ═══════════════════════════════════════════
-
 const USER = 'MVSmoney';
 const PASS = 'MVS1234@';
-
-// Sample data — update this manually or from editor
-const data = {
-  date: '11th June 2026',
-  callMarket: {min:'9.15', max:'9.25', wa:'9.19', vol:'41'},
-  repoMarket: {min:'9.22', max:'9.25', wa:'9.23', vol:'76.81'},
-  liq: {cur:'57.38', prev:'59.18', labels:['4-Jun','5-Jun','6-Jun','9-Jun','10-Jun'], vals:[111.94,105.04,63.25,59.18,57.38]},
-  fx: {labels:['2-Jun','3-Jun','4-Jun','5-Jun','6-Jun','8-Jun','10-Jun'], vals:[332.50,334.50,337.00,336.07,335.00,337.15,332.00], close:'332.00/333.00'},
-  exec: {usd:'332.00/333.00', dir:'decreased', delta:'1.80'}
-};
 
 function signin(){
   const u = document.getElementById('user').value.trim();
   const p = document.getElementById('pass').value;
   if(u === USER && p === PASS){
     sessionStorage.setItem('mvs_auth', '1');
-    showDash();
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    render();
   } else {
     document.getElementById('err').textContent = 'Invalid credentials';
   }
@@ -196,132 +218,45 @@ function signout(){
   location.reload();
 }
 
-function showDash(){
+function render(){
+  // Charts
+  new Chart(document.getElementById('liqChart'), {
+    type:'line',
+    data:{labels:['4-Jun','5-Jun','6-Jun','9-Jun','10-Jun','12-Jun'],
+          datasets:[{label:'Rs.Bn',data:[105.04,63.25,59.18,57.38,66.62],borderColor:'#c8a84b',backgroundColor:'rgba(200,168,75,0.2)',tension:0.4,pointRadius:3,borderWidth:2,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
+  });
+
+  new Chart(document.getElementById('fxChart'), {
+    type:'line',
+    data:{labels:['4-Jun','5-Jun','6-Jun','7-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'],
+          datasets:[{label:'LKR',data:[336.07,337.15,338.00,332.00,335.00,335.00,337.00,337.15,336.50],borderColor:'#4da3e8',backgroundColor:'rgba(77,163,232,0.1)',tension:0.3,pointRadius:2,borderWidth:2,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'},min:330,max:340},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
+  });
+
+  new Chart(document.getElementById('tbillChart'), {
+    type:'line',
+    data:{labels:['6/10/2026','6/3/2026','5/26/2026','5/20/2026','5/13/2026'],
+          datasets:[
+            {label:'3M',data:[10.09,9.84,9.36,8.18,8.13],borderColor:'#4da3e8',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false},
+            {label:'6M',data:[10.27,10.01,9.68,8.25,8.23],borderColor:'#c8a84b',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false},
+            {label:'12M',data:[10.16,10.02,9.83,8.49,8.49],borderColor:'#6dd4a0',tension:0.3,pointRadius:2,borderWidth:1.5,fill:false}
+          ]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:'#7fa3c8',font:{size:9},boxWidth:8}}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}},x:{ticks:{color:'#7fa3c8',font:{size:9}},grid:{color:'rgba(26,48,80,.5)'}}}}
+  });
+
+  new Chart(document.getElementById('yieldChart'), {
+    type:'line',
+    data:{labels:['6M','1Y','2Y','3Y','5Y'],
+          datasets:[{label:'Avg Yield %',data:[10.40,11.15,11.93,12.08,12.23],borderColor:'#c8a84b',backgroundColor:'rgba(200,168,75,0.2)',tension:0.4,pointRadius:4,pointBorderColor:'#fff',pointBorderWidth:2,borderWidth:2.5,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:'#7fa3c8',font:{size:9}}}},scales:{y:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'},min:10,max:12.5},x:{ticks:{color:'#7fa3c8',font:{size:10}},grid:{color:'rgba(26,48,80,.5)'}}}}
+  });
+}
+
+if(sessionStorage.getItem('mvs_auth') === '1'){
   document.getElementById('login').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   render();
-}
-
-function render(){
-  document.getElementById('dateDisplay').textContent = data.date;
-  document.getElementById('cmmin').textContent = data.callMarket.min;
-  document.getElementById('cmmax').textContent = data.callMarket.max;
-  document.getElementById('cmwa').textContent = data.callMarket.wa;
-  document.getElementById('cmvol').textContent = data.callMarket.vol;
-  document.getElementById('rmmin').textContent = data.repoMarket.min;
-  document.getElementById('rmmax').textContent = data.repoMarket.max;
-  document.getElementById('rmwa').textContent = data.repoMarket.wa;
-  document.getElementById('rmvol').textContent = data.repoMarket.vol;
-  document.getElementById('liqcur').textContent = data.liq.cur;
-  document.getElementById('liqprev').textContent = data.liq.prev;
-  document.getElementById('exusd').textContent = data.exec.usd;
-  document.getElementById('exdir').textContent = data.exec.dir;
-  document.getElementById('exdelta').textContent = data.exec.delta;
-  
-  // Charts
-  if(document.getElementById('liqChart').getContext){
-    new Chart(document.getElementById('liqChart'), {
-      type:'line',
-      data:{labels:data.liq.labels, datasets:[{label:'Rs.Bn', data:data.liq.vals, borderColor:'#4da3e8', fill:true, backgroundColor:'rgba(77,163,232,0.1)', tension:0.3}]},
-      options:{responsive:true, maintainAspectRatio:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}, x:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}}}
-    });
-  }
-  
-  if(document.getElementById('fxChart').getContext){
-    new Chart(document.getElementById('fxChart'), {
-      type:'line',
-      data:{labels:data.fx.labels, datasets:[{label:'LKR', data:data.fx.vals, borderColor:'#c8a84b', fill:true, backgroundColor:'rgba(200,168,75,0.1)', tension:0.3}]},
-      options:{responsive:true, maintainAspectRatio:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}, x:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}}}
-    });
-  }
-
-  // T-Bill Chart
-  if(document.getElementById('tbillChart').getContext){
-    new Chart(document.getElementById('tbillChart'), {
-      type:'line',
-      data:{
-        labels:['6/10/2026', '6/3/2026', '5/26/2026'],
-        datasets:[
-          {label:'3M', data:[10.09, 9.84, 9.36], borderColor:'#4da3e8', tension:0.2, pointRadius:2, borderWidth:1.5, fill:false},
-          {label:'6M', data:[10.27, 10.01, 9.68], borderColor:'#c8a84b', tension:0.2, pointRadius:2, borderWidth:1.5, fill:false},
-          {label:'12M', data:[10.16, 10.02, 9.83], borderColor:'#6dd4a0', tension:0.2, pointRadius:2, borderWidth:1.5, fill:false}
-        ]
-      },
-      options:{responsive:true, maintainAspectRatio:true, plugins:{legend:{display:true, labels:{color:'#7fa3c8', font:{size:9}, boxWidth:8, padding:5}}}, scales:{y:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}, x:{ticks:{color:'#7fa3c8'}, grid:{color:'rgba(26,48,80,.5)'}}}}
-    });
-  }
-
-  // Average Yield Curve
-  if(document.getElementById('yieldChart').getContext){
-    new Chart(document.getElementById('yieldChart'), {
-      type:'line',
-      data:{
-        labels:['6M', '1Y', '2Y', '3Y', '5Y'],
-        datasets:[
-          {
-            label:'Average Yield (%)', 
-            data:[10.40, 11.15, 11.93, 12.08, 12.23], 
-            borderColor:'#c8a84b', 
-            backgroundColor:'rgba(200,168,75,0.2)',
-            tension:0.4, 
-            pointRadius:5, 
-            pointBackgroundColor:'#c8a84b',
-            pointBorderColor:'#fff',
-            pointBorderWidth:2,
-            borderWidth:3, 
-            fill:true
-          }
-        ]
-      },
-      options:{
-        responsive:true, 
-        maintainAspectRatio:true, 
-        plugins:{
-          legend:{
-            display:true, 
-            labels:{
-              color:'#7fa3c8', 
-              font:{size:11, weight:'bold'}, 
-              boxWidth:12, 
-              padding:10
-            }
-          },
-          tooltip:{
-            backgroundColor:'rgba(0,0,0,0.9)',
-            padding:12,
-            titleColor:'#c8a84b',
-            bodyColor:'#fff',
-            borderColor:'#c8a84b',
-            borderWidth:1,
-            callbacks:{
-              label:function(context){
-                return 'Yield: ' + context.parsed.y.toFixed(2) + '%';
-              }
-            }
-          }
-        }, 
-        scales:{
-          y:{
-            ticks:{color:'#7fa3c8', font:{size:11}}, 
-            grid:{color:'rgba(26,48,80,.5)'},
-            min:10,
-            max:12.5,
-            title:{display:true, text:'Yield (%)', color:'#7fa3c8'}
-          }, 
-          x:{
-            ticks:{color:'#7fa3c8', font:{size:11}}, 
-            grid:{color:'rgba(26,48,80,.5)'},
-            title:{display:true, text:'Time to Maturity', color:'#7fa3c8'}
-          }
-        }
-      }
-    });
-  }
-}
-
-// Check if logged in
-if(sessionStorage.getItem('mvs_auth') === '1'){
-  showDash();
 }
 </script>
 </body>
