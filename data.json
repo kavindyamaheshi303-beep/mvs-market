@@ -1,7 +1,7 @@
 {
-  "date": "15th June 2026",
+  "date": "11th June 2026",
   "callMarket": {
-    "min": "9.15",
+    "min": "0",
     "max": "9.25",
     "wa": "9.19",
     "vol": "34.33"
@@ -16,13 +16,13 @@
     "current": "62.57",
     "previous": "66.62",
     "labels": [
+      "3-Jun",
       "4-Jun",
-      "5-Jun",
+      "7-Jun",
       "8-Jun",
       "9-Jun",
       "10-Jun",
-      "11-Jun",
-      "12-Jun"
+      "11-Jun"
     ],
     "values": [
       111.94,
@@ -36,38 +36,38 @@
   },
   "fxSwaps": {
     "1w": {
-      "sell": "5.75",
-      "buy": "7.25"
+      "sell": "",
+      "buy": ""
     },
     "1m": {
-      "sell": "6.00",
-      "buy": "6.75"
+      "sell": "",
+      "buy": ""
     },
     "2m": {
-      "sell": "6.00",
-      "buy": "6.50"
+      "sell": "",
+      "buy": ""
     },
     "3m": {
-      "sell": "6.00",
-      "buy": "6.40"
+      "sell": "",
+      "buy": ""
     },
     "6m": {
-      "sell": "5.50",
-      "buy": "6.10"
+      "sell": "",
+      "buy": ""
     },
     "1y": {
-      "sell": "5.15",
-      "buy": "6.00"
+      "sell": "",
+      "buy": ""
     }
   },
   "usdlkr": {
     "labels": [
-      "5-Jun",
+      "4-Jun",
+      "7-Jun",
       "8-Jun",
       "9-Jun",
       "10-Jun",
-      "11-Jun",
-      "12-Jun"
+      "11-Jun"
     ],
     "values": [
       336.07,
@@ -81,44 +81,44 @@
   },
   "tbills": [
     {
-      "date": "10-Jun",
+      "date": "6/9/2026",
       "m3": "10.09",
       "m6": "10.27",
       "m12": "10.16"
     },
     {
-      "date": "3-Jun",
+      "date": "6/2/2026",
       "m3": "9.84",
       "m6": "10.01",
       "m12": "10.02"
     },
     {
-      "date": "26-May",
+      "date": "5/25/2026",
       "m3": "9.36",
       "m6": "9.68",
       "m12": "9.83"
     },
     {
-      "date": "20-May",
+      "date": "5/19/2026",
       "m3": "8.18",
       "m6": "8.25",
       "m12": "8.49"
     },
     {
-      "date": "13-May",
+      "date": "5/12/2026",
       "m3": "8.13",
       "m6": "8.23",
       "m12": "8.49"
     },
     {
-      "date": "6-May",
-      "m3": "8.20",
+      "date": "5/5/2026",
+      "m3": "8.2",
       "m6": "8.24",
       "m12": "8.52"
     },
     {
-      "date": "29-Apr",
-      "m3": "8.20",
+      "date": "4/28/2026",
+      "m3": "8.2",
       "m6": "8.25",
       "m12": "8.52"
     }
@@ -271,5 +271,6 @@
     "usdlkr": "337.00/337.40",
     "liqDelta": "17.66",
     "liqDir": "decreased"
-  }
+  },
+  "marketSummary": "The rupee value of Treasury Bills and Treasury Bonds held by foreign investors decreased by approximately 3.32 percent in the reporting week compared to the previous week."
 }
