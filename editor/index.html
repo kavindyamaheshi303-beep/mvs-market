@@ -437,6 +437,8 @@ async function publishData(){
 }
 
 // ── DATA BUILDER ────────────────────────────────────────
+let bondHeaders = ['5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'];
+
 function gv(id){ return document.getElementById(id).value.trim(); }
 function buildData(){
   return {
@@ -475,7 +477,6 @@ function buildData(){
 }
 
 // ── DYNAMIC ROWS ────────────────────────────────────────
-let bondHeaders = ['5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'];
 
 function addRow(tbodyId, defaults){
   const tbody = document.getElementById(tbodyId);
