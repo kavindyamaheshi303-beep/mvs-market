@@ -292,6 +292,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 <div class="toast" id="toast"></div>
 
 <script>
+// ── GLOBALS (must be first) ─────────────────────────────
+let bondHeaders = ['5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'];
+
 // ── STAFF AUTH ──────────────────────────────────────────
 const EDIT_USER = 'MVSeditor';
 const EDIT_PASS = 'MVSEdit@2026';
@@ -437,8 +440,6 @@ async function publishData(){
 }
 
 // ── DATA BUILDER ────────────────────────────────────────
-let bondHeaders = ['5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'];
-
 function gv(id){ return document.getElementById(id).value.trim(); }
 function buildData(){
   return {
