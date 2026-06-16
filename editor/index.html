@@ -138,7 +138,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
   <div class="section">
     <div class="sec-title">Report Date</div>
     <div class="fgrid">
-      <div class="fg"><label>Date Label (shown on dashboard)</label><input id="f-date" placeholder="e.g. 11th June 2026"></div>
+      <div class="fg"><label>Report Date (auto-set from Excel latest date)</label><input id="f-date" placeholder="Auto-filled on import…" readonly style="color:#6dd4a0;cursor:default"></div>
     </div>
   </div>
 
@@ -390,30 +390,50 @@ function renderBondHeaders(){
 function updateBH(){bondHeaders.forEach((h,i)=>{const e=document.getElementById('bh'+i);if(e)e.textContent=h||'—';});}
 
 // ── DATE HELPERS ──────────────────────────────────────────
+// Date helpers — use LOCAL date parts (getDate/getMonth/getFullYear) so that
+// JS Date objects from cellDates:true (which are already in local time) give
+// the correct day number. e.g. 15-Jun not 14-Jun.
 function toShortDate(v){
   const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   let d=null;
   if(v instanceof Date)d=v;
-  else if(typeof v==='number')d=new Date((v-25569)*86400000);
+  else if(typeof v==='number'){
+    // Excel serial → interpret as plain calendar date, no timezone shift
+    const ms=(v-25569)*86400000;
+    d=new Date(ms);
+    // Use UTC parts for serial numbers to avoid DST shift
+    const M2=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return d.getUTCDate()+'-'+M2[d.getUTCMonth()];
+  }
   if(!d||isNaN(d.getTime()))return String(v||'').trim();
-  return d.getUTCDate()+'-'+M[d.getUTCMonth()];
+  // JS Date from cellDates:true — use LOCAL parts (browser already localised it)
+  return d.getDate()+'-'+M[d.getMonth()];
 }
 function toUSDate(v){
   let d=null;
   if(v instanceof Date)d=v;
-  else if(typeof v==='number')d=new Date((v-25569)*86400000);
+  else if(typeof v==='number'){
+    const ms=(v-25569)*86400000; d=new Date(ms);
+    return (d.getUTCMonth()+1)+'/'+d.getUTCDate()+'/'+d.getUTCFullYear();
+  }
   if(!d||isNaN(d.getTime()))return String(v||'').trim();
-  return (d.getUTCMonth()+1)+'/'+d.getUTCDate()+'/'+d.getUTCFullYear();
+  return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
 }
 function toOrdinalDate(v){
   let d=null;
   if(v instanceof Date)d=v;
-  else if(typeof v==='number')d=new Date((v-25569)*86400000);
+  else if(typeof v==='number'){
+    const ms=(v-25569)*86400000; d=new Date(ms);
+    const M=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const day=d.getUTCDate();
+    const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+    return day+sfx+' '+M[d.getUTCMonth()]+' '+d.getUTCFullYear();
+  }
   if(!d||isNaN(d.getTime()))return String(v||'').trim();
   const M=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const day=d.getUTCDate();
+  const day=d.getDate();
   const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
-  return day+sfx+' '+M[d.getUTCMonth()]+' '+d.getUTCFullYear();
+  return day+sfx+' '+M[d.getMonth()]+' '+d.getFullYear();
 }
 function ns(v){if(v===null||v===undefined||v==='')return'';if(typeof v==='number')return String(Math.round(v*10000)/10000);return String(v).trim();}
 function cleanBond(v){if(v===null||v===undefined||v==='')return'0';if(typeof v==='number'&&v===0)return'0';const s=String(v).trim();if(s===''||s==='-'||s.startsWith('#'))return'0';return s;}
