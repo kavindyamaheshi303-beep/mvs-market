@@ -1,5 +1,5 @@
 {
-  "date": "29th December 1899",
+  "date": "15th June 2026",
   "callMarket": {
     "min": "8.4",
     "max": "9.25",
@@ -270,8 +270,8 @@
     ]
   },
   "execSummary": {
-    "usdlkr": "",
-    "liqDelta": "",
+    "usdlkr": "334/334.50",
+    "liqDelta": "23",
     "liqDir": "decreased"
   },
   "marketSummary": ""
