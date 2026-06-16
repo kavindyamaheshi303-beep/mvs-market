@@ -77,7 +77,7 @@ table tr:hover td{background:#132540}
     </div>
     <div class="hdr-right">
       <div class="hdr-date" id="dateDisplay">—</div>
-      <span class="hdr-live">LIVE</span>
+      <span class="hdr-live" id="last-updated">—</span>
       <button class="sign-out" onclick="signout()">Sign Out</button>
     </div>
   </div>
@@ -181,7 +181,6 @@ function signin(){
     document.getElementById("login").style.display="none";
     document.getElementById("dashboard").style.display="block";
     loadData();
-    setInterval(loadData,30000);
   }else document.getElementById("err").textContent="Invalid credentials";
 }
 function signout(){sessionStorage.removeItem("mvs_auth");location.reload();}
@@ -190,7 +189,7 @@ async function loadData(){
   const bar=document.getElementById("loading-bar"),errEl=document.getElementById("load-err");
   bar.style.display="block";errEl.style.display="none";
   try{
-    const res=await fetch(DATA_URL+"?t="+Date.now());
+    const res=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
     if(!res.ok)throw new Error("HTTP "+res.status);
     render(await res.json());
     bar.style.display="none";
@@ -202,8 +201,35 @@ async function loadData(){
 
 function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=(val!=null&&val!=="")? val:"—";}
 
+// Auto-set report date from the latest date in the data
+function autoDate(d){
+  // Use latest USD/LKR label or liquidity label as the report date
+  const fxLabels=d.usdlkr?.labels||[];
+  const liqLabels=d.liquidity?.labels||[];
+  const allLabels=[...fxLabels,...liqLabels];
+  if(allLabels.length>0){
+    const last=allLabels[allLabels.length-1];
+    // Convert "15-Jun" → "15th June 2026"  (year from d.date if available)
+    const yearMatch=(d.date||'').match(/\d{4}/);
+    const year=yearMatch?yearMatch[0]:new Date().getFullYear();
+    const m=String(last).match(/(\d+)-([A-Za-z]+)/);
+    if(m){
+      const day=parseInt(m[1]);
+      const sfx=day===1||day===21||day===31?'st':day===2||day===22?'nd':day===3||day===23?'rd':'th';
+      const months={Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',
+                    Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
+      return day+sfx+' '+(months[m[2]]||m[2])+' '+year;
+    }
+  }
+  return d.date||'—';
+}
+
 function render(d){
-  setText("dateDisplay",d.date);
+  // Auto-set report date from latest chart date label
+  setText("dateDisplay", autoDate(d));
+  // Show when data was last published
+  const lu=document.getElementById("last-updated");
+  if(lu) lu.textContent="Updated: "+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   // Money & Repo
   setText("cmmin",d.callMarket?.min); setText("rmmin",d.repoMarket?.min);
   setText("cmmax",d.callMarket?.max); setText("rmmax",d.repoMarket?.max);
@@ -308,7 +334,6 @@ if(sessionStorage.getItem("mvs_auth")==="1"){
   document.getElementById("login").style.display="none";
   document.getElementById("dashboard").style.display="block";
   loadData();
-  setInterval(loadData,30000);
 }
 </script>
 </body>
