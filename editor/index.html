@@ -419,23 +419,38 @@ async function publishData(){
     document.getElementById('setup-box').style.display='block';
     return;
   }
-  const statusEl = document.getElementById('save-status');
-  statusEl.className='save-status saving';
-  statusEl.textContent='Publishing… fetching current file SHA…';
-  try{
-    // 1. Get current SHA (needed for update)
-    const current = await ghGet(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token);
-    statusEl.textContent='Publishing… committing to GitHub…';
-    // 2. Commit new data.json
-    const content = JSON.stringify(buildData(), null, 2);
-    await ghPut(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token, content, current.sha||null);
-    statusEl.className='save-status ok';
-    statusEl.textContent='✓ Published at '+new Date().toLocaleTimeString()+' — dashboard will update in ~30 seconds.';
-    showToast('✓ data.json committed to GitHub!');
-  } catch(e){
-    statusEl.className='save-status fail';
-    statusEl.textContent='✗ '+e.message;
-    showToast(e.message,'err');
+  const st = document.getElementById('save-status');
+  st.className='save-status saving';
+  const content = JSON.stringify(buildData(), null, 2);
+
+  // Retry up to 5 times — fetch a FRESH SHA immediately before every PUT attempt
+  for(let attempt=1; attempt<=5; attempt++){
+    try{
+      st.textContent = 'Publishing… (attempt '+attempt+') fetching SHA…';
+      const cur = await ghGet(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token);
+      st.textContent = 'Committing to GitHub…';
+      await ghPut(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token, content, cur.sha||null);
+      st.className='save-status ok';
+      st.textContent='✓ Published at '+new Date().toLocaleTimeString()+' — dashboard updates in ~30 sec.';
+      showToast('✓ Published to GitHub!');
+      return;
+    } catch(e){
+      const isConflict = e.message&&(
+        e.message.includes('does not match')||
+        e.message.includes('409')||
+        e.message.includes('sha')||
+        e.message.includes('conflict')
+      );
+      if(isConflict && attempt < 5){
+        st.textContent = 'SHA conflict — retrying ('+attempt+'/5)…';
+        await new Promise(r=>setTimeout(r, 800*attempt)); // back off slightly each retry
+        continue;
+      }
+      st.className='save-status fail';
+      st.textContent='✗ '+e.message;
+      showToast(e.message,'err');
+      return;
+    }
   }
 }
 
