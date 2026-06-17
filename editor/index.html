@@ -93,9 +93,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
   <div class="card">
     <div class="card-logo">✏️</div>
     <h2>MVS Money Brokers<br>Data Editor — Staff Access</h2>
-    <div class="field"><label>Username</label><input id="u" type="text" placeholder="Staff username" autocomplete="username" name="username"></div>
-    <div class="field"><label>Password</label><input id="p" type="password" placeholder="Staff password" autocomplete="current-password" name="password" onkeydown="if(event.key==='Enter')login()"></div>
-    <button class="login-btn" onclick="login()">Sign In</button>
+    <form id="loginForm" autocomplete="on">
+      <div class="field"><label>Username</label><input id="u" type="text" placeholder="Staff username" autocomplete="username" name="username"></div>
+      <div class="field"><label>Password</label><input id="p" type="password" placeholder="Staff password" autocomplete="current-password" name="password"></div>
+      <button type="submit" class="login-btn">Sign In</button>
+    </form>
     <div class="err" id="err"></div>
   </div>
 </div>
@@ -310,6 +312,10 @@ function login(){
     document.getElementById('err').textContent='Incorrect username or password.';
   }
 }
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  login();
+});
 function logout(){ sessionStorage.removeItem('mvs_e'); location.reload(); }
 if(sessionStorage.getItem('mvs_e')==='1'){
   document.getElementById('login-page').style.display='none';
