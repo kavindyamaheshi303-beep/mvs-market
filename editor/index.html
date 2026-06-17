@@ -47,6 +47,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .fg{display:flex;flex-direction:column;gap:4px;min-width:0}
 .fg label{font-size:10px;color:#7fa3c8;text-transform:uppercase;letter-spacing:.3px}
 .fg input,.fg select{background:#091525;border:1px solid #1a3050;border-radius:4px;padding:7px 10px;color:#d4e4f4;font-size:12px;outline:none;transition:border-color .2s;width:100%}
+.fg textarea{background:#091525;border:1px solid #1a3050;border-radius:4px;padding:7px 10px;color:#d4e4f4;font-size:12px;outline:none;transition:border-color .2s;width:100%;resize:vertical;font-family:inherit}
 .fg input:focus,.fg select:focus{border-color:#4da3e8}
 
 /* Setup box */
@@ -274,7 +275,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
   <!-- EXEC SUMMARY -->
   <div class="section">
     <div class="sec-title">Executive Summary</div>
-    <div class="fgrid">
+    <div class="fgrid" style="margin-bottom:12px">
       <div class="fg"><label>USD/LKR Close</label><input id="ex-usdlkr" value="336.50/337.00"></div>
       <div class="fg"><label>Liquidity Change (Rs.Bn)</label><input id="ex-delta" value="9.24"></div>
       <div class="fg">
@@ -284,6 +285,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
           <option value="decreased">Decreased</option>
         </select>
       </div>
+    </div>
+    <div class="fg">
+      <label>Market Summary (free text — type anything here, shown on the dashboard)</label>
+      <textarea id="market-summary" rows="5" placeholder="Type your market commentary here — e.g. The rupee value of Treasury Bills and Treasury Bonds held by foreign investors decreased by approximately 3.32 percent..."></textarea>
     </div>
   </div>
 
@@ -492,7 +497,8 @@ function buildData(){
       usdlkr:   gv('ex-usdlkr'),
       liqDelta: gv('ex-delta'),
       liqDir:   document.getElementById('ex-dir').value
-    }
+    },
+    marketSummary: document.getElementById('market-summary').value.trim()
   };
 }
 
