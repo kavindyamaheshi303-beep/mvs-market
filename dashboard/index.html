@@ -66,9 +66,11 @@ canvas{max-width:100%!important}
 <div id="login">
   <div class="login-card">
     <h2>MVS Money Brokers<br>Daily Market Report</h2>
-    <div class="field"><label>Username</label><input id="user" type="text" placeholder="Username" autocomplete="username" name="username"></div>
-    <div class="field"><label>Password</label><input id="pass" type="password" placeholder="Password" autocomplete="current-password" name="password" onkeydown="if(event.key==='Enter')signin()"></div>
-    <button class="login-btn" onclick="signin()">Sign In</button>
+    <form id="loginForm" autocomplete="on">
+      <div class="field"><label>Username</label><input id="user" type="text" placeholder="Username" autocomplete="username" name="username"></div>
+      <div class="field"><label>Password</label><input id="pass" type="password" placeholder="Password" autocomplete="current-password" name="password"></div>
+      <button type="submit" class="login-btn">Sign In</button>
+    </form>
     <div class="login-err" id="err"></div>
   </div>
 </div>
@@ -178,6 +180,10 @@ function signin(){
     startPolling();
   }else document.getElementById("err").textContent="Invalid credentials";
 }
+document.getElementById("loginForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  signin();
+});
 function signout(){
   stopPolling();
   sessionStorage.removeItem("mvs_auth");
