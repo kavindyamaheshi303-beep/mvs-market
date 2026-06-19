@@ -50,7 +50,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .fg textarea{background:#091525;border:1px solid #1a3050;border-radius:4px;padding:7px 10px;color:#d4e4f4;font-size:12px;outline:none;transition:border-color .2s;width:100%;resize:vertical;font-family:inherit}
 .fg input:focus,.fg select:focus{border-color:#4da3e8}
 
-/* Setup box */
 .setup-box{background:#0b1a08;border:2px solid #c8a84b;border-radius:8px;padding:16px 18px;margin-bottom:12px;min-width:0;overflow:hidden;max-width:100%}
 .setup-step{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
 .step-num{background:#c8a84b;color:#0a1628;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
@@ -60,7 +59,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .step-body strong{color:#fff}
 .connected-badge{background:#0a2a0a;border:1px solid #2a6a2a;border-radius:6px;padding:10px 14px;font-size:12px;color:#6dd4a0;margin-bottom:12px;display:none}
 
-/* Save bar */
 .save-bar{background:#0d1e38;border:2px solid #2a5080;border-radius:8px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .save-info{flex:1;min-width:0}
 .save-info h3{font-size:13px;color:#fff;font-weight:700;margin-bottom:3px}
@@ -69,7 +67,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .save-status.ok{color:#6dd4a0}
 .save-status.fail{color:#e87a4d}
 
-/* Dynamic table */
 .dyn-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
 .dyn-table th{background:#091525;color:#7fa3c8;font-size:10px;padding:5px 8px;text-align:left;border-bottom:1px solid #1a3050}
 .dyn-table td{padding:4px 4px;border-top:1px solid #0d2040}
@@ -80,6 +77,28 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .rm-btn:hover{background:#5a1a1a}
 .add-btn{background:#091525;color:#4da3e8;border:1px solid #1a4060;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;margin-top:6px}
 .add-btn:hover{background:#1a3050}
+
+/* ── TBILL AUCTION SECTION ───────────────────────── */
+.tbill-auction-hint{font-size:11px;color:#7fa3c8;margin-bottom:8px;line-height:1.6}
+.tbill-auction-hint strong{color:#c8a84b}
+/* Group block per auction date */
+.auction-group{background:#091525;border:1px solid #1a3050;border-radius:6px;padding:10px 12px;margin-bottom:10px;position:relative}
+.auction-group-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.auction-group-hdr label{font-size:10px;color:#7fa3c8;text-transform:uppercase}
+.auction-group-hdr input{background:#0d1e38;border:1px solid #1a4060;border-radius:4px;padding:5px 9px;color:#c8a84b;font-size:12px;font-weight:700;outline:none;width:140px}
+.auction-group-hdr input:focus{border-color:#c8a84b}
+.rm-group-btn{background:#2a1010;color:#e87a4d;border:1px solid #5a2020;border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;margin-left:auto}
+.rm-group-btn:hover{background:#5a1a1a}
+.mat-rows table{width:100%;border-collapse:collapse;font-size:11px}
+.mat-rows th{background:#0a1828;color:#7fa3c8;padding:4px 8px;font-size:10px;text-align:left;border-bottom:1px solid #1a3050}
+.mat-rows td{padding:3px 3px;border-top:1px solid #0d2040}
+.mat-rows td input,.mat-rows td select{background:#060f1e;border:1px solid #0d2040;border-radius:3px;padding:4px 7px;color:#d4e4f4;font-size:11px;width:100%;outline:none}
+.mat-rows td input:focus,.mat-rows td select:focus{border-color:#4da3e8}
+.mat-rows td:last-child{width:30px;text-align:center}
+.add-mat-btn{background:#091525;color:#6dd4a0;border:1px solid #1a4060;border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer;margin-top:5px}
+.add-mat-btn:hover{background:#1a3050}
+.add-group-btn{background:#0d1e38;color:#c8a84b;border:1px solid #c8a84b;border-radius:5px;padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer;margin-top:4px}
+.add-group-btn:hover{background:#1a2a0a}
 
 .toast{position:fixed;bottom:22px;right:22px;background:#1a5c3a;color:#6dd4a0;border:1px solid #2a7a50;border-radius:6px;padding:10px 18px;font-size:12px;font-weight:600;z-index:2000;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;max-width:320px}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -127,37 +146,18 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div class="sec-title gold" style="margin-bottom:14px">⚙️ One-time GitHub setup (2 minutes)</div>
     <div class="setup-step">
       <div class="step-num">1</div>
-      <div class="step-body">
-        Go to <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a>. Give it a name like <strong>MVS Editor</strong>. Under <strong>Repository permissions</strong>, set <strong>Contents → Read and write</strong>. Click <strong>Generate token</strong> and copy it.
-      </div>
+      <div class="step-body">Go to <a href="https://github.com/settings/tokens/new" target="_blank">github.com/settings/tokens/new</a>. Give it a name like <strong>MVS Editor</strong>. Under <strong>Repository permissions</strong>, set <strong>Contents → Read and write</strong>. Click <strong>Generate token</strong> and copy it.</div>
     </div>
     <div class="setup-step">
       <div class="step-num">2</div>
-      <div class="step-body">
-        Fill in your GitHub details below and click <strong>Save &amp; Test</strong>.
-      </div>
+      <div class="step-body">Fill in your GitHub details below and click <strong>Save &amp; Test</strong>.</div>
     </div>
     <div class="fgrid" style="gap:10px">
-      <div class="fg" style="grid-column:1/-1">
-        <label>GitHub Personal Access Token (fine-grained)</label>
-        <input id="gh-token" type="password" placeholder="github_pat_...">
-      </div>
-      <div class="fg">
-        <label>GitHub Username / Org</label>
-        <input id="gh-owner" placeholder="e.g. kavindyamaheshi303-beep">
-      </div>
-      <div class="fg">
-        <label>Repository Name</label>
-        <input id="gh-repo" placeholder="e.g. mvs-market">
-      </div>
-      <div class="fg">
-        <label>Branch</label>
-        <input id="gh-branch" placeholder="main" value="main">
-      </div>
-      <div class="fg">
-        <label>Path to data.json in repo</label>
-        <input id="gh-path" placeholder="data.json" value="data.json">
-      </div>
+      <div class="fg" style="grid-column:1/-1"><label>GitHub Personal Access Token (fine-grained)</label><input id="gh-token" type="password" placeholder="github_pat_..."></div>
+      <div class="fg"><label>GitHub Username / Org</label><input id="gh-owner" placeholder="e.g. kavindyamaheshi303-beep"></div>
+      <div class="fg"><label>Repository Name</label><input id="gh-repo" placeholder="e.g. mvs-market"></div>
+      <div class="fg"><label>Branch</label><input id="gh-branch" placeholder="main" value="main"></div>
+      <div class="fg"><label>Path to data.json in repo</label><input id="gh-path" placeholder="data.json" value="data.json"></div>
     </div>
     <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn-gold" onclick="saveGithubConfig()">💾 Save &amp; Test Connection</button>
@@ -166,13 +166,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div id="setup-result" style="margin-top:10px;font-size:12px;min-height:16px"></div>
   </div>
 
-  <!-- CONNECTED BADGE -->
   <div class="connected-badge" id="connected-badge">
     ✓ Connected to GitHub · <strong id="connected-repo">—</strong> · <span id="connected-path">—</span>
     <button class="btn-ghost" style="margin-left:12px;padding:2px 8px;font-size:10px" onclick="document.getElementById('setup-box').style.display='block'">Edit</button>
   </div>
 
-  <!-- PUBLISH BAR -->
   <div class="save-bar">
     <div class="save-info">
       <h3>🚀 Publish to Dashboard</h3>
@@ -249,15 +247,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     </div>
   </div>
 
-  <!-- T-BILLS -->
+  <!-- T-BILLS (yield chart data) -->
   <div class="section">
-    <div class="sec-title">Treasury Bills — Auction Data</div>
-    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Latest auction first.</div>
+    <div class="sec-title">Treasury Bills — Auction Yield Data (chart)</div>
+    <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Latest auction first. Used for the yield trend chart.</div>
     <table class="dyn-table">
       <thead><tr><th>Auction Date</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
       <tbody id="tbill-rows"></tbody>
     </table>
     <button class="add-btn" onclick="addRow('tbill-rows',['','','',''])">+ Add Row</button>
+  </div>
+
+  <!-- ══ NEW: T-BILL AUCTION DETAIL TABLE ══ -->
+  <div class="section">
+    <div class="sec-title green">Treasury Bill — Auction Detail Table (new dashboard table)</div>
+    <div class="tbill-auction-hint">
+      Each <strong>auction date block</strong> can have up to 3 maturity rows (3M, 6M, 12M) with Amount Offered, Amount Accepted and Yield.<br>
+      Columns in your Excel: <strong>F = Auction Date, G = Maturity, H = Amount Offered, I = Amount Accepted, J = %</strong>
+    </div>
+    <div id="auction-groups"></div>
+    <button class="add-group-btn" onclick="addAuctionGroup()">+ Add Auction Date</button>
   </div>
 
   <!-- T-BONDS -->
@@ -280,15 +289,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <div class="fg"><label>Liquidity Change (Rs.Bn)</label><input id="ex-delta" value="9.24"></div>
       <div class="fg">
         <label>Direction</label>
-        <select id="ex-dir">
-          <option value="increased">Increased</option>
-          <option value="decreased">Decreased</option>
-        </select>
+        <select id="ex-dir"><option value="increased">Increased</option><option value="decreased">Decreased</option></select>
       </div>
     </div>
     <div class="fg">
-      <label>Market Summary (free text — type anything here, shown on the dashboard)</label>
-      <textarea id="market-summary" rows="5" placeholder="Type your market commentary here — e.g. The rupee value of Treasury Bills and Treasury Bonds held by foreign investors decreased by approximately 3.32 percent..."></textarea>
+      <label>Market Summary (free text — shown as ticker on dashboard)</label>
+      <textarea id="market-summary" rows="5" placeholder="Type your market commentary here..."></textarea>
     </div>
   </div>
 
@@ -300,350 +306,309 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 <div class="toast" id="toast"></div>
 
 <script>
-// ── GLOBALS (must be first) ─────────────────────────────
+// ── GLOBALS ─────────────────────────────────────────────
 let bondHeaders = ['5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'];
 
-// ── STAFF AUTH ──────────────────────────────────────────
-const EDIT_USER = 'MVSeditor';
-const EDIT_PASS = 'MVSEdit@2026';
-
+// ── AUTH ────────────────────────────────────────────────
+const EDIT_USER='MVSeditor', EDIT_PASS='MVSEdit@2026';
 function login(){
-  if(document.getElementById('u').value.trim()===EDIT_USER && document.getElementById('p').value===EDIT_PASS){
+  if(document.getElementById('u').value.trim()===EDIT_USER&&document.getElementById('p').value===EDIT_PASS){
     sessionStorage.setItem('mvs_e','1');
     document.getElementById('login-page').style.display='none';
     document.getElementById('app').style.display='block';
     initApp();
-  } else {
-    document.getElementById('err').textContent='Incorrect username or password.';
-  }
+  }else document.getElementById('err').textContent='Incorrect username or password.';
 }
-document.getElementById('loginForm').addEventListener('submit', function(e){
-  e.preventDefault();
-  login();
-});
-function logout(){ sessionStorage.removeItem('mvs_e'); location.reload(); }
+document.getElementById('loginForm').addEventListener('submit',function(e){e.preventDefault();login();});
+function logout(){sessionStorage.removeItem('mvs_e');location.reload();}
 if(sessionStorage.getItem('mvs_e')==='1'){
   document.getElementById('login-page').style.display='none';
   document.getElementById('app').style.display='block';
   initApp();
 }
 
-// ── GITHUB CONFIG ───────────────────────────────────────
+// ── GITHUB CONFIG ────────────────────────────────────────
 function loadConfig(){
-  return {
-    token:  localStorage.getItem('mvs_gh_token')  || '',
-    owner:  localStorage.getItem('mvs_gh_owner')  || '',
-    repo:   localStorage.getItem('mvs_gh_repo')   || '',
-    branch: localStorage.getItem('mvs_gh_branch') || 'main',
-    path:   localStorage.getItem('mvs_gh_path')   || 'data.json'
-  };
+  return{token:localStorage.getItem('mvs_gh_token')||'',owner:localStorage.getItem('mvs_gh_owner')||'',repo:localStorage.getItem('mvs_gh_repo')||'',branch:localStorage.getItem('mvs_gh_branch')||'main',path:localStorage.getItem('mvs_gh_path')||'data.json'};
 }
-
 function initApp(){
   initDefaultRows();
-  const cfg = loadConfig();
-  if(cfg.token && cfg.owner && cfg.repo){
+  const cfg=loadConfig();
+  if(cfg.token&&cfg.owner&&cfg.repo){
     document.getElementById('setup-box').style.display='none';
     document.getElementById('connected-badge').style.display='block';
-    document.getElementById('connected-repo').textContent = cfg.owner+'/'+cfg.repo;
-    document.getElementById('connected-path').textContent = cfg.path+' ('+cfg.branch+')';
-    document.getElementById('gh-token').value  = cfg.token;
-    document.getElementById('gh-owner').value  = cfg.owner;
-    document.getElementById('gh-repo').value   = cfg.repo;
-    document.getElementById('gh-branch').value = cfg.branch;
-    document.getElementById('gh-path').value   = cfg.path;
+    document.getElementById('connected-repo').textContent=cfg.owner+'/'+cfg.repo;
+    document.getElementById('connected-path').textContent=cfg.path+' ('+cfg.branch+')';
+    document.getElementById('gh-token').value=cfg.token;
+    document.getElementById('gh-owner').value=cfg.owner;
+    document.getElementById('gh-repo').value=cfg.repo;
+    document.getElementById('gh-branch').value=cfg.branch;
+    document.getElementById('gh-path').value=cfg.path;
   }
 }
-
 async function saveGithubConfig(){
-  const token  = document.getElementById('gh-token').value.trim();
-  const owner  = document.getElementById('gh-owner').value.trim();
-  const repo   = document.getElementById('gh-repo').value.trim();
-  const branch = document.getElementById('gh-branch').value.trim() || 'main';
-  const path   = document.getElementById('gh-path').value.trim()   || 'data.json';
-  const result = document.getElementById('setup-result');
-
-  if(!token||!owner||!repo){ result.style.color='#e87a4d'; result.textContent='Fill in all fields.'; return; }
-
-  result.style.color='#c8a84b'; result.textContent='Testing connection…';
-
+  const token=document.getElementById('gh-token').value.trim(),owner=document.getElementById('gh-owner').value.trim(),repo=document.getElementById('gh-repo').value.trim(),branch=document.getElementById('gh-branch').value.trim()||'main',path=document.getElementById('gh-path').value.trim()||'data.json';
+  const result=document.getElementById('setup-result');
+  if(!token||!owner||!repo){result.style.color='#e87a4d';result.textContent='Fill in all fields.';return;}
+  result.style.color='#c8a84b';result.textContent='Testing connection…';
   try{
-    const res = await ghGet(owner, repo, branch, path, token);
-    localStorage.setItem('mvs_gh_token',  token);
-    localStorage.setItem('mvs_gh_owner',  owner);
-    localStorage.setItem('mvs_gh_repo',   repo);
-    localStorage.setItem('mvs_gh_branch', branch);
-    localStorage.setItem('mvs_gh_path',   path);
+    const res=await ghGet(owner,repo,branch,path,token);
+    localStorage.setItem('mvs_gh_token',token);localStorage.setItem('mvs_gh_owner',owner);
+    localStorage.setItem('mvs_gh_repo',repo);localStorage.setItem('mvs_gh_branch',branch);localStorage.setItem('mvs_gh_path',path);
     result.style.color='#6dd4a0';
-    result.textContent = res.sha
-      ? '✓ Connected! Found data.json (SHA: '+res.sha.slice(0,8)+'…). You can now Publish.'
-      : '✓ Connected! data.json not found yet — it will be created on first Publish.';
+    result.textContent=res.sha?'✓ Connected! Found data.json (SHA: '+res.sha.slice(0,8)+'…). You can now Publish.':'✓ Connected! data.json not found yet — it will be created on first Publish.';
     document.getElementById('connected-badge').style.display='block';
-    document.getElementById('connected-repo').textContent = owner+'/'+repo;
-    document.getElementById('connected-path').textContent = path+' ('+branch+')';
+    document.getElementById('connected-repo').textContent=owner+'/'+repo;
+    document.getElementById('connected-path').textContent=path+' ('+branch+')';
     showToast('✓ GitHub connected!');
-  } catch(e){
-    result.style.color='#e87a4d';
-    result.textContent='✗ '+e.message;
-  }
+  }catch(e){result.style.color='#e87a4d';result.textContent='✗ '+e.message;}
 }
 
-// ── GITHUB API HELPERS ──────────────────────────────────
-async function ghGet(owner, repo, branch, path, token){
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-  const res = await fetch(url,{ headers:{
-    'Authorization':'Bearer '+token,
-    'Accept':'application/vnd.github+json'
-  }});
-  if(res.status===404) return {sha:null};
-  if(!res.ok){ const d=await res.json(); throw new Error(d.message||'GitHub error '+res.status); }
+// ── GITHUB API ───────────────────────────────────────────
+async function ghGet(owner,repo,branch,path,token){
+  const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,{headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}});
+  if(res.status===404)return{sha:null};
+  if(!res.ok){const d=await res.json();throw new Error(d.message||'GitHub error '+res.status);}
+  return res.json();
+}
+async function ghPut(owner,repo,branch,path,token,content,sha){
+  const body={message:'Update market data — '+new Date().toLocaleString('en-GB',{timeZone:'Asia/Colombo'}),content:btoa(unescape(encodeURIComponent(content))),branch};
+  if(sha)body.sha=sha;
+  const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`,{method:'PUT',headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!res.ok){const d=await res.json();throw new Error(d.message||'GitHub error '+res.status);}
   return res.json();
 }
 
-async function ghPut(owner, repo, branch, path, token, content, sha){
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
-  const body = {
-    message: 'Update market data — '+new Date().toLocaleString('en-GB',{timeZone:'Asia/Colombo'}),
-    content: btoa(unescape(encodeURIComponent(content))),
-    branch:  branch
-  };
-  if(sha) body.sha = sha;
-  const res = await fetch(url,{
-    method:'PUT',
-    headers:{
-      'Authorization':'Bearer '+token,
-      'Accept':'application/vnd.github+json',
-      'Content-Type':'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-  if(!res.ok){ const d=await res.json(); throw new Error(d.message||'GitHub error '+res.status); }
-  return res.json();
-}
-
-// ── PUBLISH ─────────────────────────────────────────────
+// ── PUBLISH ──────────────────────────────────────────────
 async function publishData(){
-  const cfg = loadConfig();
-  if(!cfg.token||!cfg.owner||!cfg.repo){
-    showToast('Complete the GitHub setup first.','err');
-    document.getElementById('setup-box').style.display='block';
-    return;
-  }
-  const st = document.getElementById('save-status');
+  const cfg=loadConfig();
+  if(!cfg.token||!cfg.owner||!cfg.repo){showToast('Complete the GitHub setup first.','err');document.getElementById('setup-box').style.display='block';return;}
+  const st=document.getElementById('save-status');
   st.className='save-status saving';
-  const content = JSON.stringify(buildData(), null, 2);
-
-  for(let attempt=1; attempt<=5; attempt++){
+  const content=JSON.stringify(buildData(),null,2);
+  for(let attempt=1;attempt<=5;attempt++){
     try{
-      st.textContent = 'Publishing… (attempt '+attempt+') fetching SHA…';
-      const cur = await ghGet(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token);
-      st.textContent = 'Committing to GitHub…';
-      await ghPut(cfg.owner, cfg.repo, cfg.branch, cfg.path, cfg.token, content, cur.sha||null);
+      st.textContent='Publishing… (attempt '+attempt+') fetching SHA…';
+      const cur=await ghGet(cfg.owner,cfg.repo,cfg.branch,cfg.path,cfg.token);
+      st.textContent='Committing to GitHub…';
+      await ghPut(cfg.owner,cfg.repo,cfg.branch,cfg.path,cfg.token,content,cur.sha||null);
       st.className='save-status ok';
       st.textContent='✓ Published at '+new Date().toLocaleTimeString()+' — dashboard updates in ~30 sec.';
-      showToast('✓ Published to GitHub!');
-      return;
-    } catch(e){
-      const isConflict = e.message&&(
-        e.message.includes('does not match')||
-        e.message.includes('409')||
-        e.message.includes('sha')||
-        e.message.includes('conflict')
-      );
-      if(isConflict && attempt < 5){
-        st.textContent = 'SHA conflict — retrying ('+attempt+'/5)…';
-        await new Promise(r=>setTimeout(r, 800*attempt));
-        continue;
-      }
-      st.className='save-status fail';
-      st.textContent='✗ '+e.message;
-      showToast(e.message,'err');
-      return;
+      showToast('✓ Published to GitHub!');return;
+    }catch(e){
+      const isConflict=e.message&&(e.message.includes('does not match')||e.message.includes('409')||e.message.includes('sha')||e.message.includes('conflict'));
+      if(isConflict&&attempt<5){st.textContent='SHA conflict — retrying ('+attempt+'/5)…';await new Promise(r=>setTimeout(r,800*attempt));continue;}
+      st.className='save-status fail';st.textContent='✗ '+e.message;showToast(e.message,'err');return;
     }
   }
 }
 
-// ── DATA BUILDER ────────────────────────────────────────
-function gv(id){ return document.getElementById(id).value.trim(); }
+// ── DATA BUILDER ─────────────────────────────────────────
+function gv(id){return document.getElementById(id).value.trim();}
 function buildData(){
-  return {
-    date: gv('f-date'),
-    callMarket:{ min:gv('cm-min'), max:gv('cm-max'), wa:gv('cm-wa'), vol:gv('cm-vol') },
-    repoMarket:{ min:gv('rm-min'), max:gv('rm-max'), wa:gv('rm-wa'), vol:gv('rm-vol') },
-    liquidity:{
-      current:gv('liq-cur'), previous:gv('liq-prev'),
-      labels: getRows('liq-rows').map(r=>r[0]),
-      values: getRows('liq-rows').map(r=>parseFloat(r[1])||0)
-    },
-    fxSwaps:{
-      '1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},
-      '1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},
-      '2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},
-      '3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},
-      '6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},
-      '1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}
-    },
-    usdlkr:{
-      labels: getRows('fx-rows').map(r=>r[0]),
-      values: getRows('fx-rows').map(r=>parseFloat(r[1])||0),
-      close:  gv('fx-close')
-    },
-    tbills: getRows('tbill-rows').map(r=>({date:r[0],m3:r[1],m6:r[2],m12:r[3]})),
-    bonds:{
-      headers: bondHeaders,
-      rows: getRows('bond-rows').map(r=>({bond:r[0],values:r.slice(1)}))
-    },
-    execSummary:{
-      usdlkr:   gv('ex-usdlkr'),
-      liqDelta: gv('ex-delta'),
-      liqDir:   document.getElementById('ex-dir').value
-    },
-    marketSummary: document.getElementById('market-summary').value.trim()
+  return{
+    date:gv('f-date'),
+    callMarket:{min:gv('cm-min'),max:gv('cm-max'),wa:gv('cm-wa'),vol:gv('cm-vol')},
+    repoMarket:{min:gv('rm-min'),max:gv('rm-max'),wa:gv('rm-wa'),vol:gv('rm-vol')},
+    liquidity:{current:gv('liq-cur'),previous:gv('liq-prev'),labels:getRows('liq-rows').map(r=>r[0]),values:getRows('liq-rows').map(r=>parseFloat(r[1])||0)},
+    fxSwaps:{'1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},'1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},'2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},'3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},'6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},'1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}},
+    usdlkr:{labels:getRows('fx-rows').map(r=>r[0]),values:getRows('fx-rows').map(r=>parseFloat(r[1])||0),close:gv('fx-close')},
+    tbills:getRows('tbill-rows').map(r=>({date:r[0],m3:r[1],m6:r[2],m12:r[3]})),
+    // NEW: T-Bill auction detail
+    tbillAuction:getAuctionData(),
+    bonds:{headers:bondHeaders,rows:getRows('bond-rows').map(r=>({bond:r[0],values:r.slice(1)}))},
+    execSummary:{usdlkr:gv('ex-usdlkr'),liqDelta:gv('ex-delta'),liqDir:document.getElementById('ex-dir').value},
+    marketSummary:document.getElementById('market-summary').value.trim()
   };
 }
 
-// ── DYNAMIC ROWS ────────────────────────────────────────
-
-function addRow(tbodyId, defaults){
-  const tbody = document.getElementById(tbodyId);
-  const tr = document.createElement('tr');
-  tr.innerHTML = defaults.map(v=>`<td><input value="${v}"></td>`).join('')
-    + `<td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+// ── DYNAMIC ROWS ─────────────────────────────────────────
+function addRow(tbodyId,defaults){
+  const tbody=document.getElementById(tbodyId);
+  const tr=document.createElement('tr');
+  tr.innerHTML=defaults.map(v=>`<td><input value="${v}"></td>`).join('')+`<td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
   tbody.appendChild(tr);
 }
 function getRows(tbodyId){
-  return Array.from(document.getElementById(tbodyId).querySelectorAll('tr'))
-    .map(tr=>Array.from(tr.querySelectorAll('input')).map(i=>i.value.trim()));
-}
-function renderBondHeaders(){
-  const div = document.getElementById('bond-headers-row');
-  div.innerHTML = '<label style="font-size:10px;color:#7fa3c8;text-transform:uppercase;grid-column:1/-1">Column date headers:</label>';
-  bondHeaders.forEach((h,i)=>{
-    div.innerHTML += `<div class="fg"><label>Col ${i+1}</label><input value="${h}" oninput="bondHeaders[${i}]=this.value;updateBondHeaderCells()"></div>`;
-  });
-  updateBondHeaderCells();
-}
-function updateBondHeaderCells(){
-  bondHeaders.forEach((h,i)=>{ const el=document.getElementById('bh'+i); if(el) el.textContent=h||'—'; });
+  return Array.from(document.getElementById(tbodyId).querySelectorAll('tr')).map(tr=>Array.from(tr.querySelectorAll('input')).map(i=>i.value.trim()));
 }
 
+// ── AUCTION GROUP BUILDER ────────────────────────────────
+function addAuctionGroup(dateVal, maturities){
+  const container=document.getElementById('auction-groups');
+  const groupId='ag_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+  const div=document.createElement('div');
+  div.className='auction-group';
+  div.id=groupId;
+  div.innerHTML=`
+    <div class="auction-group-hdr">
+      <label>Auction Date</label>
+      <input class="ag-date" placeholder="e.g. 6/17/2026" value="${dateVal||''}">
+      <button class="rm-group-btn" onclick="document.getElementById('${groupId}').remove()">✕ Remove</button>
+    </div>
+    <div class="mat-rows">
+      <table>
+        <thead><tr><th>Maturity</th><th>Amount Offered (Rs.Mn)</th><th>Amount Accepted (Rs.Mn)</th><th>Yield (%)</th><th></th></tr></thead>
+        <tbody class="ag-mat-body"></tbody>
+      </table>
+    </div>
+    <button class="add-mat-btn" onclick="addMatRow(this)">+ Add Maturity Row</button>`;
+  container.appendChild(div);
+  const matBody=div.querySelector('.ag-mat-body');
+  if(maturities&&maturities.length){
+    maturities.forEach(m=>addMatRowToBody(matBody,m.maturity||'',m.offered||'',m.accepted||'',m.yield||''));
+  }else{
+    // default 3 rows for 3M, 6M, 12M
+    ['3M','6M','12M'].forEach(m=>addMatRowToBody(matBody,m,'','',''));
+  }
+}
+function addMatRow(btn){
+  const body=btn.previousElementSibling.querySelector('.ag-mat-body');
+  addMatRowToBody(body,'','','','');
+}
+function addMatRowToBody(body,mat,offered,accepted,yld){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td><select style="background:#060f1e;border:1px solid #0d2040;border-radius:3px;padding:4px 7px;color:#d4e4f4;font-size:11px;width:100%;outline:none">
+      <option${mat==='3M'?' selected':''}>3M</option>
+      <option${mat==='6M'?' selected':''}>6M</option>
+      <option${mat==='12M'?' selected':''}>12M</option>
+    </select></td>
+    <td><input value="${offered}" placeholder="—"></td>
+    <td><input value="${accepted}" placeholder="—"></td>
+    <td><input value="${yld}" placeholder="—"></td>
+    <td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
+  body.appendChild(tr);
+}
+function getAuctionData(){
+  const groups=document.querySelectorAll('.auction-group');
+  return Array.from(groups).map(g=>{
+    const date=g.querySelector('.ag-date').value.trim();
+    const mats=Array.from(g.querySelectorAll('.ag-mat-body tr')).map(tr=>{
+      const cells=tr.querySelectorAll('select,input');
+      return{maturity:cells[0]?cells[0].value.trim():'',offered:cells[1]?cells[1].value.trim():'',accepted:cells[2]?cells[2].value.trim():'',yield:cells[3]?cells[3].value.trim():''};
+    });
+    return{date,maturities:mats};
+  }).filter(g=>g.date);
+}
+
+// ── BOND HEADERS ──────────────────────────────────────────
+function renderBondHeaders(){
+  const div=document.getElementById('bond-headers-row');
+  div.innerHTML='<label style="font-size:10px;color:#7fa3c8;text-transform:uppercase;grid-column:1/-1">Column date headers:</label>';
+  bondHeaders.forEach((h,i)=>{div.innerHTML+=`<div class="fg"><label>Col ${i+1}</label><input value="${h}" oninput="bondHeaders[${i}]=this.value;updateBondHeaderCells()"></div>`;});
+  updateBondHeaderCells();
+}
+function updateBondHeaderCells(){bondHeaders.forEach((h,i)=>{const el=document.getElementById('bh'+i);if(el)el.textContent=h||'—';});}
+
+// ── DEFAULT DATA ──────────────────────────────────────────
 function initDefaultRows(){
   [['4-Jun','105.04'],['5-Jun','63.25'],['6-Jun','59.18'],['9-Jun','57.38'],['10-Jun','66.62']].forEach(r=>addRow('liq-rows',r));
   [['4-Jun','336.07'],['5-Jun','337.15'],['6-Jun','338.00'],['9-Jun','335.00'],['10-Jun','337.00'],['11-Jun','337.15'],['12-Jun','336.50']].forEach(r=>addRow('fx-rows',r));
   [['6/10/2026','10.09','10.27','10.16'],['6/3/2026','9.84','10.01','10.02'],['5/26/2026','9.36','9.68','9.83'],['5/20/2026','8.18','8.25','8.49'],['5/13/2026','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
-  [['15.12.2026','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],
-   ['15.09.2027','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],
-   ['15.12.2028','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],
-   ['15.12.2029','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],
-   ['01.07.2030','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],
-   ['15.03.2031','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],
-   ['15.12.2032','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],
-   ['01.11.2033','12.40/12.80','12.65/13','12.65/13','12.7/13','0','0'],
-   ['15.06.2034','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2','0','0'],
-   ['15.03.2035','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3','0','0'],
-   ['01.08.2036','12.60/13.20','13/13.5','13/13.5','13/13.5','0','0'],
-   ['01.07.2037','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4','0','0']].forEach(r=>addRow('bond-rows',r));
+
+  // Default auction detail groups matching your Excel image
+  addAuctionGroup('6/17/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('6/10/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('6/3/2026', [{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('5/26/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+
+  [['15.12.2026','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],['15.09.2027','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],['15.12.2028','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],['15.12.2029','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],['01.07.2030','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],['15.03.2031','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],['15.12.2032','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],['01.11.2033','12.40/12.80','12.65/13','12.65/13','12.7/13','0','0'],['15.06.2034','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2','0','0'],['15.03.2035','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3','0','0'],['01.08.2036','12.60/13.20','13/13.5','13/13.5','13/13.5','0','0'],['01.07.2037','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4','0','0']].forEach(r=>addRow('bond-rows',r));
   renderBondHeaders();
 }
 
-// ── EXCEL IMPORT ────────────────────────────────────────
+// ── EXCEL IMPORT ─────────────────────────────────────────
 function importExcel(event){
-  const file=event.target.files[0]; if(!file) return;
+  const file=event.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=function(e){
     try{
       const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
       applyMVSExcel(wb);
       showToast('✓ Excel imported! Review then click Publish.');
-    }catch(err){ showToast('⚠ Error: '+err.message,'err'); console.error(err); }
+    }catch(err){showToast('⚠ Error: '+err.message,'err');console.error(err);}
     event.target.value='';
   };
   reader.readAsBinaryString(file);
 }
-
 function fmtDate(d){
-  if(!d) return '';
-  const dt = (d instanceof Date) ? d : new Date(d);
-  if(isNaN(dt)) return String(d);
+  if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);
+  if(isNaN(dt))return String(d);
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return dt.getDate()+'-'+months[dt.getMonth()];
 }
-function fmtDateFull(d){
-  if(!d) return '';
-  const dt = (d instanceof Date) ? d : new Date(d);
-  if(isNaN(dt)) return String(d);
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const day=dt.getDate();
-  const sfx=day===1?'st':day===2?'nd':day===3?'rd':'th';
-  return day+sfx+' '+months[dt.getMonth()]+' '+dt.getFullYear();
-}
-function sv(id,val){ if(val!==undefined&&val!==''&&val!==null) document.getElementById(id).value=String(val); }
-function n2(v){ return (typeof v==='number')?v.toFixed(2):String(v||''); }
+function sv(id,val){if(val!==undefined&&val!==''&&val!==null)document.getElementById(id).value=String(val);}
+function n2(v){return(typeof v==='number')?v.toFixed(2):String(v||'');}
 
 function applyMVSExcel(wb){
-  const ws = wb.Sheets['get_data'];
-  if(!ws){ showToast('⚠ Sheet "get_data" not found!','err'); return; }
-  const rows = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false,dateNF:'yyyy-mm-dd'});
-  const rowsRaw = XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
+  const ws=wb.Sheets['get_data'];
+  if(!ws){showToast('⚠ Sheet "get_data" not found!','err');return;}
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:false,dateNF:'yyyy-mm-dd'});
+  const rowsRaw=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,raw:true});
 
-  const _td=new Date(), _dy=_td.getDate();
+  const _td=new Date(),_dy=_td.getDate();
   const _sx=_dy===1||_dy===21||_dy===31?'st':_dy===2||_dy===22?'nd':_dy===3||_dy===23?'rd':'th';
   const _ml=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  sv('f-date', _dy+_sx+' '+_ml[_td.getMonth()]+' '+_td.getFullYear());
+  sv('f-date',_dy+_sx+' '+_ml[_td.getMonth()]+' '+_td.getFullYear());
 
-  const hdrRow = rows[0];
+  // Bond headers (row 0, cols 20-25)
+  const hdrRow=rows[0];
   if(hdrRow){
     const bh=[20,21,22,23,24,25].map(c=>String(hdrRow[c]||'').trim()).filter(h=>h);
-    if(bh.length){ bondHeaders=bh.slice(0,6); renderBondHeaders(); }
+    if(bh.length){bondHeaders=bh.slice(0,6);renderBondHeaders();}
   }
 
+  // FX data (rows 1-7, col 0=date, col 1=rate)
   const fxData=[];
   for(let i=1;i<=7;i++){
-    const dv=rows[i]?.[0], rv=rowsRaw[i]?.[1];
+    const dv=rows[i]?.[0],rv=rowsRaw[i]?.[1];
     if(!dv||rv===null||rv===undefined||rv===0)continue;
-    fxData.push([fmtDate(new Date(dv)), n2(rv)]);
+    fxData.push([fmtDate(new Date(dv)),n2(rv)]);
   }
   if(fxData.length){
     document.getElementById('fx-rows').innerHTML='';
     fxData.forEach(r=>addRow('fx-rows',r));
     const lastFX=fxData[fxData.length-1][1];
-    sv('fx-close',lastFX+'/'+lastFX);
-    sv('ex-usdlkr',lastFX+'/'+lastFX);
+    sv('fx-close',lastFX+'/'+lastFX);sv('ex-usdlkr',lastFX+'/'+lastFX);
   }
 
+  // Liquidity data (rows 1-6, col 7=date, col 8=value)
   const liqData=[];
   for(let i=1;i<=6;i++){
-    const dv=rows[i]?.[7], lv=rowsRaw[i]?.[8];
+    const dv=rows[i]?.[7],lv=rowsRaw[i]?.[8];
     if(!dv||lv===null||lv===undefined||typeof lv!=='number')continue;
-    liqData.push([fmtDate(new Date(dv)), n2(lv)]);
+    liqData.push([fmtDate(new Date(dv)),n2(lv)]);
   }
   if(liqData.length){
     document.getElementById('liq-rows').innerHTML='';
     liqData.forEach(r=>addRow('liq-rows',r));
-    sv('liq-cur',  liqData[liqData.length-1][1]);
-    sv('liq-prev', liqData.length>1?liqData[liqData.length-2][1]:'');
+    sv('liq-cur',liqData[liqData.length-1][1]);
+    sv('liq-prev',liqData.length>1?liqData[liqData.length-2][1]:'');
   }
 
+  // T-Bill yield chart data (rows 1-7, col 10=date, 11=3M, 12=6M, 13=12M)
   const tbData=[];
   for(let i=1;i<=7;i++){
-    const dv=rows[i]?.[10], m3=rowsRaw[i]?.[11], m6=rowsRaw[i]?.[12], m12=rowsRaw[i]?.[13];
+    const dv=rows[i]?.[10],m3=rowsRaw[i]?.[11],m6=rowsRaw[i]?.[12],m12=rowsRaw[i]?.[13];
     if(!dv||m3===null||m3===undefined)continue;
-    tbData.push([fmtDate(new Date(dv)), n2(m3), n2(m6), n2(m12)]);
+    tbData.push([fmtDate(new Date(dv)),n2(m3),n2(m6),n2(m12)]);
   }
   if(tbData.length){
     document.getElementById('tbill-rows').innerHTML='';
     tbData.forEach(r=>addRow('tbill-rows',r));
   }
 
+  // Money market rates (rows 1-4, col 15=label, 16=call, 17=repo)
   for(let i=1;i<=4;i++){
     const lbl=String(rows[i]?.[15]||'').toLowerCase();
-    const call=rowsRaw[i]?.[16], repo=rowsRaw[i]?.[17];
-    if(lbl.includes('minimum')){  sv('cm-min',n2(call)); sv('rm-min',n2(repo)); }
-    if(lbl.includes('maximum')){  sv('cm-max',n2(call)); sv('rm-max',n2(repo)); }
-    if(lbl.includes('w.a')||lbl.includes('yield')){ sv('cm-wa',n2(call)); sv('rm-wa',n2(repo)); }
-    if(lbl.includes('gross')||lbl.includes('volume')){ sv('cm-vol',n2(call)); sv('rm-vol',n2(repo)); }
+    const call=rowsRaw[i]?.[16],repo=rowsRaw[i]?.[17];
+    if(lbl.includes('minimum')){sv('cm-min',n2(call));sv('rm-min',n2(repo));}
+    if(lbl.includes('maximum')){sv('cm-max',n2(call));sv('rm-max',n2(repo));}
+    if(lbl.includes('w.a')||lbl.includes('yield')){sv('cm-wa',n2(call));sv('rm-wa',n2(repo));}
+    if(lbl.includes('gross')||lbl.includes('volume')){sv('cm-vol',n2(call));sv('rm-vol',n2(repo));}
   }
 
+  // Bond rows (rows 1-12, col 19=maturity, cols 20-25=values)
   const bondData=[];
   for(let i=1;i<=12;i++){
     const mat=String(rows[i]?.[19]||'').trim();
@@ -660,35 +625,70 @@ function applyMVSExcel(wb){
     bondData.forEach(r=>addRow('bond-rows',r));
   }
 
-  const execWs = wb.Sheets['Executive summary'];
+  // ── NEW: T-Bill Auction Detail (cols F-J = indices 5-9)
+  // Sheet: get_data  Columns: F(5)=Auction Date, G(6)=Maturity, H(7)=Amount Offered, I(8)=Amount Accepted, J(9)=%
+  // Rows: scan rows 1 onwards until no more data
+  const auctionGroups=[];
+  let currentGroup=null;
+  for(let i=1;i<Math.min(rows.length,50);i++){
+    const dateVal=rowsRaw[i]?.[5];   // col F
+    const matVal =String(rows[i]?.[6]||'').trim();  // col G
+    const offered=rowsRaw[i]?.[7];   // col H
+    const accepted=rowsRaw[i]?.[8];  // col I
+    const yld=rowsRaw[i]?.[9];       // col J
+    // Skip rows with no maturity and no date
+    if(!matVal&&(dateVal===null||dateVal===undefined||dateVal===''))continue;
+    // If there's a date value in col F, start a new group
+    if(dateVal!==null&&dateVal!==undefined&&dateVal!==''){
+      const parsedDate=dateVal instanceof Date?dateVal:new Date(dateVal);
+      const dateStr=isNaN(parsedDate)?String(dateVal):(parsedDate.getMonth()+1)+'/'+parsedDate.getDate()+'/'+parsedDate.getFullYear();
+      currentGroup={date:dateStr,maturities:[]};
+      auctionGroups.push(currentGroup);
+    }
+    // Add maturity row to current group
+    if(currentGroup&&matVal){
+      const matLabel=matVal.toUpperCase().includes('3')?'3M':matVal.toUpperCase().includes('6')?'6M':matVal.toUpperCase().includes('12')?'12M':matVal;
+      currentGroup.maturities.push({
+        maturity:matLabel,
+        offered:offered!==null&&offered!==undefined?String(offered):'',
+        accepted:accepted!==null&&accepted!==undefined?String(accepted):'',
+        yield:yld!==null&&yld!==undefined?(typeof yld==='number'?yld.toFixed(2):String(yld)):''
+      });
+    }
+  }
+  if(auctionGroups.length){
+    document.getElementById('auction-groups').innerHTML='';
+    auctionGroups.forEach(g=>addAuctionGroup(g.date,g.maturities));
+    showToast('✓ T-Bill auction data imported: '+auctionGroups.length+' dates');
+  }
+
+  // Executive summary sheet
+  const execWs=wb.Sheets['Executive summary'];
   if(execWs){
-    const execRows = XLSX.utils.sheet_to_json(execWs,{header:1,defval:''});
+    const execRows=XLSX.utils.sheet_to_json(execWs,{header:1,defval:''});
     execRows.forEach(r=>{
       const txt=String(r[0]||'').trim();
       const usdM=txt.match(/USD\/LKR\s+Closed\s+at\s+([\d.\/]+)/i);
-      if(usdM){ sv('ex-usdlkr',usdM[1]); sv('fx-close',usdM[1]); }
+      if(usdM){sv('ex-usdlkr',usdM[1]);sv('fx-close',usdM[1]);}
       const liqM=txt.match(/liquidity\s+(increased|decreased)\s+by\s+([\d.]+)/i);
-      if(liqM){
-        document.getElementById('ex-dir').value=liqM[1].toLowerCase();
-        sv('ex-delta',liqM[2]);
-      }
+      if(liqM){document.getElementById('ex-dir').value=liqM[1].toLowerCase();sv('ex-delta',liqM[2]);}
     });
   }
 
-  const sumWs = wb.Sheets['Summary'];
+  // Summary sheet (FX swaps)
+  const sumWs=wb.Sheets['Summary'];
   if(sumWs){
-    const sumRows = XLSX.utils.sheet_to_json(sumWs,{header:1,defval:null,raw:true});
-    const dateLabel = sumRows[2] && sumRows[2][7] ? String(sumRows[2][7]) : '';
-    if(dateLabel) sv('f-date', dateLabel+' 2026');
-
+    const sumRows=XLSX.utils.sheet_to_json(sumWs,{header:1,defval:null,raw:true});
+    const dateLabel=sumRows[2]&&sumRows[2][7]?String(sumRows[2][7]):'';
+    if(dateLabel)sv('f-date',dateLabel+' 2026');
     const swapKeys=['1w','1m','2m','3m','6m','1y'];
     const swapRows=[6,8,10,12,14,16];
     swapRows.forEach((ri,i)=>{
       const r=sumRows[ri];
       if(r){
-        const sell=r[15], buy=r[16];
-        if(sell) sv('sw-'+swapKeys[i]+'-s', typeof sell==='number'?sell.toFixed(2):sell);
-        if(buy)  sv('sw-'+swapKeys[i]+'-b', typeof buy==='number'?buy.toFixed(2):buy);
+        const sell=r[15],buy=r[16];
+        if(sell)sv('sw-'+swapKeys[i]+'-s',typeof sell==='number'?sell.toFixed(2):sell);
+        if(buy) sv('sw-'+swapKeys[i]+'-b',typeof buy==='number'?buy.toFixed(2):buy);
       }
     });
   }
@@ -696,38 +696,28 @@ function applyMVSExcel(wb){
 
 function downloadTemplate(){
   const rows=[
-    ['Field','Value1','Value2','Value3','Value4','Value5','Value6','Value7'],
-    ['Date','12th June 2026'],
-    ['Call Min Rate','9.15','9.23'],['Call Max Rate','9.25','9.25'],
-    ['Call WA Yield','9.19','9.24'],['Call Vol','34.33','82.99'],
-    ['Liquidity Cur','66.62','57.38'],
-    ['Liq Values','105.04','63.25','59.18','57.38','66.62'],
-    ['Liq Labels','4-Jun','5-Jun','6-Jun','9-Jun','10-Jun'],
-    ['FX 1W','5.75','7.25'],['FX 1M','6.00','6.75'],['FX 2M','6.00','6.50'],
-    ['FX 3M','6.00','6.40'],['FX 6M','5.50','6.10'],['FX 1Y','5.15','6.00'],
-    ['USDLKR Values','336.07','337.15','338.00','335.00','337.00','337.15','336.50'],
-    ['USDLKR Labels','4-Jun','5-Jun','6-Jun','9-Jun','10-Jun','11-Jun','12-Jun'],
-    ['FX Close','336.50/337.00'],
-    ['Bond Headers','5-Jun','8-Jun','9-Jun','10-Jun','11-Jun','12-Jun'],
-    ['TBILL_1','6/10/2026','10.09','10.27','10.16'],
-    ['TBILL_2','6/3/2026','9.84','10.01','10.02'],
-    ['BOND_1','15.12.2026','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],
-    ['BOND_2','15.09.2027','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],
-    ['Exec USDLKR','336.50/337.00'],
-    ['Exec Liq Delta','9.24'],
-    ['Exec Liq Dir','increased'],
+    ['Field','Value1','Value2','Value3','Value4','Value5','Value6','Value7','','','','','','','','','','','','','','','','','',''],
+    // Row 1 - headers for T-Bill auction cols F-J
+    ['FX Date','FX Rate','','','','Auction Date','Maturity','Offered','Accepted','Yield%','TBill Date','3M','6M','12M','','Money Mkt Label','Call','Repo','','Bond Maturity','Col1','Col2','Col3','Col4','Col5','Col6'],
+    // Row 2 - first FX + first auction
+    ['6/4/2026','336.07','','','','6/17/2026','3M','','','','6/10/2026','10.09','10.27','10.16','','Minimum Rate(%)','9.15','9.23','','15.12.2026','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],
+    ['6/5/2026','337.15','','','','','6M','','','','6/3/2026','9.84','10.01','10.02','','Maximum Rate(%)','9.25','9.25','','15.09.2027','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],
+    ['6/6/2026','338.00','','','','','12M','','','','5/26/2026','9.36','9.68','9.83','','W.A Yield (%)','9.19','9.24','','15.12.2028','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],
+    ['6/9/2026','335.00','','','','6/10/2026','3M','','','','5/20/2026','8.18','8.25','8.49','','Gross Volume(Bn)','34.33','82.99','','15.12.2029','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],
+    ['6/10/2026','337.00','','','','','6M','','','','','','','','','','','','','01.07.2030','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],
+    ['6/11/2026','337.15','','','','','12M','','','','','','','','','','','','','15.03.2031','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],
+    ['6/12/2026','336.50','','','','6/3/2026','3M','','','','','','','','','','','','','15.12.2032','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],
   ];
   const wb=XLSX.utils.book_new();
   const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:18},...Array(7).fill({wch:14})];
-  XLSX.utils.book_append_sheet(wb,ws,'MVS Data');
+  ws['!cols']=[...Array(26).fill({wch:14})];
+  XLSX.utils.book_append_sheet(wb,ws,'get_data');
   XLSX.writeFile(wb,'MVS_Data_Template.xlsx');
 }
 
-function showToast(msg, type=''){
+function showToast(msg,type=''){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast'+(type?(' '+type):'')+' show';
+  t.textContent=msg;t.className='toast'+(type?' '+type:'')+' show';
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 </script>
