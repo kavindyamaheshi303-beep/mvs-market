@@ -146,7 +146,7 @@ canvas{max-width:100%!important}
       <div class="panel-title pt-row"><span>Treasury Bill</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('tbill',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('tbill','all',this)" title="Full year (all data)">Y</button></span></div>
       <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas>
       <table style="font-size:10px;margin-bottom:12px">
-        <thead><tr><th>Auction Date</th><th>EOY</th><th>EOM</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
+        <thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
         <tbody id="tbillRows"></tbody>
       </table>
       <!-- Auction Detail Table inside T-Bill panel -->
@@ -400,10 +400,10 @@ function render(d){
 
   const tb=document.getElementById("tbillRows");tb.innerHTML="";
   // show only the 4 most recent auctions (d.tbills is newest-first)
-  (d.tbills||[]).slice(0,4).forEach(r=>{const tr=document.createElement("tr");const blk=v=>(v&&String(v).trim()&&v!=="0")?v:"—";tr.innerHTML=`<td>${r.date}</td><td>${blk(r.eoy)}</td><td>${blk(r.eom)}</td><td>${r.m3}</td><td>${r.m6}</td><td>${r.m12}</td>`;tb.appendChild(tr);});
+  (d.tbills||[]).slice(0,4).forEach(r=>{const tr=document.createElement("tr");const blk=v=>(v&&String(v).trim()&&v!=="0")?v:"—";tr.innerHTML=`<td>${r.date}</td><td>${r.m3}</td><td>${r.m6}</td><td>${r.m12}</td>`;tb.appendChild(tr);});
 
   // ── Bond table: AVERAGE (mid) rates with professional transparent heat-map
-  const bhr=document.getElementById("bondHeaderRow");bhr.innerHTML="<th>Maturity</th><th>EOY</th><th>EOM</th>";
+  const bhr=document.getElementById("bondHeaderRow");bhr.innerHTML="<th>Maturity</th>";
   const bHeaders=d.bonds?.headers||[], bRows=d.bonds?.rows||[];
   bHeaders.forEach(h=>{const th=document.createElement("th");th.textContent=h;bhr.appendChild(th);});
   const midMatrix=bRows.map(r=>(r.values||[]).map(bondMid));
@@ -411,10 +411,8 @@ function render(d){
   bRows.forEach((r,ri)=>{
     const tr=document.createElement("tr");
     const td0=document.createElement("td");td0.textContent=r.bond;tr.appendChild(td0);
-    // End-of-Year / End-of-Month reference rates (no heat-map)
+    // End-of-Year / End-of-Month reference rates removed
     const blk=v=>(v&&String(v).trim()&&String(v).trim()!=="0")?String(v).trim():"—";
-    const tdY=document.createElement("td");tdY.textContent=blk(r.eoy);tdY.style.color="#c8a84b";tr.appendChild(tdY);
-    const tdM=document.createElement("td");tdM.textContent=blk(r.eom);tdM.style.color="#9fb6d4";tr.appendChild(tdM);
     const mids=midMatrix[ri]||[];
     // per-row heat scale: this bond's own low (green) → high (red) across the dates
     const rv=mids.filter(m=>m!=null);
