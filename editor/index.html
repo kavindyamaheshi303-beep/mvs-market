@@ -263,6 +263,16 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <tbody id="tbill-rows"></tbody>
     </table>
     <button class="add-btn" onclick="addRow('tbill-rows',['','','',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="tbill-rows" onclick="toggleRows('tbill-rows',this)" style="display:none">Show all</button>
+    <div style="margin-top:14px;border-top:1px solid #1a3050;padding-top:12px">
+      <div style="font-size:11px;color:#c8a84b;font-weight:700;margin-bottom:8px">Reference rows (shown at the bottom of the T-Bill table)</div>
+      <table class="dyn-table" style="max-width:520px">
+        <thead><tr><th></th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
+        <tbody>
+          <tr><td style="font-size:11px;color:#9fb6d4">End of Month</td><td><input id="tbref-lm-3m"></td><td><input id="tbref-lm-6m"></td><td><input id="tbref-lm-12m"></td></tr>
+          <tr><td style="font-size:11px;color:#9fb6d4">End of Year</td><td><input id="tbref-ly-3m"></td><td><input id="tbref-ly-6m"></td><td><input id="tbref-ly-12m"></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ══ T-BILL AUCTION DETAIL TABLE ══ -->
@@ -393,6 +403,7 @@ function populateFromData(d){
   if(d.foreign)fillRows('fh-rows',(d.foreign.labels||[]).map((l,i)=>[l,(d.foreign.values||[])[i]]));
   if(d.usdlkr){set('fx-close',d.usdlkr.close);fillRows('fx-rows',(d.usdlkr.labels||[]).map((l,i)=>[l,(d.usdlkr.values||[])[i]]));}
   if(Array.isArray(d.tbills))fillRows('tbill-rows',d.tbills.map(t=>[t.date,t.m3,t.m6,t.m12]));
+  if(d.tbillRef){const lm=d.tbillRef.lastMonth||{},ly=d.tbillRef.lastYear||{};set('tbref-lm-3m',lm.m3);set('tbref-lm-6m',lm.m6);set('tbref-lm-12m',lm.m12);set('tbref-ly-3m',ly.m3);set('tbref-ly-6m',ly.m6);set('tbref-ly-12m',ly.m12);}
   if(d.global10y&&Array.isArray(d.global10y.labels))fillRows('gm-rows',d.global10y.labels.map((l,i)=>[l,(d.global10y.values||[])[i]]));
   if(d.bonds){
     if(Array.isArray(d.bonds.headers)&&d.bonds.headers.length){bondHeaders=d.bonds.headers.slice(0,6);renderBondHeaders();}
@@ -474,6 +485,7 @@ function buildData(){
     fxSwaps:{'1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},'1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},'2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},'3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},'6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},'1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}},
     usdlkr:{labels:getRows('fx-rows').map(r=>r[0]),values:getRows('fx-rows').map(r=>parseFloat(r[1])||0),close:gv('fx-close')},
     tbills:getRows('tbill-rows').map(r=>({date:r[0],m3:r[1],m6:r[2],m12:r[3]})),
+    tbillRef:{lastMonth:{m3:gv('tbref-lm-3m'),m6:gv('tbref-lm-6m'),m12:gv('tbref-lm-12m')},lastYear:{m3:gv('tbref-ly-3m'),m6:gv('tbref-ly-6m'),m12:gv('tbref-ly-12m')}},
     // NEW: T-Bill auction detail
     tbillAuction:getAuctionData(),
     bonds:{headers:bondHeaders,rows:getRows('bond-rows').map(r=>({bond:r[0],eoy:r[1],eom:r[2],values:r.slice(3)}))},
@@ -794,6 +806,13 @@ function applyMVSExcel(wb){
   if(tbData.length){
     document.getElementById('tbill-rows').innerHTML='';
     tbData.forEach(r=>addRow('tbill-rows',r));
+  }
+  // T-Bill Last Month / Last Year reference yields (get_data rows where col10 is a text label)
+  for(let i=1;i<=11;i++){
+    const lbl=String(rows[i]?.[10]||'').toLowerCase().trim();
+    const m3=rowsRaw[i]?.[11],m6=rowsRaw[i]?.[12],m12=rowsRaw[i]?.[13];
+    if(lbl.includes('last month')){sv('tbref-lm-3m',n2(m3));sv('tbref-lm-6m',n2(m6));sv('tbref-lm-12m',n2(m12));}
+    if(lbl.includes('last year')){sv('tbref-ly-3m',n2(m3));sv('tbref-ly-6m',n2(m6));sv('tbref-ly-12m',n2(m12));}
   }
 
   // Money market rates (rows 1-4, col 15=label, 16=call, 17=repo)
