@@ -197,7 +197,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <thead><tr><th>Date Label</th><th>Value (Rs.Bn)</th><th></th></tr></thead>
       <tbody id="liq-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('liq-rows',['',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('liq-rows',['',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="liq-rows" onclick="toggleRows('liq-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- CBSL HOLDINGS -->
@@ -208,7 +208,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <thead><tr><th>Date Label</th><th>Holdings (Rs.Bn)</th><th></th></tr></thead>
       <tbody id="cbsl-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('cbsl-rows',['',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('cbsl-rows',['',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="cbsl-rows" onclick="toggleRows('cbsl-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- FOREIGN HOLDINGS -->
@@ -219,7 +219,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <thead><tr><th>Date Label</th><th>Volume (Rs.Mn)</th><th></th></tr></thead>
       <tbody id="fh-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('fh-rows',['',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('fh-rows',['',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="fh-rows" onclick="toggleRows('fh-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- FX SWAPS -->
@@ -248,7 +248,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <thead><tr><th>Date Label</th><th>Rate</th><th></th></tr></thead>
       <tbody id="fx-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('fx-rows',['',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('fx-rows',['',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="fx-rows" onclick="toggleRows('fx-rows',this)" style="display:none">Show all</button>
     <div class="fgrid" style="margin-top:10px">
       <div class="fg"><label>Closing Rate (e.g. 336.50/337.00)</label><input id="fx-close" value="336.50/337.00"></div>
     </div>
@@ -259,10 +259,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div class="sec-title">Treasury Bills — Auction Yield Data (chart)</div>
     <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Latest auction first. Used for the yield trend chart.</div>
     <table class="dyn-table">
-      <thead><tr><th>Auction Date</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
+      <thead><tr><th>Auction Date</th><th>End of Year</th><th>End of Month</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
       <tbody id="tbill-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('tbill-rows',['','','',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('tbill-rows',['','','','','',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="tbill-rows" onclick="toggleRows('tbill-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- ══ T-BILL AUCTION DETAIL TABLE ══ -->
@@ -284,10 +284,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Column headers = dates. Values = bid/offer e.g. 10.5/11. Use 0 for no data.</div>
     <div class="fgrid2" style="margin-bottom:10px" id="bond-headers-row"></div>
     <table class="dyn-table">
-      <thead><tr><th>Bond Maturity</th><th id="bh0">—</th><th id="bh1">—</th><th id="bh2">—</th><th id="bh3">—</th><th id="bh4">—</th><th id="bh5">—</th><th></th></tr></thead>
+      <thead><tr><th>Bond Maturity</th><th>End of Year</th><th>End of Month</th><th id="bh0">—</th><th id="bh1">—</th><th id="bh2">—</th><th id="bh3">—</th><th id="bh4">—</th><th id="bh5">—</th><th></th></tr></thead>
       <tbody id="bond-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('bond-rows',['','','','','','',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('bond-rows',['','','','','','','','',''])">+ Add Row</button>
   </div>
 
   <!-- GLOBAL MARKET (US 10Y) -->
@@ -298,7 +298,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       <thead><tr><th>Date Label</th><th>Yield (%)</th><th></th></tr></thead>
       <tbody id="gm-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('gm-rows',['',''])">+ Add Row</button>
+    <button class="add-btn" onclick="addRow('gm-rows',['',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="gm-rows" onclick="toggleRows('gm-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- EXEC SUMMARY -->
@@ -313,8 +313,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
       </div>
     </div>
     <div class="fg">
-      <label>Market Summary (free text — shown as ticker on dashboard)</label>
-      <textarea id="market-summary" rows="5" placeholder="Type your market commentary here..."></textarea>
+      <label>Live Market News — each row becomes a separate scrolling news item</label>
+      <table class="dyn-table">
+        <thead><tr><th>News item (row 1 = first news, row 2 = second news, …)</th><th></th></tr></thead>
+        <tbody id="news-rows"></tbody>
+      </table>
+      <button class="add-btn" onclick="addRow('news-rows',[''])">+ Add News</button>
     </div>
   </div>
 
@@ -420,14 +424,15 @@ function buildData(){
     foreign:{labels:getRows('fh-rows').map(r=>r[0]),values:getRows('fh-rows').map(r=>parseFloat(r[1])||0)},
     fxSwaps:{'1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},'1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},'2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},'3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},'6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},'1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}},
     usdlkr:{labels:getRows('fx-rows').map(r=>r[0]),values:getRows('fx-rows').map(r=>parseFloat(r[1])||0),close:gv('fx-close')},
-    tbills:getRows('tbill-rows').map(r=>({date:r[0],m3:r[1],m6:r[2],m12:r[3]})),
+    tbills:getRows('tbill-rows').map(r=>({date:r[0],eoy:r[1],eom:r[2],m3:r[3],m6:r[4],m12:r[5]})),
     // NEW: T-Bill auction detail
     tbillAuction:getAuctionData(),
-    bonds:{headers:bondHeaders,rows:getRows('bond-rows').map(r=>({bond:r[0],values:r.slice(1)}))},
+    bonds:{headers:bondHeaders,rows:getRows('bond-rows').map(r=>({bond:r[0],eoy:r[1],eom:r[2],values:r.slice(3)}))},
     // NEW: Global Market — US 10Y daily series
     global10y:{labels:getRows('gm-rows').map(r=>r[0]),values:getRows('gm-rows').map(r=>parseFloat(r[1])||0)},
     execSummary:{usdlkr:gv('ex-usdlkr'),liqDelta:gv('ex-delta'),liqDir:document.getElementById('ex-dir').value},
-    marketSummary:document.getElementById('market-summary').value.trim()
+    marketNews:getRows('news-rows').map(r=>(r[0]||'').trim()).filter(Boolean),
+    marketSummary:getRows('news-rows').map(r=>(r[0]||'').trim()).filter(Boolean).join('   \u25C6   ')
   };
 }
 
@@ -441,6 +446,22 @@ function addRow(tbodyId,defaults){
 function getRows(tbodyId){
   return Array.from(document.getElementById(tbodyId).querySelectorAll('tr')).map(tr=>Array.from(tr.querySelectorAll('input')).map(i=>i.value.trim()));
 }
+
+// ── ROW LIMITING (show last 4, toggle to show all) ──────
+function applyRowLimit(tbodyId,collapsed){
+  const tb=document.getElementById(tbodyId); if(!tb) return;
+  const rows=Array.from(tb.querySelectorAll('tr'));
+  const n=rows.length;
+  rows.forEach((tr,i)=>{ tr.style.display=(collapsed && i < n-4) ? 'none' : ''; });
+  const btn=document.querySelector('.show-toggle[data-target="'+tbodyId+'"]');
+  if(btn){
+    btn.dataset.expanded = collapsed ? '0' : '1';
+    btn.style.display = (n>4) ? '' : 'none';
+    btn.textContent = collapsed ? ('Show all '+n+' rows \u25be') : 'Show last 4 \u25b4';
+  }
+}
+function toggleRows(tbodyId,btn){ applyRowLimit(tbodyId, btn.dataset.expanded==='1'); }
+function collapseAll(){ ['liq-rows','cbsl-rows','fh-rows','fx-rows','tbill-rows','gm-rows'].forEach(id=>applyRowLimit(id,true)); }
 
 // ── AUCTION FLAT TABLE ───────────────────────────────────
 function addAuctionRow(vals){
@@ -495,7 +516,7 @@ function updateBondHeaderCells(){bondHeaders.forEach((h,i)=>{const el=document.g
 function initDefaultRows(){
   [['4-Jun','105.04'],['5-Jun','63.25'],['6-Jun','59.18'],['9-Jun','57.38'],['10-Jun','66.62']].forEach(r=>addRow('liq-rows',r));
   [['4-Jun','336.07'],['5-Jun','337.15'],['6-Jun','338.00'],['9-Jun','335.00'],['10-Jun','337.00'],['11-Jun','337.15'],['12-Jun','336.50']].forEach(r=>addRow('fx-rows',r));
-  [['6/10/2026','10.09','10.27','10.16'],['6/3/2026','9.84','10.01','10.02'],['5/26/2026','9.36','9.68','9.83'],['5/20/2026','8.18','8.25','8.49'],['5/13/2026','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
+  [['6/10/2026','','','10.09','10.27','10.16'],['6/3/2026','','','9.84','10.01','10.02'],['5/26/2026','','','9.36','9.68','9.83'],['5/20/2026','','','8.18','8.25','8.49'],['5/13/2026','','','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
 
   // Default auction detail groups matching your Excel image
   addAuctionGroup('6/17/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
@@ -503,7 +524,7 @@ function initDefaultRows(){
   addAuctionGroup('6/3/2026', [{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
   addAuctionGroup('5/26/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
 
-  [['15.12.2026','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],['15.09.2027','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],['15.12.2028','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],['15.12.2029','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],['01.07.2030','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],['15.03.2031','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],['15.12.2032','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],['01.11.2033','12.40/12.80','12.65/13','12.65/13','12.7/13','0','0'],['15.06.2034','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2','0','0'],['15.03.2035','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3','0','0'],['01.08.2036','12.60/13.20','13/13.5','13/13.5','13/13.5','0','0'],['01.07.2037','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4','0','0']].forEach(r=>addRow('bond-rows',r));
+  [['15.12.2026','','','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],['15.09.2027','','','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],['15.12.2028','','','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],['15.12.2029','','','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],['01.07.2030','','','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],['15.03.2031','','','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],['15.12.2032','','','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],['01.11.2033','','','12.40/12.80','12.65/13','12.65/13','12.7/13','0','0'],['15.06.2034','','','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2','0','0'],['15.03.2035','','','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3','0','0'],['01.08.2036','','','12.60/13.20','13/13.5','13/13.5','13/13.5','0','0'],['01.07.2037','','','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4','0','0']].forEach(r=>addRow('bond-rows',r));
   renderBondHeaders();
 
   // Default Global Market (US 10Y) rows — replaced when MarketData.xlsx is imported
@@ -514,6 +535,11 @@ function initDefaultRows(){
 
   // Default Foreign Holdings rows — replaced when MarketData.xlsx is imported
   [['2 Apr','143617'],['10 Apr','142920'],['17 Apr','142922'],['24 Apr','144202'],['30 Apr','144202'],['8 May','142732'],['15 May','138007'],['22 May','133427'],['29 May','126099'],['5 Jun','121331'],['12 Jun','121344']].forEach(r=>addRow('fh-rows',r));
+
+  // Default Live Market News — one row per news item
+  [['CBSL holds policy rate steady at the latest review'],['Overnight liquidity remains in surplus'],['T-bill yields ease across all tenors at this week\u2019s auction']].forEach(r=>addRow('news-rows',r));
+
+  collapseAll();
 }
 
 // ── EXCEL IMPORT (one or both files at once) ─────────────
@@ -538,7 +564,8 @@ function importExcel(event){
     mdWbs.forEach(it=>{applyMarketData(it.wb);});
     if(mdWbs.length)did.push('marketdata');
     if(!did.length){showToast('⚠ Unrecognised file(s) — expected MarketData.xlsx and/or the get_data report.','err');return;}
-    showToast('✓ Imported '+files.length+' file(s) ['+did.join(' + ')+']. Review then click Publish.');
+    collapseAll();
+    showToast('✓ Imported '+files.length+' file(s) ['+did.join(' + ')+']. Showing last 4 rows per table — click “Show all”. Review then Publish.');
   }).catch(err=>{showToast('⚠ Error: '+err.message,'err');console.error(err);});
   event.target.value='';
 }
@@ -586,7 +613,7 @@ function applyMarketData(wb){
     recs.sort((a,b)=>b[0]-a[0]); // newest first
     if(recs.length){
       document.getElementById('tbill-rows').innerHTML='';
-      recs.forEach(x=>addRow('tbill-rows',[mdLabel(x[0]),n2(x[1]),n2(x[2]),n2(x[3])]));
+      recs.forEach(x=>addRow('tbill-rows',[mdLabel(x[0]),'','',n2(x[1]),n2(x[2]),n2(x[3])]));
     }
     // auction detail: F(5)=date, G(6)=maturity, H(7)=offered, I(8)=accepted, J(9)=%
     const groups=[];let cur=null;
@@ -710,7 +737,7 @@ function applyMVSExcel(wb){
   for(let i=1;i<=7;i++){
     const dv=rows[i]?.[10],m3=rowsRaw[i]?.[11],m6=rowsRaw[i]?.[12],m12=rowsRaw[i]?.[13];
     if(!dv||m3===null||m3===undefined)continue;
-    tbData.push([fmtDate(new Date(dv)),n2(m3),n2(m6),n2(m12)]);
+    tbData.push([fmtDate(new Date(dv)),'','',n2(m3),n2(m6),n2(m12)]);
   }
   if(tbData.length){
     document.getElementById('tbill-rows').innerHTML='';
@@ -737,7 +764,7 @@ function applyMVSExcel(wb){
       if(v===null||v===undefined||v===0||String(v).trim()===''||String(v).trim()==='-')return'0';
       return String(v).trim();
     });
-    bondData.push([mat,...vals]);
+    bondData.push([mat,'','',...vals]);
   }
   if(bondData.length){
     document.getElementById('bond-rows').innerHTML='';
