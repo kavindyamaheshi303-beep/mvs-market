@@ -171,7 +171,7 @@ canvas{max-width:100%!important}
 
   <!-- PAGE NAV -->
   <div class="nav-bar">
-    <button class="nav-btn active" onclick="showPage('page-open',this)">Market Open</button>
+    <button class="nav-btn active" onclick="showPage('page-open',this)">Opening Report</button>
     <button class="nav-btn" onclick="showPage('page-close',this)">Closing Report</button>
     <button class="nav-btn" onclick="showPage('page-mm',this)">Money Market</button>
     <button class="nav-btn" onclick="showPage('page-fi',this)">Fixed Income</button>
@@ -183,6 +183,11 @@ canvas{max-width:100%!important}
 
   <!-- PAGE: MARKET OPEN REPORT (full Summary-report replica from get_data) -->
   <div class="page" id="page-close">
+
+    <!-- Title -->
+    <div class="panel full-width">
+      <div class="panel-title" id="closing-report-title">Closing Report — <span id="closing-report-date"></span></div>
+    </div>
 
     <!-- Row 1: Money & Repo Market  |  Foreign Exchange Market -->
     <div class="grid-2x2">
@@ -1122,6 +1127,17 @@ function buildCharts(d){
 // no login required — load immediately
 loadData();
 startPolling();
+
+// Set closing report date dynamically
+(function(){
+  const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const ORDINALS=["th","st","nd","rd"];
+  function ord(n){const v=n%100;return ORDINALS[(v-20)%10]||ORDINALS[v]||ORDINALS[0];}
+  const now=new Date();
+  const d=now.getDate(), mo=MONTHS[now.getMonth()], yr=now.getFullYear();
+  const el=document.getElementById("closing-report-date");
+  if(el) el.innerHTML=d+"<sup>"+ord(d)+"</sup> "+mo+" "+yr;
+})();
 
 </script>
 </body>
