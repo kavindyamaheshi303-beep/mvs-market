@@ -259,10 +259,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div class="sec-title">Treasury Bills — Auction Yield Data (chart)</div>
     <div style="font-size:11px;color:#7fa3c8;margin-bottom:8px">Latest auction first. Used for the yield trend chart.</div>
     <table class="dyn-table">
-      <thead><tr><th>Auction Date</th><th>End of Year</th><th>End of Month</th><th>Last Year</th><th>Last Month</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
+      <thead><tr><th>Auction Date</th><th>3M Yield</th><th>6M Yield</th><th>12M Yield</th><th></th></tr></thead>
       <tbody id="tbill-rows"></tbody>
     </table>
-    <button class="add-btn" onclick="addRow('tbill-rows',['','','','','','','',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="tbill-rows" onclick="toggleRows('tbill-rows',this)" style="display:none">Show all</button>
+    <button class="add-btn" onclick="addRow('tbill-rows',['','','',''])">+ Add Row</button> <button class="add-btn show-toggle" data-target="tbill-rows" onclick="toggleRows('tbill-rows',this)" style="display:none">Show all</button>
   </div>
 
   <!-- ══ T-BILL AUCTION DETAIL TABLE ══ -->
@@ -271,7 +271,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
     <div style="font-size:11px;color:#7fa3c8;margin-bottom:10px">One row per maturity. Columns match your Excel: <strong style="color:#c8a84b">F = Auction Date &nbsp;|&nbsp; G = Maturity &nbsp;|&nbsp; H = Amount Offered &nbsp;|&nbsp; I = Amount Accepted &nbsp;|&nbsp; J = %</strong></div>
     <div style="overflow-x:auto">
       <table class="dyn-table">
-        <thead><tr><th>Auction Date</th><th>Maturity</th><th>Last Year (%)</th><th>Last Month (%)</th><th>Amount Offered (Rs.Mn)</th><th>Amount Accepted (Rs.Mn)</th><th>Accepted %</th><th></th></tr></thead>
+        <thead><tr><th>Auction Date</th><th>Maturity</th><th>Amount Offered (Rs.Mn)</th><th>Amount Accepted (Rs.Mn)</th><th>Yield (%)</th><th></th></tr></thead>
         <tbody id="auction-rows"></tbody>
       </table>
     </div>
@@ -354,6 +354,55 @@ function initApp(){
     document.getElementById('gh-branch').value=cfg.branch;
     document.getElementById('gh-path').value=cfg.path;
   }
+  // On load, pull the latest published data.json so the editor reflects what's live
+  loadPublished();
+}
+
+// Fetch the latest published data.json and fill the editor with it (falls back to defaults if unavailable)
+async function loadPublished(){
+  const cfg=loadConfig();
+  if(!(cfg.owner&&cfg.repo&&cfg.path))return false;
+  const branch=cfg.branch||'main';
+  try{
+    const url=`https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${branch}/${cfg.path}?t=${Date.now()}`;
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok)return false;
+    const d=await res.json();
+    populateFromData(d);
+    showToast('✓ Loaded latest published data from GitHub');
+    return true;
+  }catch(e){return false;}
+}
+
+// Clear a dynamic table and refill it from an array of row-arrays
+function fillRows(tbodyId,rowsArr){
+  const tb=document.getElementById(tbodyId);if(!tb)return;
+  tb.innerHTML='';
+  (rowsArr||[]).forEach(r=>addRow(tbodyId,(r||[]).map(v=>v==null?'':String(v))));
+}
+
+// Reverse of buildData: populate every editor field/table from a published data.json object
+function populateFromData(d){
+  if(!d||typeof d!=='object')return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el&&v!=null&&v!=='')el.value=v;};
+  if(d.date)set('f-date',d.date);
+  if(d.callMarket){set('cm-min',d.callMarket.min);set('cm-max',d.callMarket.max);set('cm-wa',d.callMarket.wa);set('cm-vol',d.callMarket.vol);}
+  if(d.repoMarket){set('rm-min',d.repoMarket.min);set('rm-max',d.repoMarket.max);set('rm-wa',d.repoMarket.wa);set('rm-vol',d.repoMarket.vol);}
+  if(d.liquidity){set('liq-cur',d.liquidity.current);set('liq-prev',d.liquidity.previous);fillRows('liq-rows',(d.liquidity.labels||[]).map((l,i)=>[l,(d.liquidity.values||[])[i]]));}
+  if(d.cbsl)fillRows('cbsl-rows',(d.cbsl.labels||[]).map((l,i)=>[l,(d.cbsl.values||[])[i]]));
+  if(d.foreign)fillRows('fh-rows',(d.foreign.labels||[]).map((l,i)=>[l,(d.foreign.values||[])[i]]));
+  if(d.usdlkr){set('fx-close',d.usdlkr.close);fillRows('fx-rows',(d.usdlkr.labels||[]).map((l,i)=>[l,(d.usdlkr.values||[])[i]]));}
+  if(Array.isArray(d.tbills))fillRows('tbill-rows',d.tbills.map(t=>[t.date,t.m3,t.m6,t.m12]));
+  if(d.global10y&&Array.isArray(d.global10y.labels))fillRows('gm-rows',d.global10y.labels.map((l,i)=>[l,(d.global10y.values||[])[i]]));
+  if(d.bonds){
+    if(Array.isArray(d.bonds.headers)&&d.bonds.headers.length){bondHeaders=d.bonds.headers.slice(0,6);renderBondHeaders();}
+    fillRows('bond-rows',(d.bonds.rows||[]).map(r=>{const vals=(r.values||[]).slice(0,6);while(vals.length<6)vals.push('');return [r.bond,r.eoy||'',r.eom||'',...vals];}));
+  }
+  if(Array.isArray(d.tbillAuction)){document.getElementById('auction-rows').innerHTML='';d.tbillAuction.forEach(g=>addAuctionGroup(g.date,g.maturities||[]));}
+  if(d.fxSwaps){['1w','1m','2m','3m','6m','1y'].forEach(k=>{const sw=d.fxSwaps[k]||{};set('sw-'+k+'-s',sw.sell);set('sw-'+k+'-b',sw.buy);});}
+  if(d.execSummary){set('ex-usdlkr',d.execSummary.usdlkr);set('ex-delta',d.execSummary.liqDelta);const dir=document.getElementById('ex-dir');if(dir&&d.execSummary.liqDir)dir.value=d.execSummary.liqDir;}
+  if(Array.isArray(d.marketNews)){const nb=document.getElementById('news-rows');if(nb){nb.innerHTML='';d.marketNews.forEach(n=>addRow('news-rows',[n]));}}
+  collapseAll();
 }
 async function saveGithubConfig(){
   const token=document.getElementById('gh-token').value.trim(),owner=document.getElementById('gh-owner').value.trim(),repo=document.getElementById('gh-repo').value.trim(),branch=document.getElementById('gh-branch').value.trim()||'main',path=document.getElementById('gh-path').value.trim()||'data.json';
@@ -424,7 +473,7 @@ function buildData(){
     foreign:{labels:getRows('fh-rows').map(r=>r[0]),values:getRows('fh-rows').map(r=>parseFloat(r[1])||0)},
     fxSwaps:{'1w':{sell:gv('sw-1w-s'),buy:gv('sw-1w-b')},'1m':{sell:gv('sw-1m-s'),buy:gv('sw-1m-b')},'2m':{sell:gv('sw-2m-s'),buy:gv('sw-2m-b')},'3m':{sell:gv('sw-3m-s'),buy:gv('sw-3m-b')},'6m':{sell:gv('sw-6m-s'),buy:gv('sw-6m-b')},'1y':{sell:gv('sw-1y-s'),buy:gv('sw-1y-b')}},
     usdlkr:{labels:getRows('fx-rows').map(r=>r[0]),values:getRows('fx-rows').map(r=>parseFloat(r[1])||0),close:gv('fx-close')},
-    tbills:getRows('tbill-rows').map(r=>({date:r[0],eoy:r[1],eom:r[2],lastYear:r[3],lastMonth:r[4],m3:r[5],m6:r[6],m12:r[7]})),
+    tbills:getRows('tbill-rows').map(r=>({date:r[0],m3:r[1],m6:r[2],m12:r[3]})),
     // NEW: T-Bill auction detail
     tbillAuction:getAuctionData(),
     bonds:{headers:bondHeaders,rows:getRows('bond-rows').map(r=>({bond:r[0],eoy:r[1],eom:r[2],values:r.slice(3)}))},
@@ -470,17 +519,15 @@ function addAuctionRow(vals){
   const matSel=['3M','6M','12M'].map(m=>`<option${vals[1]===m?' selected':''}>${m}</option>`).join('');
   tr.innerHTML=`<td><input value="${vals[0]||''}" placeholder="e.g. 6/17/2026" style="min-width:90px"></td>`+
     `<td><select style="background:#091525;border:1px solid #0d2040;border-radius:3px;padding:4px 6px;color:#d4e4f4;font-size:11px;width:100%;outline:none">${matSel}</select></td>`+
-    `<td><input value="${vals[2]||''}" placeholder="Last Yr %"></td>`+
-    `<td><input value="${vals[3]||''}" placeholder="Last Mo %"></td>`+
-    `<td><input value="${vals[4]||''}" placeholder="Offered"></td>`+
-    `<td><input value="${vals[5]||''}" placeholder="Accepted"></td>`+
-    `<td><input value="${vals[6]||''}" placeholder="%"></td>`+
+    `<td><input value="${vals[2]||''}" placeholder="Offered"></td>`+
+    `<td><input value="${vals[3]||''}" placeholder="Accepted"></td>`+
+    `<td><input value="${vals[4]||''}" placeholder="%"></td>`+
     `<td><button class="rm-btn" onclick="this.closest('tr').remove()">✕</button></td>`;
   tbody.appendChild(tr);
 }
 // Compatibility helper: add a grouped auction (date + maturities) as flat rows
 function addAuctionGroup(date,maturities){
-  (maturities||[]).forEach((m,i)=>addAuctionRow([i===0?date:'',m.maturity,m.lastYear||'',m.lastMonth||'',m.offered,m.accepted,m.yield]));
+  (maturities||[]).forEach((m,i)=>addAuctionRow([i===0?date:'',m.maturity,m.offered,m.accepted,m.yield]));
 }
 function getAuctionData(){
   // Build grouped structure for dashboard from flat table rows
@@ -490,17 +537,15 @@ function getAuctionData(){
   rows.forEach(tr=>{
     const cells=tr.querySelectorAll('input,select');
     if(!cells.length)return;
-    const date    =cells[0].value.trim();
-    const mat     =cells[1].value.trim();
-    const lastYear=cells[2].value.trim();
-    const lastMonth=cells[3].value.trim();
-    const off     =cells[4].value.trim();
-    const acc     =cells[5].value.trim();
-    const yld     =cells[6].value.trim();
+    const date=cells[0].value.trim();
+    const mat =cells[1].value.trim();
+    const off =cells[2].value.trim();
+    const acc =cells[3].value.trim();
+    const yld =cells[4].value.trim();
     const useDate=date||lastDate;
     if(date)lastDate=date;
     const grp=groups.find(g=>g.date===useDate);
-    const entry={maturity:mat,lastYear,lastMonth,offered:off,accepted:acc,yield:yld};
+    const entry={maturity:mat,offered:off,accepted:acc,yield:yld};
     if(grp){grp.maturities.push(entry);}
     else{groups.push({date:useDate,maturities:[entry]});}
   });
@@ -520,13 +565,13 @@ function updateBondHeaderCells(){bondHeaders.forEach((h,i)=>{const el=document.g
 function initDefaultRows(){
   [['4-Jun','105.04'],['5-Jun','63.25'],['6-Jun','59.18'],['9-Jun','57.38'],['10-Jun','66.62']].forEach(r=>addRow('liq-rows',r));
   [['4-Jun','336.07'],['5-Jun','337.15'],['6-Jun','338.00'],['9-Jun','335.00'],['10-Jun','337.00'],['11-Jun','337.15'],['12-Jun','336.50']].forEach(r=>addRow('fx-rows',r));
-  [['6/10/2026','','','','','10.09','10.27','10.16'],['6/3/2026','','','','','9.84','10.01','10.02'],['5/26/2026','','','','','9.36','9.68','9.83'],['5/20/2026','','','','','8.18','8.25','8.49'],['5/13/2026','','','','','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
+  [['6/10/2026','10.09','10.27','10.16'],['6/3/2026','9.84','10.01','10.02'],['5/26/2026','9.36','9.68','9.83'],['5/20/2026','8.18','8.25','8.49'],['5/13/2026','8.13','8.23','8.49']].forEach(r=>addRow('tbill-rows',r));
 
   // Default auction detail groups matching your Excel image
-  addAuctionGroup('6/17/2026',[{maturity:'3M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'6M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'12M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''}]);
-  addAuctionGroup('6/10/2026',[{maturity:'3M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'6M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'12M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''}]);
-  addAuctionGroup('6/3/2026', [{maturity:'3M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'6M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'12M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''}]);
-  addAuctionGroup('5/26/2026',[{maturity:'3M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'6M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''},{maturity:'12M',lastYear:'',lastMonth:'',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('6/17/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('6/10/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('6/3/2026', [{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
+  addAuctionGroup('5/26/2026',[{maturity:'3M',offered:'',accepted:'',yield:''},{maturity:'6M',offered:'',accepted:'',yield:''},{maturity:'12M',offered:'',accepted:'',yield:''}]);
 
   [['15.12.2026','','','9.70/10.20','9.75/10','9.8/10.25','10.25/10.55','0','0'],['15.09.2027','','','10.80/11.40','10.9/11.1','10.85/11','11/11.3','0','0'],['15.12.2028','','','11.50/12.00','11.75/12','11.8/12','11.9/11.95','0','0'],['15.12.2029','','','11.75/12.25','12/12.2','12/12.2','12/12.15','0','0'],['01.07.2030','','','11.80/12.30','12.15/12.2','12.15/12.25','12.15/12.3','0','0'],['15.03.2031','','','12.20/12.60','12.3/12.7','12.3/12.7','12.3/12.7','0','0'],['15.12.2032','','','12.30/12.70','12.5/12.9','12.5/12.9','12.55/12.9','0','0'],['01.11.2033','','','12.40/12.80','12.65/13','12.65/13','12.7/13','0','0'],['15.06.2034','','','12.50/13.00','12.8/13.15','12.8/13.1','13/13.2','0','0'],['15.03.2035','','','12.50/13.00','12.85/13.15','12.8/13.2','13/13.3','0','0'],['01.08.2036','','','12.60/13.20','13/13.5','13/13.5','13/13.5','0','0'],['01.07.2037','','','12.60/13.20','12.9/13.3','13.1/13.3','13.1/13.4','0','0']].forEach(r=>addRow('bond-rows',r));
   renderBondHeaders();
@@ -575,7 +620,7 @@ function importExcel(event){
 }
 
 // ── MarketData.xlsx parser (full-year daily series + global 10Y) ──
-function mdLabel(d){const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const dt=(d instanceof Date)?d:new Date(d);return isNaN(dt)?String(d):dt.getDate()+' '+M[dt.getMonth()];}
+function mdLabel(d){const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const dt=(d instanceof Date)?d:new Date(d);return isNaN(dt)?String(d):dt.getUTCDate()+' '+M[dt.getUTCMonth()];}
 function mdDate(v){ if(v instanceof Date&&!isNaN(v))return v; if(typeof v==='number'){const dt=new Date(Math.round((v-25569)*86400*1000));return isNaN(dt)?null:dt;} if(v==null||v==='')return null; const d=new Date(v);return isNaN(d)?null:d; }
 function mdNum(v){ if(v==null||v==='')return null; const n=parseFloat(String(v).replace(/,/g,'')); return isNaN(n)?null:n; }
 function applyMarketData(wb){
@@ -617,7 +662,7 @@ function applyMarketData(wb){
     recs.sort((a,b)=>b[0]-a[0]); // newest first
     if(recs.length){
       document.getElementById('tbill-rows').innerHTML='';
-      recs.forEach(x=>addRow('tbill-rows',[mdLabel(x[0]),'','',n2(x[1]),n2(x[2]),n2(x[3])]));
+      recs.forEach(x=>addRow('tbill-rows',[mdLabel(x[0]),n2(x[1]),n2(x[2]),n2(x[3])]));
     }
     // auction detail: F(5)=date, G(6)=maturity, H(7)=offered, I(8)=accepted, J(9)=%
     const groups=[];let cur=null;
@@ -627,7 +672,7 @@ function applyMarketData(wb){
       const off=r[7],acc=r[8],yld=r[9];
       if(!matRaw&&(dv==null||dv===''))continue;
       if(dv!=null&&dv!==''){
-        const pd=mdDate(dv);const ds=pd?((pd.getMonth()+1)+'/'+pd.getDate()+'/'+pd.getFullYear()):String(dv);
+        const pd=mdDate(dv);const ds=pd?((pd.getUTCMonth()+1)+'/'+pd.getUTCDate()+'/'+pd.getUTCFullYear()):String(dv);
         cur={date:ds,maturities:[]};groups.push(cur);
       }
       if(cur&&matRaw){
@@ -635,7 +680,10 @@ function applyMarketData(wb){
         cur.maturities.push({maturity:ml,offered:off!=null?String(off):'',accepted:acc!=null?String(acc):'',yield:yld!=null?(typeof yld==='number'?yld.toFixed(2):String(yld)):''});
       }
     }
-    if(groups.length){
+    // Only rebuild the auction table from MarketData if it actually carries Offered/Accepted/% values.
+    // (In the current file H/I/J are empty, so we keep the yields imported from get_data instead of wiping them.)
+    const hasAuctionVals=groups.some(g=>g.maturities.some(m=>(m.offered&&m.offered!=='')||(m.accepted&&m.accepted!=='')||(m.yield&&m.yield!=='')));
+    if(groups.length&&hasAuctionVals){
       document.getElementById('auction-rows').innerHTML='';
       groups.forEach(g=>g.maturities.forEach((m,i)=>addAuctionRow([i===0?g.date:'',m.maturity,m.offered,m.accepted,m.yield])));
     }
@@ -685,7 +733,7 @@ function fmtDate(d){
   if(!d)return'';const dt=(d instanceof Date)?d:new Date(d);
   if(isNaN(dt))return String(d);
   const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return dt.getDate()+'-'+months[dt.getMonth()];
+  return dt.getUTCDate()+'-'+months[dt.getUTCMonth()];
 }
 function sv(id,val){if(val!==undefined&&val!==''&&val!==null)document.getElementById(id).value=String(val);}
 function n2(v){return(typeof v==='number')?v.toFixed(2):String(v||'');}
@@ -704,7 +752,7 @@ function applyMVSExcel(wb){
   // Bond headers (row 0, cols 20-25 for 6 columns)
   const hdrRow=rows[0];
   if(hdrRow){
-    const bh=[20,21,22,23,24,25].map(c=>String(hdrRow[c]||'').trim()).filter(h=>h);
+    const bh=[22,23,24,25,26,27].map(c=>String(hdrRow[c]||'').trim()).filter(h=>h);
     if(bh.length){bondHeaders=bh.slice(0,6);renderBondHeaders();}
   }
 
@@ -741,7 +789,7 @@ function applyMVSExcel(wb){
   for(let i=1;i<=7;i++){
     const dv=rows[i]?.[10],m3=rowsRaw[i]?.[11],m6=rowsRaw[i]?.[12],m12=rowsRaw[i]?.[13];
     if(!dv||m3===null||m3===undefined)continue;
-    tbData.push([fmtDate(new Date(dv)),'','','','',n2(m3),n2(m6),n2(m12)]);
+    tbData.push([fmtDate(new Date(dv)),n2(m3),n2(m6),n2(m12)]);
   }
   if(tbData.length){
     document.getElementById('tbill-rows').innerHTML='';
@@ -760,61 +808,43 @@ function applyMVSExcel(wb){
 
   // Bond rows (rows 1-12, col 19=maturity, cols 20-25=values for 6 date columns)
   const bondData=[];
+  const refCell=v=>(v===null||v===undefined||v===0||String(v).trim()===''||String(v).trim()==='-')?'':(typeof v==='number'?(+v).toFixed(2):String(v).trim());
   for(let i=1;i<=12;i++){
     const mat=String(rows[i]?.[19]||'').trim();
     if(!mat.match(/^\d{2}\.\d{2}\.\d{4}$/))continue;
-    const vals=[20,21,22,23,24,25].map(c=>{
+    const ly=refCell(rowsRaw[i]?.[20]);   // col 20 = Last Year
+    const lm=refCell(rowsRaw[i]?.[21]);   // col 21 = Last Month
+    const vals=[22,23,24,25,26,27].map(c=>{   // cols 22-27 = date columns
       const v=rowsRaw[i]?.[c];
       if(v===null||v===undefined||v===0||String(v).trim()===''||String(v).trim()==='-')return'0';
       return String(v).trim();
     });
-    bondData.push([mat,'','',...vals]);
+    bondData.push([mat,ly,lm,...vals]);
   }
   if(bondData.length){
     document.getElementById('bond-rows').innerHTML='';
     bondData.forEach(r=>addRow('bond-rows',r));
   }
 
-  // ── T-Bill Auction Detail (cols F-J = indices 5-9, plus Last Year col K=10, Last Month col L=11 if present)
-  // Sheet: get_data  Columns: F(5)=Auction Date, G(6)=Maturity, H(7)=Offered, I(8)=Accepted, J(9)=%, K(10)=Last Year, L(11)=Last Month
-  const auctionGroups=[];
-  let currentGroup=null;
-  for(let i=1;i<Math.min(rows.length,50);i++){
-    const dateVal=rowsRaw[i]?.[5];   // col F
-    const matVal =String(rows[i]?.[6]||'').trim();  // col G
-    const offered=rowsRaw[i]?.[7];   // col H
-    const accepted=rowsRaw[i]?.[8];  // col I
-    const yld=rowsRaw[i]?.[9];       // col J
-    const lastYr=rowsRaw[i]?.[10];   // col K (new)
-    const lastMo=rowsRaw[i]?.[11];   // col L (new — careful: tbill date also in col K, check for number)
-    // Skip rows with no maturity and no date
-    if(!matVal&&(dateVal===null||dateVal===undefined||dateVal===''))continue;
-    // If there's a date value in col F, start a new group
-    if(dateVal!==null&&dateVal!==undefined&&dateVal!==''){
-      const parsedDate=dateVal instanceof Date?dateVal:new Date(dateVal);
-      const dateStr=isNaN(parsedDate)?String(dateVal):(parsedDate.getMonth()+1)+'/'+parsedDate.getDate()+'/'+parsedDate.getFullYear();
-      currentGroup={date:dateStr,maturities:[]};
-      auctionGroups.push(currentGroup);
-    }
-    // Add maturity row to current group
-    if(currentGroup&&matVal){
-      const matLabel=matVal.toUpperCase().includes('3')?'3M':matVal.toUpperCase().includes('6')?'6M':matVal.toUpperCase().includes('12')?'12M':matVal;
-      const lyStr=lastYr!==null&&lastYr!==undefined&&typeof lastYr==='number'?lastYr.toFixed(2):(lastYr?String(lastYr):'');
-      const lmStr=lastMo!==null&&lastMo!==undefined&&typeof lastMo==='number'?lastMo.toFixed(2):(lastMo?String(lastMo):'');
-      currentGroup.maturities.push({
-        maturity:matLabel,
-        lastYear:lyStr,
-        lastMonth:lmStr,
-        offered:offered!==null&&offered!==undefined?String(offered):'',
-        accepted:accepted!==null&&accepted!==undefined?String(accepted):'',
-        yield:yld!==null&&yld!==undefined?(typeof yld==='number'?yld.toFixed(2):String(yld)):''
-      });
-    }
+  // ── T-Bill Auction Detail from get_data auction yields (col10=date, 11=3M, 12=6M, 13=12M).
+  // Offered/Accepted are not in the sheet, so they stay blank for manual entry; % column = auction yield.
+  const aGroups=[];
+  for(let i=1;i<=12;i++){
+    const dv=rows[i]?.[10];
+    if(dv===null||dv===undefined||dv==='')continue;
+    const d=dv instanceof Date?dv:new Date(dv);
+    const ds=isNaN(d)?String(dv):((d.getUTCMonth()+1)+'/'+d.getUTCDate()+'/'+d.getUTCFullYear());
+    const y3=rowsRaw[i]?.[11],y6=rowsRaw[i]?.[12],y12=rowsRaw[i]?.[13];
+    const mats=[];
+    if(y3!==null&&y3!==undefined&&y3!=='')mats.push({maturity:'3M',offered:'',accepted:'',yield:n2(y3)});
+    if(y6!==null&&y6!==undefined&&y6!=='')mats.push({maturity:'6M',offered:'',accepted:'',yield:n2(y6)});
+    if(y12!==null&&y12!==undefined&&y12!=='')mats.push({maturity:'12M',offered:'',accepted:'',yield:n2(y12)});
+    if(mats.length)aGroups.push({date:ds,maturities:mats});
   }
-  if(auctionGroups.length){
+  if(aGroups.length){
     document.getElementById('auction-rows').innerHTML='';
-    auctionGroups.forEach(g=>addAuctionGroup(g.date,g.maturities));
-    showToast('✓ T-Bill auction data imported: '+auctionGroups.length+' dates');
+    aGroups.forEach(g=>addAuctionGroup(g.date,g.maturities));
+    showToast('✓ Auction detail imported ('+aGroups.length+' dates, yields filled; Offered/Accepted blank — add in Excel if needed)');
   }
 
   // Executive summary sheet
