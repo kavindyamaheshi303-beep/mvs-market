@@ -101,7 +101,18 @@ canvas{max-width:100%!important}
 .cs-chg.down{color:#6dd4a0;background:rgba(109,212,160,0.12)}
 .cs-chg.flat{color:#7fa3c8;background:rgba(77,163,232,0.10)}
 @media(max-width:1024px){.grid-2x2,.full-grid{grid-template-columns:1fr}}
-@media(max-width:600px){.report-hdr{flex-direction:column;text-align:center}.hdr-right{text-align:center}.hdr-left{flex-direction:column;justify-content:center}.logo{width:68px;height:68px}.logo-img{height:68px}}
+@media(max-width:600px){
+  .report-hdr{flex-direction:row;flex-wrap:nowrap;align-items:center;padding:8px 10px;gap:8px}
+  .hdr-left{flex-direction:row;gap:8px;align-items:center}
+  .logo{width:36px;height:36px;flex-shrink:0}
+  .logo-img{height:36px}
+  .hdr-info h1{font-size:12px;line-height:1.2}
+  .hdr-info p{font-size:9px;display:none}
+  .hdr-right{text-align:right;flex-shrink:0}
+  .hdr-date{font-size:11px;margin-bottom:2px}
+  .hdr-live{font-size:9px;padding:1px 6px}
+  #last-updated{font-size:9px}
+}
 .nav-bar{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px;}
 .nav-btn{background:#0d1e38;color:#9fb6d4;border:1px solid #1a3050;padding:9px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.4px;transition:all .15s;font-family:inherit;}
 .nav-btn:hover{background:#142a4a;color:#eaf2fb;}
@@ -908,7 +919,7 @@ function render(d){
         let prev=null;for(let k=ci-1;k>=0;k--){if(mids[k]!=null){prev=mids[k];break;}}
         const delta=prev!=null?+(m-prev).toFixed(3):null;
         let arrow="",acol="";
-        if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#7ee0a8";}else{arrow="\u25b4";acol="#ff8a78";} }
+        if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";} }
         td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
         td.style.background=heatColor(m,rmn,rmx);   // per-row colour
         td.style.color="#eaf2fb";td.style.fontWeight="600";
@@ -976,7 +987,7 @@ function render(d){
           let prev=null;for(let k=ci-1;k>=0;k--){if(mids[k]!=null){prev=mids[k];break;}}
           const delta=prev!=null?+(m-prev).toFixed(3):null;
           let arrow="",acol="";
-          if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#7ee0a8";}else{arrow="\u25b4";acol="#ff8a78";}}
+          if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";}}
           td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
           td.style.background=heatColor(m,rmn,rmx);td.style.color="#eaf2fb";td.style.fontWeight="600";
         }else{td.textContent="—";td.style.color="#3a5575";}
