@@ -2877,23 +2877,28 @@
  "keyDates": [
   {
    "label": "Next Squaring Off Day",
-   "date": "2026-07-07"
+   "date": "2026-07-07",
+   "show": true
   },
   {
    "label": "Next T-Bill Auction Day",
-   "date": "2026-06-24"
+   "date": "2026-06-24",
+   "show": true
   },
   {
    "label": "Next T-Bond Auction Day",
-   "date": "2026-06-26"
+   "date": "2026-06-26",
+   "show": true
   },
   {
    "label": "Next Monetary Policy Day",
-   "date": "2026-07-22"
+   "date": "2026-07-22",
+   "show": true
   },
   {
    "label": "Next FOMC Meeting Day",
-   "date": "2026-07-28"
+   "date": "2026-07-28",
+   "show": true
   }
  ],
  "execSummary": {
@@ -2902,5 +2907,8 @@
   "liqDelta": 20.1
  },
  "marketNews": [],
- "date": "2026-06-24"
+ "date": "2026-06-24",
+ "openingDate": "",
+ "closingDate": "",
+ "fxVolDate": ""
 }
