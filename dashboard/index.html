@@ -974,7 +974,12 @@ function renderExtras(d){
    const ot=document.getElementById("opening-report-date");
    if(ot){ot.innerHTML=ov(d.openingDate)?escHtml(ov(d.openingDate)):fmtOrd(todayD);}
    const cd=document.getElementById("closing-report-date");
-   if(cd){cd.innerHTML=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);}}
+   if(cd){cd.innerHTML=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);}
+   const ft=document.getElementById("op-fxsum-title");
+   if(ft){const fv=ov(d.fxVolDate)||fmtShort(yestD);ft.textContent="Volume of FX Market ("+fv+")";}}
+  set('dyn-op-vd',(d.valueDates||[]).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-op-srr',(d.srr||[]).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${dash(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+}
 
 function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
 
