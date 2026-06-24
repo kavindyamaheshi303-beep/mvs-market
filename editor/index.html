@@ -34,6 +34,22 @@ button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-wei
 .toast.err{background:#2a1212;border-color:#7a2e2e;color:#e8917a}
 .hint{font-size:11px;color:#5a7a9a;margin-top:6px}
 code{background:#081424;padding:1px 6px;border-radius:4px;color:#c8a84b;font-size:11px}
+.fresh-banner{padding:11px 14px;border-radius:8px;font-size:13px;font-weight:700;margin-bottom:12px}
+.fresh-banner.ok{background:#0d2818;border:1px solid #1f7a4d;color:#6dd4a0}
+.fresh-banner.warn{background:#2a1f08;border:1px solid #b5862b;color:#f0c45a}
+.fresh-banner.bad{background:#2a1212;border:1px solid #7a2e2e;color:#e8917a}
+.fresh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:9px}
+.fresh-item{background:#081424;border:1px solid #1a3050;border-left:3px solid #2a4566;border-radius:7px;padding:9px 12px}
+.fresh-item .fi-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fresh-item .fi-name{font-size:12px;font-weight:600;color:#eaf2fb}
+.fresh-item .fi-tag{font-size:8.5px;text-transform:uppercase;letter-spacing:.5px;color:#7fa3c8;background:#0d1e38;border:1px solid #1a3050;border-radius:4px;padding:1px 6px;white-space:nowrap}
+.fresh-item .fi-msg{font-size:10.5px;color:#9fb6d4;margin-top:5px}
+.fresh-item.ok{border-left-color:#1f7a4d}
+.fresh-item.pending{border-left-color:#b5862b}
+.fresh-item.pending .fi-msg{color:#f0c45a}
+.fresh-item.stale,.fresh-item.missing{border-left-color:#c0392b}
+.fresh-item.stale .fi-msg,.fresh-item.missing .fi-msg{color:#ef8e7a;font-weight:600}
+.fresh-item.info{border-left-color:#3a5a7a}
 </style></head>
 <body>
 <h1>MVS Market Data — Editor</h1>
@@ -75,13 +91,20 @@ code{background:#081424;padding:1px 6px;border-radius:4px;color:#c8a84b;font-siz
 
 <!-- PREVIEW -->
 <div class="card">
-  <h2>3 · Review loaded data</h2>
+  <h2>3 · Data freshness check</h2>
+  <div id="fresh-banner" class="fresh-banner" style="display:none"></div>
+  <div class="fresh-grid" id="freshness"><div class="hint">Import the Excel to check which sections are up to date for today's Sri Lankan / US working day.</div></div>
+</div>
+
+<!-- PREVIEW DATA -->
+<div class="card">
+  <h2>4 · Review loaded data</h2>
   <div class="prev-grid" id="preview"><div class="prev-item empty"><div class="pl">No data</div><div class="pv">Import an Excel or reload published data.</div></div></div>
 </div>
 
 <!-- PUBLISH -->
 <div class="card">
-  <h2>4 · Publish to dashboard</h2>
+  <h2>5 · Publish to dashboard</h2>
   <div class="row"><button class="btn-green" onclick="publishData()">🚀 Publish to Dashboard</button></div>
   <div class="status" id="save-status"></div>
 </div>
@@ -148,7 +171,8 @@ function importExcel(ev){
     try{
       const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
       LOADED=parseWorkbook(wb,XLSX);
-      st.style.color='#6dd4a0';st.textContent='✓ Imported '+f.name+'. Review below, then Publish.';
+      try{renderFreshness(analyzeFreshness(wb,XLSX));}catch(fe){}
+      st.style.color='#6dd4a0';st.textContent='✓ Imported '+f.name+'. Check freshness & review below, then Publish.';
       renderPreview(LOADED);showToast('✓ Excel imported');
     }catch(err){st.style.color='#e8917a';st.textContent='✗ '+err.message;showToast('Import failed: '+err.message,'err');}
     ev.target.value='';
@@ -158,6 +182,8 @@ function importExcel(ev){
 function clearAll(){
   LOADED=null;
   document.getElementById('preview').innerHTML='<div class="prev-item empty"><div class="pl">Cleared</div><div class="pv">All data cleared. Import an Excel to start again.</div></div>';
+  const fb=document.getElementById('fresh-banner');if(fb)fb.style.display='none';
+  document.getElementById('freshness').innerHTML='<div class="hint">Import the Excel to check which sections are up to date for today\u2019s Sri Lankan / US working day.</div>';
   document.getElementById('import-status').textContent='';
   document.getElementById('save-status').textContent='';
   showToast('All data cleared');
@@ -293,6 +319,77 @@ function parseWorkbook(wb,XLSX){
   o.marketNews=o.marketNews||[];
   o.date=new Date().toISOString().slice(0,10);
   return o;
+}
+
+// ── FRESHNESS: detect which sections weren't updated for today's working day ──
+function analyzeFreshness(wb,XLSX,nowOverride){
+  const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
+  const sheets=wb.SheetNames, find=name=>sheets.find(s=>s.toLowerCase().replace(/\s+/g,'').includes(name));
+  const MON3=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  const MONF=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  // US federal holidays 2026 (fixed) — SL relies on weekend + the soft "pending" tier (poya/bank days vary)
+  const US_HOL=new Set(["2026-01-01","2026-01-19","2026-02-16","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-10-12","2026-11-11","2026-11-26","2026-12-25"]);
+  const iso=d=>d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,'0')+"-"+String(d.getUTCDate()).padStart(2,'0');
+  const fmt=d=>d.getUTCDate()+" "+MONF[d.getUTCMonth()];
+  const isWknd=d=>{const g=d.getUTCDay();return g===0||g===6;};
+  const isWork=(d,cal)=>!isWknd(d)&&!(cal==='US'&&US_HOL.has(iso(d)));
+  const lastWork=(d,cal)=>{let x=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));while(!isWork(x,cal))x.setUTCDate(x.getUTCDate()-1);return x;};
+  const wdBetween=(a,b,cal)=>{let c=0,x=new Date(a.getTime());while(x<b){x.setUTCDate(x.getUTCDate()+1);if(isWork(x,cal))c++;}return c;};
+  const now=nowOverride||new Date();
+  const todayUTC=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
+  const usNow=new Date(now.getTime()-10.5*3600*1000); // US daily series close overnight (Colombo +10.5h ahead)
+  const usTodayUTC=new Date(Date.UTC(usNow.getUTCFullYear(),usNow.getUTCMonth(),usNow.getUTCDate()));
+  const latestDate=(rows,col,sr)=>{sr=sr||2;let mx=null;for(let i=sr;i<rows.length;i++){const v=rows[i]&&rows[i][col];if(v instanceof Date){if(!mx||v>mx)mx=v;}}return mx?new Date(Date.UTC(mx.getUTCFullYear(),mx.getUTCMonth(),mx.getUTCDate())):null;};
+  const parseDM=s=>{const m=String(s||'').trim().match(/^(\d{1,2})[\s\-]([A-Za-z]{3})/);if(!m)return null;const mi=MON3.indexOf(m[2].toLowerCase());if(mi<0)return null;return new Date(Date.UTC(now.getFullYear(),mi,parseInt(m[1])));};
+  const out=[];
+  const daily=(label,cal,last)=>{
+    const ref=cal==='US'?usTodayUTC:todayUTC, exp=lastWork(ref,cal);
+    if(!last){out.push({label,cadence:'Daily',cal,status:'missing',msg:'No dates found in this section.'});return;}
+    if(last>=exp){out.push({label,cadence:'Daily',cal,status:'ok',msg:'Up to date — latest '+fmt(last)+'.'});return;}
+    const gap=wdBetween(last,exp,cal);
+    out.push({label,cadence:'Daily',cal,status:gap>=2?'stale':'pending',msg:(gap>=2?'NOT updated — ':'Today still pending — ')+'latest '+fmt(last)+', expected '+fmt(exp)+' ('+gap+' working day'+(gap>1?'s':'')+' behind).'});
+  };
+  const weekly=(label,cal,last)=>{
+    const ref=cal==='US'?usTodayUTC:todayUTC;
+    if(!last){out.push({label,cadence:'Weekly',cal,status:'missing',msg:'No dates found.'});return;}
+    const days=Math.round((ref-last)/86400000);
+    out.push({label,cadence:'Weekly',cal,status:days>9?'stale':(days>7?'pending':'ok'),msg:(days>9?'NOT updated — ':'')+'latest '+fmt(last)+' ('+days+' day'+(days===1?'':'s')+' ago).'});
+  };
+  const mm=S(find('moneymorket')||find('moneymarket')||'');
+  daily('Money Market & Liquidity','SL',latestDate(mm,7));
+  const fx=S(find('fx')||''); daily('USD/LKR & FX Spot','SL',latestDate(fx,0));
+  const fi=S(find('fixedincome')||'');
+  {let bh=fi[1]||[],last=null;for(let c=3;c<=8;c++){const d=parseDM(bh[c]);if(d&&(!last||d>last))last=d;}daily('Daily Bond / Yield Rates','SL',last);}
+  const gl=S(find('globalmarket')||'');
+  daily('US 10Y Treasury','US',latestDate(gl,0));
+  daily('Gold (XAU/USD)','US',latestDate(gl,10));
+  daily('Crude Oil (WTI / Brent)','US',latestDate(gl,3));
+  daily('US Dollar Index (DXY)','US',latestDate(gl,7));
+  const mc=S(find('macroeconomy')||'');
+  weekly('Foreign Holdings of Govt Securities','SL',latestDate(mc,0));
+  weekly('T-Bill Auction (Primary)','SL',latestDate(fi,15));
+  const monthLbl=(mc[1]&&mc[1][11])?String(mc[1][11]).trim():'';
+  out.push({label:'Reserves · Inflation · Tourism · Remittances',cadence:'Monthly',cal:'SL',status:'info',msg:'Monthly series — latest column: '+(monthLbl||'n/a')+'. Update when the new month is released.'});
+  const an=S(find('announcement')||'');
+  let passed=[];for(let i=2;i<an.length;i++){const v=an[i]&&an[i][1];if(v){const m=String(v).match(/^(\d{1,2})(?:-\d{1,2})?[.\-/](\d{1,2})[.\-/](\d{4})/);if(m){const dt=new Date(Date.UTC(+m[3],+m[2]-1,+m[1]));if(dt<todayUTC)passed.push(String(an[i][0]).trim());}}}
+  out.push({label:'OPR · SRR · FOMC · Key Dates',cadence:'Fixed / Special',cal:'—',status:passed.length?'pending':'info',msg:passed.length?('A scheduled date has passed — update: '+passed.join(', ')):'Event-driven — update only when a new policy decision or date occurs.'});
+  return out;
+}
+function renderFreshness(checks){
+  const grid=document.getElementById('freshness'),banner=document.getElementById('fresh-banner');
+  const bad=checks.filter(c=>c.status==='stale'||c.status==='missing').length;
+  const pend=checks.filter(c=>c.status==='pending').length;
+  if(banner){
+    banner.style.display='block';
+    if(bad){banner.className='fresh-banner bad';banner.textContent='⚠ '+bad+' section'+(bad>1?'s are':' is')+' NOT updated for today — review the red items below before you publish.';}
+    else if(pend){banner.className='fresh-banner warn';banner.textContent='● '+pend+' section'+(pend>1?'s':'')+' may still be pending today (1 working day behind). Confirm whether today\u2019s figures are out yet.';}
+    else{banner.className='fresh-banner ok';banner.textContent='✓ All daily & weekly sections are up to date for the latest working day.';}
+  }
+  const cal=c=>c.cal==='—'?'':(c.cal==='US'?' · US days':' · SL days');
+  grid.innerHTML=checks.map(c=>{
+    const icon=c.status==='ok'?'✓':c.status==='info'?'ⓘ':c.status==='pending'?'●':'⚠';
+    return `<div class="fresh-item ${c.status}"><div class="fi-top"><span class="fi-name">${icon} ${c.label}</span><span class="fi-tag">${c.cadence}${cal(c)}</span></div><div class="fi-msg">${c.msg}</div></div>`;
+  }).join('');
 }
 
 // ── INIT ─────────────────────────────────────────────────
