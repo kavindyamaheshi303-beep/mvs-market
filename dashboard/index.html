@@ -155,14 +155,6 @@ canvas{max-width:100%!important}
 .event-card .ev-days.soon{color:#e8b14d;background:rgba(232,177,77,.12)}
 .event-card .ev-days.today{color:#ff8a78;background:rgba(255,138,120,.14)}
 .event-card .ev-days.passed{color:#7a93b4;background:rgba(122,147,180,.1)}
-.mini-tbl{margin-top:8px;max-height:128px;overflow-y:auto;border:1px solid #14283f;border-radius:6px}
-.mini-tbl table{width:100%;border-collapse:collapse;font-size:9.5px}
-.mini-tbl th{position:sticky;top:0;background:#0d1e38;color:#7fa3c8;font-weight:600;text-align:right;padding:3px 8px;letter-spacing:.3px;border-bottom:1px solid #1a3050}
-.mini-tbl th:first-child,.mini-tbl td:first-child{text-align:left}
-.mini-tbl td{padding:3px 8px;border-bottom:1px solid #0f2138;color:#cfe0f2}
-.mini-tbl tr:last-child td{border-bottom:none}
-.mini-tbl tr:first-child td{color:#fff;font-weight:700}
-.mini-tbl .chg-up{color:#6dd4a0}.mini-tbl .chg-dn{color:#ff8a78}
 </style>
 </head>
 <body>
@@ -329,7 +321,11 @@ canvas{max-width:100%!important}
           <tr><th rowspan="2" style="vertical-align:bottom;text-align:left">Facility</th><th colspan="2" style="text-align:center">Volume (LKR Bn)</th><th colspan="2" style="text-align:center">CBSL Policy Window Rates</th></tr>
           <tr><th style="text-align:right">19<sup>th</sup> Jun</th><th style="text-align:right">18<sup>th</sup> Jun</th><th style="text-align:right">19<sup>th</sup> Jun</th><th style="text-align:right">18<sup>th</sup> Jun</th></tr>
         </thead>
-        <tbody id="dyn-op-cbsl"></tbody>
+        <tbody>
+          <tr><td>Standing Deposit Facility (SDF)</td><td>76.24</td><td>90.42</td><td>8.25%</td><td>8.25%</td></tr>
+          <tr><td>Standing Lending Facility (SLF)</td><td>44.99</td><td>59.22</td><td>9.25%</td><td>9.25%</td></tr>
+          <tr><td style="font-weight:700">Net Market Liquidity Status</td><td style="color:#c8a84b;font-weight:700">31.25 <span class="up-arrow">&#9650;</span></td><td>31.20</td><td colspan="2" style="color:#6dd4a0;font-weight:700">CBSL Holdings: 2,498.12 Bn</td></tr>
+        </tbody>
       </table>
     </div>
 
@@ -339,14 +335,21 @@ canvas{max-width:100%!important}
         <div class="panel-title"><span class="sec-num">2.</span> Interbank Money Market (Call &amp; Repo)</div>
         <table style="font-size:11px">
           <thead><tr><th>Instrument</th><th>Highest</th><th>Lowest</th><th>W/A</th><th>Volume</th></tr></thead>
-          <tbody id="dyn-op-mm"></tbody>
+          <tbody>
+            <tr><td>Call Money</td><td>9.25%</td><td>8.40%</td><td style="color:#c8a84b">9.22%</td><td>32.83 Bn</td></tr>
+            <tr><td>Repo</td><td>9.25%</td><td>9.23%</td><td style="color:#c8a84b">9.24%</td><td>69.18 Bn</td></tr>
+          </tbody>
         </table>
       </div>
       <div class="panel">
         <div class="panel-title"><span class="sec-num">3.</span> Monetary Policy Decisions (OPR)</div>
         <table style="font-size:12px">
           <thead><tr><th>Date</th><th>OPR</th></tr></thead>
-          <tbody id="dyn-op-opr"></tbody>
+          <tbody>
+            <tr><td>27.11.2024</td><td>8.00%</td></tr>
+            <tr><td>22.05.2025</td><td>7.75%</td></tr>
+            <tr><td>26.05.2026</td><td style="color:#c8a84b;font-weight:700">8.75% <span class="up-arrow">&#9650;</span></td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -357,19 +360,28 @@ canvas{max-width:100%!important}
         <div class="panel-title"><span class="sec-num">4.</span> Treasury Bills (T-Bills) Data</div>
         <table style="font-size:12px">
           <thead><tr><th>Tenure</th><th>Days to Maturity</th><th>W/A (%)</th></tr></thead>
-          <tbody id="dyn-op-tbill3"></tbody>
+          <tbody>
+            <tr><td>3 Months</td><td>91 Days</td><td style="color:#c8a84b">10.02%</td></tr>
+            <tr><td>6 Months</td><td>182 Days</td><td style="color:#c8a84b">10.16%</td></tr>
+            <tr><td>1 Year</td><td>364 Days</td><td style="color:#c8a84b">10.16%</td></tr>
+          </tbody>
         </table>
       </div>
       <div class="panel">
-        <div class="panel-title"><span class="sec-num">5.</span> FX Market Overview (Spot)</div>
-        <div class="fx-ov" id="dyn-op-fxov"></div>
+        <div class="panel-title"><span class="sec-num">5.</span> FX Market Overview (19<sup>th</sup> Jun)</div>
+        <div class="fx-ov">
+          <div class="fx-ov-row"><span class="lbl">Opening Spot</span><span class="val">335.50 / 334.25</span></div>
+          <div class="fx-ov-row"><span class="lbl">Closing Spot</span><span class="val">333.90 / 334.25</span></div>
+          <div class="fx-ov-row"><span class="lbl">Intraday Lowest Rate</span><span class="val">333.50</span></div>
+          <div class="fx-ov-row"><span class="lbl">Intraday Highest Rate</span><span class="val">334.00</span></div>
+        </div>
       </div>
     </div>
 
     <!-- 6. T-Bonds secondary yields -->
     <div class="panel full-width">
       <div class="panel-title"><span class="sec-num">6.</span> T-Bonds Secondary Market Closing Yields <span style="font-size:9px;color:#7a93b4;font-weight:400">(19<sup>th</sup> June · bid / offer)</span></div>
-      <div class="by-grid" id="dyn-op-secondary"></div>
+      <div class="by-grid"><div class="by-row"><span class="by-mat">15.09.2027</span><span class="by-rate">10.35 / 10.45</span></div><div class="by-row"><span class="by-mat">15.02.2028</span><span class="by-rate">10.50 / 10.60</span></div><div class="by-row"><span class="by-mat">15.03.2028</span><span class="by-rate">10.50 / 10.60</span></div><div class="by-row"><span class="by-mat">01.05.2028</span><span class="by-rate">10.50 / 10.65</span></div><div class="by-row"><span class="by-mat">01.07.2028</span><span class="by-rate">10.50 / 10.70</span></div><div class="by-row"><span class="by-mat">01.09.2028</span><span class="by-rate">10.50 / 10.70</span></div><div class="by-row"><span class="by-mat">15.10.2028</span><span class="by-rate">10.50 / 10.70</span></div><div class="by-row"><span class="by-mat">15.12.2028</span><span class="by-rate">10.50 / 10.75</span></div><div class="by-row"><span class="by-mat">15.06.2029</span><span class="by-rate">10.85 / 10.95</span></div><div class="by-row"><span class="by-mat">15.07.2029</span><span class="by-rate">10.85 / 10.95</span></div><div class="by-row"><span class="by-mat">15.09.2029</span><span class="by-rate">10.85 / 11.00</span></div><div class="by-row"><span class="by-mat">15.10.2029</span><span class="by-rate">10.85 / 11.00</span></div><div class="by-row"><span class="by-mat">15.12.2029</span><span class="by-rate">10.90 / 11.00</span></div><div class="by-row"><span class="by-mat">01.03.2030</span><span class="by-rate">11.00 / 11.10</span></div><div class="by-row"><span class="by-mat">15.05.2030</span><span class="by-rate">11.00 / 11.15</span></div><div class="by-row"><span class="by-mat">01.07.2030</span><span class="by-rate">11.05 / 11.20</span></div><div class="by-row"><span class="by-mat">01.08.2030</span><span class="by-rate">11.15 / 11.25</span></div><div class="by-row"><span class="by-mat">15.10.2030</span><span class="by-rate">11.15 / 11.25</span></div><div class="by-row"><span class="by-mat">15.01.2033</span><span class="by-rate">11.40 / 11.50</span></div><div class="by-row"><span class="by-mat">01.06.2033</span><span class="by-rate">11.45 / 11.55</span></div><div class="by-row"><span class="by-mat">15.06.2034</span><span class="by-rate">11.60 / 11.70</span></div><div class="by-row"><span class="by-mat">15.09.2034</span><span class="by-rate">11.60 / 11.70</span></div><div class="by-row"><span class="by-mat">15.03.2035</span><span class="by-rate">11.70 / 11.80</span></div><div class="by-row"><span class="by-mat">15.06.2035</span><span class="by-rate">11.70 / 11.90</span></div><div class="by-row"><span class="by-mat">15.08.2036</span><span class="by-rate">11.75 / 12.00</span></div></div>
     </div>
 
     <!-- 7. FX Market Summary + Value Dates -->
@@ -378,14 +390,23 @@ canvas{max-width:100%!important}
         <div class="panel-title"><span class="sec-num">7.</span> FX Market Summary (19<sup>th</sup> Jun)</div>
         <table style="font-size:11px">
           <thead><tr><th>Tenor</th><th>Volume (USD Mn)</th><th>W/A</th></tr></thead>
-          <tbody id="dyn-op-fxsum"></tbody>
+          <tbody>
+            <tr><td>Spot</td><td>14.75</td><td>333.7646</td></tr>
+            <tr><td>Tom</td><td>—</td><td>—</td></tr>
+            <tr><td>Cash</td><td>—</td><td>—</td></tr>
+            <tr style="font-weight:700"><td>SubTotal</td><td>14.75</td><td></td></tr>
+            <tr><td>1W</td><td>01.25</td><td>334.4200</td></tr>
+            <tr><td>1M</td><td>07.25</td><td>335.6062</td></tr>
+            <tr style="font-weight:700"><td>Sub Total (Forwards)</td><td>08.50</td><td></td></tr>
+            <tr style="font-weight:700;color:#c8a84b"><td>Grand Total Volume</td><td>23.25</td><td></td></tr>
+          </tbody>
         </table>
       </div>
       <div class="panel">
-        <div class="panel-title">Value Dates</div>
+        <div class="panel-title">Value Dates (22.06.2026)</div>
         <div style="max-height:300px;overflow-y:auto"><table style="font-size:10px">
           <thead><tr><th>Tenor</th><th>Value Date</th><th>NOD</th></tr></thead>
-          <tbody id="dyn-op-vd"></tbody>
+          <tbody><tr><td>Cash</td><td>22.06.2026</td><td style="color:#9fb6d4"></td></tr><tr><td>Tom</td><td>23.06.2026</td><td style="color:#9fb6d4"></td></tr><tr><td>Spot</td><td>24.06.2026</td><td style="color:#9fb6d4"></td></tr><tr><td>1 Week</td><td>01.07.2026</td><td style="color:#9fb6d4">07 Days</td></tr><tr><td>2 Weeks</td><td>08.07.2026</td><td style="color:#9fb6d4">14 Days</td></tr><tr><td>3 Weeks</td><td>15.07.2026</td><td style="color:#9fb6d4">21 Days</td></tr><tr><td>1 Month</td><td>24.07.2026</td><td style="color:#9fb6d4">30 Days</td></tr><tr><td>2 Months</td><td>24.08.2026</td><td style="color:#9fb6d4">61 Days</td></tr><tr><td>3 Months</td><td>24.09.2026</td><td style="color:#9fb6d4">92 Days</td></tr><tr><td>4 Months</td><td>26.10.2026</td><td style="color:#9fb6d4">124 Days</td></tr><tr><td>5 Months</td><td>25.11.2026</td><td style="color:#9fb6d4">154 Days</td></tr><tr><td>6 Months</td><td>24.12.2026</td><td style="color:#9fb6d4">183 Days</td></tr><tr><td>7 Months</td><td>25.01.2027</td><td style="color:#9fb6d4">215 Days</td></tr><tr><td>8 Months</td><td>24.02.2027</td><td style="color:#9fb6d4">245 Days</td></tr><tr><td>9 Months</td><td>24.03.2027</td><td style="color:#9fb6d4">273 Days</td></tr><tr><td>10 Months</td><td>26.04.2027</td><td style="color:#9fb6d4">306 Days</td></tr><tr><td>11 Months</td><td>24.05.2027</td><td style="color:#9fb6d4">334 Days</td></tr><tr><td>12 Months</td><td>24.06.2027</td><td style="color:#9fb6d4">365 Days</td></tr></tbody>
         </table></div>
       </div>
     </div>
@@ -396,7 +417,12 @@ canvas{max-width:100%!important}
         <div class="panel-title">Statutory Reserve Requirement (SRR)</div>
         <table style="font-size:12px">
           <thead><tr><th>Date</th><th>SRR</th></tr></thead>
-          <tbody id="dyn-op-srr"></tbody>
+          <tbody>
+            <tr><td>16.03.2020</td><td>4.00%</td></tr>
+            <tr><td>16.06.2020</td><td>2.00%</td></tr>
+            <tr><td>01.09.2021</td><td>4.00%</td></tr>
+            <tr><td>16.08.2023</td><td>2.00%</td></tr>
+          </tbody>
         </table>
       </div>
       <div class="panel">
@@ -454,30 +480,13 @@ canvas{max-width:100%!important}
         <div class="liq-item"><div class="liq-label">Previous Liquidity</div><div class="liq-val" id="liqprev">—</div></div>
       </div>
     </div>
-    <div class="panel"><div class="panel-title pt-row"><span>Market Liquidity (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('liq',7,this)" title="Last 7 working days">W</button><button class="mg-btn" onclick="setChartGran('liq',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('liq','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="liqChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="liqStat"></div><div class="mini-tbl" id="liqTbl"></div></div>
-  </div>
-
-  <div class="grid-2x2">
-    <div class="panel">
-      <div class="panel-title">Policy Rate (OPR) History</div>
-      <table style="font-size:12px">
-        <thead><tr><th>Effective Date</th><th>OPR (%)</th></tr></thead>
-        <tbody id="dyn-opr"></tbody>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Standing Facilities (Rs.Bn)</div>
-      <table style="font-size:12px">
-        <thead><tr><th>Instrument</th><th>Latest</th><th>Previous</th></tr></thead>
-        <tbody id="dyn-windows"></tbody>
-      </table>
-    </div>
+    <div class="panel"><div class="panel-title pt-row"><span>Market Liquidity (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('liq',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('liq','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="liqChart" style="max-height:200px"></canvas></div>
   </div>
 
   <!-- CBSL + FOREIGN HOLDINGS (last part of Money Market, below T-bill/T-bond) -->
   <div class="grid-2x2">
-    <div class="panel"><div class="panel-title pt-row"><span>CBSL Holdings of Government Securities (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('cbsl',7,this)" title="Last 7 data points">W</button><button class="mg-btn" onclick="setChartGran('cbsl',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('cbsl','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="cbslChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="cbslStat"></div><div class="mini-tbl" id="cbslTbl"></div></div>
-    <div class="panel"><div class="panel-title pt-row"><span>Foreign Holdings of Government Securities (Rs.Mn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('fh',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('fh','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="fhChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="fhStat"></div><div class="mini-tbl" id="fhTbl"></div></div>
+    <div class="panel"><div class="panel-title pt-row"><span>CBSL Holdings of Government Securities (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('cbsl',7,this)" title="Last 7 data points">W</button><button class="mg-btn" onclick="setChartGran('cbsl',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('cbsl','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="cbslChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="cbslStat"></div></div>
+    <div class="panel"><div class="panel-title pt-row"><span>Foreign Holdings of Government Securities (Rs.Mn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('fh',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('fh','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="fhChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="fhStat"></div></div>
   </div>
 
   </div>
@@ -488,7 +497,7 @@ canvas{max-width:100%!important}
   <div class="full-grid">
     <div class="panel">
       <div class="panel-title pt-row"><span>Treasury Bill</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('tbill',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('tbill','all',this)" title="Full year (all data)">Y</button></span></div>
-      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas><div class="chart-stat-bar" id="tbillStat"></div>
+      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas>
       <table style="font-size:10px;margin-bottom:12px">
         <thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
         <tbody id="tbillRows"></tbody>
@@ -516,7 +525,7 @@ canvas{max-width:100%!important}
     </div>
     <div class="panel">
       <div class="panel-title">Treasury Bond (Yield Curve)</div>
-      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas><div class="chart-stat-bar" id="yieldStat"></div>
+      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas>
       <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Heat-map per maturity: <span style="color:#7ee0a8">low</span>→<span style="color:#ff8a78">high</span> yield · ▾ down / ▴ up vs prev day</div>
       <div style="overflow-x:auto;max-width:100%">
         <table style="font-size:9px">
@@ -524,16 +533,6 @@ canvas{max-width:100%!important}
           <tbody id="bondRows"></tbody>
         </table>
       </div>
-    </div>
-  </div>
-
-  <div class="panel full-width">
-    <div class="panel-title">T-Bond Secondary Market Closing Yields</div>
-    <div style="overflow-x:auto;max-height:320px;overflow-y:auto">
-      <table style="font-size:10px">
-        <thead><tr><th>Maturity Date</th><th>Bid (%)</th><th>Ask (%)</th></tr></thead>
-        <tbody id="dyn-secondary"></tbody>
-      </table>
     </div>
   </div>
 
@@ -562,22 +561,6 @@ canvas{max-width:100%!important}
     </div>
   </div>
 
-  <div class="grid-2x2">
-    <div class="panel">
-      <div class="panel-title">FX Market Overview (Spot)</div>
-      <table style="font-size:12px">
-        <tbody id="dyn-spot"></tbody>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Cross-Currency Rates</div>
-      <table style="font-size:11px">
-        <thead><tr><th>Currency</th><th>Buying</th><th>Selling</th></tr></thead>
-        <tbody id="dyn-cross"></tbody>
-      </table>
-    </div>
-  </div>
-
   </div>
 
   <!-- PAGE: MACRO ECONOMY -->
@@ -588,14 +571,23 @@ canvas{max-width:100%!important}
         <div class="panel-title">Inflation (CCPI vs NCPI)</div>
         <table style="font-size:11px">
           <thead><tr><th>Index / Metric</th><th>April 2026</th><th>May 2026</th></tr></thead>
-          <tbody id="dyn-inflation"></tbody>
+          <tbody>
+            <tr><td>CCPI Year-on-Year (YoY %)</td><td>5.4%</td><td style="color:#c8a84b">5.5%</td></tr>
+            <tr><td>CCPI Month-on-Month (MoM %)</td><td>3.0%</td><td style="color:#c8a84b">0.9%</td></tr>
+            <tr><td>NCPI Year-on-Year (YoY %)</td><td>4.7%</td><td>&mdash;</td></tr>
+            <tr><td>NCPI Month-on-Month (MoM %)</td><td>2.6%</td><td>&mdash;</td></tr>
+          </tbody>
         </table>
       </div>
       <div class="panel">
         <div class="panel-title">Foreign Currency Reserves</div>
         <table style="font-size:12px">
           <thead><tr><th>Month</th><th>Reserve ($)</th></tr></thead>
-          <tbody id="dyn-reserves"></tbody>
+          <tbody>
+            <tr><td>March 2026</td><td>6,800 Mn</td></tr>
+            <tr><td>April 2026</td><td>6,511 Mn</td></tr>
+            <tr><td>May 2026</td><td style="color:#c8a84b;font-weight:700">6,652 Mn</td></tr>
+          </tbody>
         </table>
         <div class="rpt-note">Source: https://www.cbsl.gov.lk/</div>
       </div>
@@ -604,12 +596,12 @@ canvas{max-width:100%!important}
       <div class="panel-title">Tourism &amp; Remittances</div>
       <div class="grid-2x2" style="margin-top:0">
         <table style="font-size:11px">
-          <thead><tr><th>Tourism (USD)</th><th>Apr 2026</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
-          <tbody id="dyn-tourism"></tbody>
+          <thead><tr><th>Tourism (USD)</th><th>Mar 2026</th><th>Apr 2026</th><th>Y-o-Y (Apr)</th></tr></thead>
+          <tbody><tr><td>Earnings</td><td>223.70 Mn</td><td>157.10 Mn</td><td style="color:#6dd4a0;font-weight:700">19.4%</td></tr></tbody>
         </table>
         <table style="font-size:11px">
-          <thead><tr><th>Remittances (USD)</th><th>Apr 2025</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
-          <tbody id="dyn-remit"></tbody>
+          <thead><tr><th>Remittances (USD)</th><th>Apr 2025</th><th>May 2026</th><th>Y-o-Y (May)</th></tr></thead>
+          <tbody><tr><td>Inflows</td><td>767.9 Mn</td><td>847.00 Mn</td><td style="color:#6dd4a0;font-weight:700">26.0%</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -623,28 +615,32 @@ canvas{max-width:100%!important}
     <div class="grid-2x2">
       <div class="panel">
         <div class="panel-title pt-row"><span>US Treasury 10-Year Yield (%)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('g10',7,this)" title="Last 7 data points">W</button><button class="mg-btn" onclick="setChartGran('g10',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('g10','all',this)" title="Full year (all data)">Y</button></span></div>
-        <canvas id="g10Chart" style="max-height:210px"></canvas><div class="chart-stat-bar" id="g10Stat"></div><div class="mini-tbl" id="g10Tbl"></div>
+        <canvas id="g10Chart" style="max-height:210px"></canvas><div class="chart-stat-bar" id="g10Stat"></div>
       </div>
       <div class="panel">
         <div class="panel-title">US Fed Rate — FOMC Decisions</div>
         <table style="font-size:11px">
           <thead><tr><th>Date</th><th>Range</th><th>O/N REPO</th><th>O/N R/REPO</th></tr></thead>
-          <tbody id="dyn-fomc"></tbody>
+          <tbody>
+            <tr><td>18<sup>th</sup> Mar 26</td><td>3.50% - 3.75%</td><td>3.75%</td><td>3.50%</td></tr>
+            <tr><td>29<sup>th</sup> Apr 26</td><td>3.50% - 3.75%</td><td>3.75%</td><td>3.50%</td></tr>
+            <tr><td>17<sup>th</sup> Jun 26</td><td>3.50% - 3.75%</td><td>3.75%</td><td>3.50%</td></tr>
+          </tbody>
         </table>
-        <div class="rpt-note" style="color:#c8a84b;font-weight:700" id="dyn-fomc-next">Next FOMC Meeting: 28 &ndash; 29 July 2026</div>
+        <div class="rpt-note" style="color:#c8a84b;font-weight:700">Next FOMC Meeting: 28 &ndash; 29 July 2026</div>
       </div>
     </div>
 
     <!-- Gold + DXY -->
     <div class="grid-2x2">
-      <div class="panel"><div class="panel-title">Gold Price (USD / oz)</div><canvas id="goldChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="goldStat"></div><div class="mini-tbl" id="goldTbl"></div><div class="rpt-note" id="goldNote">Awaiting data upload.</div></div>
-      <div class="panel"><div class="panel-title">US Dollar Index (DXY)</div><canvas id="dxyChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="dxyStat"></div><div class="mini-tbl" id="dxyTbl"></div><div class="rpt-note" id="dxyNote">Awaiting data upload.</div></div>
+      <div class="panel"><div class="panel-title">Gold Price (USD / oz)</div><canvas id="goldChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="goldStat"></div><div class="rpt-note" id="goldNote">Awaiting data upload.</div></div>
+      <div class="panel"><div class="panel-title">US Dollar Index (DXY)</div><canvas id="dxyChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="dxyStat"></div><div class="rpt-note" id="dxyNote">Awaiting data upload.</div></div>
     </div>
 
     <!-- Brent + WTI -->
     <div class="grid-2x2">
-      <div class="panel"><div class="panel-title">Brent Crude Oil (USD / bbl)</div><canvas id="brentChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="brentStat"></div><div class="mini-tbl" id="brentTbl"></div><div class="rpt-note" id="brentNote">Awaiting data upload.</div></div>
-      <div class="panel"><div class="panel-title">WTI Crude Oil (USD / bbl)</div><canvas id="wtiChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="wtiStat"></div><div class="mini-tbl" id="wtiTbl"></div><div class="rpt-note" id="wtiNote">Awaiting data upload.</div></div>
+      <div class="panel"><div class="panel-title">Brent Crude Oil (USD / bbl)</div><canvas id="brentChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="brentStat"></div><div class="rpt-note" id="brentNote">Awaiting data upload.</div></div>
+      <div class="panel"><div class="panel-title">WTI Crude Oil (USD / bbl)</div><canvas id="wtiChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="wtiStat"></div><div class="rpt-note" id="wtiNote">Awaiting data upload.</div></div>
     </div>
   </div>
 
@@ -738,20 +734,15 @@ function setChartGran(key,g,btn){
 function startPolling(){stopPolling();pollTimer=setInterval(()=>loadData(true),POLL_INTERVAL);}
 function stopPolling(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
 
-let _lastDataHash=null;
 async function loadData(silent=false){
   const bar=document.getElementById("loading-bar"),errEl=document.getElementById("load-err");
   if(!silent){bar.style.display="block";errEl.style.display="none";}
   try{
     const res=await fetch(DATA_URL+"?t="+Date.now(),{cache:"no-store"});
     if(!res.ok)throw new Error("HTTP "+res.status);
-    const txt=await res.text();
+    const d=await res.json();
     bar.style.display="none";
-    // Only re-render (and rebuild charts) when the published data has actually changed.
-    // This stops the every-30s flicker — the dashboard refreshes only after you publish.
-    if(txt===_lastDataHash)return;
-    _lastDataHash=txt;
-    render(JSON.parse(txt));
+    render(d);
   }catch(e){
     bar.style.display="none";
     if(!silent){errEl.style.display="block";errEl.textContent="Could not load data — "+e.message;}
@@ -1024,71 +1015,10 @@ function render(d){
   const nl=document.getElementById("news-list");
   if(nl){const items=(d.marketNews&&d.marketNews.length)?d.marketNews:[];nl.innerHTML=items.length?items.map((t,i)=>`<div class="news-card"><span class="news-idx">${i+1}.</span>${escHtml(t)}</div>`).join(""):'<div class="news-card">No announcements published.</div>';}
 
-  renderExtras(d);
   buildCharts(d);
 }
 
-// ── Populate all data-driven tables that aren't handled inline above ──
-function renderExtras(d){
-  const E=id=>document.getElementById(id);
-  const dash=v=>(v==null||String(v).trim()===''||String(v).trim()==='0')?'—':v;
-  const set=(id,html)=>{const el=E(id);if(el)el.innerHTML=html;};
-  // Macro — inflation
-  set('dyn-inflation',(d.inflation||[]).map(r=>`<tr><td>${escHtml(r.metric)}</td><td>${dash(r.apr)}</td><td style="color:#c8a84b">${dash(r.may)}</td></tr>`).join('')||'<tr><td colspan="3">—</td></tr>');
-  // Macro — reserves (highlight last)
-  {const r=d.reserves||[];set('dyn-reserves',r.map((x,i)=>`<tr><td>${escHtml(x.month)}</td><td${i===r.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.value)}</td></tr>`).join('')||'<tr><td colspan="2">—</td></tr>');}
-  // Macro — tourism & remittances
-  {const t=d.tourism||{};set('dyn-tourism',`<tr><td>Earnings</td><td>${dash(t.apr)}</td><td>${dash(t.may)}</td><td style="color:#6dd4a0;font-weight:700">${dash(t.yoy)}</td></tr>`);}
-  {const r=d.remittances||{};set('dyn-remit',`<tr><td>Inflows</td><td>${dash(r.apr)}</td><td>${dash(r.may)}</td><td style="color:#6dd4a0;font-weight:700">${dash(r.yoy)}</td></tr>`);}
-  // Global — FOMC
-  set('dyn-fomc',(d.fomc||[]).map(r=>`<tr><td>${escHtml(r.date)}</td><td>${escHtml(r.range)}</td><td>${dash(r.repo)}</td><td>${dash(r.rrepo)}</td></tr>`).join('')||'<tr><td colspan="4">—</td></tr>');
-  {const fk=(d.keyDates||[]).find(k=>/fomc/i.test(k.label));if(fk&&E('dyn-fomc-next')){const i=eventDayInfo(fk.date);E('dyn-fomc-next').textContent='Next FOMC Meeting: '+i.dstr+(i.daysTxt?'  ('+i.daysTxt+')':'');}}
-  // FX — spot overview + cross rates
-  {const s=d.spot||{};set('dyn-spot',`<tr><td>Opening Spot</td><td style="text-align:right">${dash(s.open)}</td></tr><tr><td>Closing Spot</td><td style="text-align:right;color:#c8a84b;font-weight:700">${dash(s.close)}</td></tr><tr><td>Intraday Lowest</td><td style="text-align:right">${dash(s.low)}</td></tr><tr><td>Intraday Highest</td><td style="text-align:right">${dash(s.high)}</td></tr>`);}
-  set('dyn-cross',(d.crossRates||[]).map(c=>`<tr><td>${escHtml(c.pair)}</td><td>${dash(c.buy)}</td><td>${dash(c.sell)}</td></tr>`).join('')||'<tr><td colspan="3">—</td></tr>');
-  // Money Market — OPR + standing facilities
-  {const o=d.opr||[];set('dyn-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2">—</td></tr>');}
-  {const w=d.windows||{};set('dyn-windows',`<tr><td>Standing Deposit (SDF)</td><td>${dash(w.sdf&&w.sdf.cur)}</td><td style="color:#7fa3c8">${dash(w.sdf&&w.sdf.prev)}</td></tr><tr><td>Standing Lending (SLF)</td><td>${dash(w.slf&&w.slf.cur)}</td><td style="color:#7fa3c8">${dash(w.slf&&w.slf.prev)}</td></tr>`);}
-  // FI — secondary yields (table)
-  set('dyn-secondary',(d.bondSecondary||[]).map(s=>`<tr><td>${escHtml(s.maturity)}</td><td>${dash(s.bid)}</td><td>${dash(s.ask)}</td></tr>`).join('')||'<tr><td colspan="3">—</td></tr>');
-
-  // ── Opening Report mirror tables ──
-  {const w=d.windows||{},lq=d.liquidity||{};
-   set('dyn-op-cbsl',`<tr><td>Standing Deposit Facility (SDF)</td><td style="text-align:right">${dash(w.sdf&&w.sdf.cur)}</td><td style="text-align:right">${dash(w.sdf&&w.sdf.prev)}</td><td style="text-align:right">—</td><td style="text-align:right">—</td></tr>`+
-     `<tr><td>Standing Lending Facility (SLF)</td><td style="text-align:right">${dash(w.slf&&w.slf.cur)}</td><td style="text-align:right">${dash(w.slf&&w.slf.prev)}</td><td style="text-align:right">—</td><td style="text-align:right">—</td></tr>`+
-     `<tr><td style="font-weight:700">Net Market Liquidity</td><td style="color:#c8a84b;font-weight:700;text-align:right">${dash(lq.current)}</td><td style="text-align:right">${dash(lq.previous)}</td><td colspan="2" style="color:#6dd4a0;font-weight:700;text-align:right">CBSL Holdings: ${dash(d.cbslHoldings)} Bn</td></tr>`);}
-  {const c=d.callMarket||{},r=d.repoMarket||{};
-   set('dyn-op-mm',`<tr><td>Call Money</td><td>${dash(c.max)}</td><td>${dash(c.min)}</td><td style="color:#c8a84b">${dash(c.wa)}</td><td>${dash(c.vol)}</td></tr>`+
-     `<tr><td>Repo</td><td>${dash(r.max)}</td><td>${dash(r.min)}</td><td style="color:#c8a84b">${dash(r.wa)}</td><td>${dash(r.vol)}</td></tr>`);}
-  {const o=d.opr||[];set('dyn-op-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2">—</td></tr>');}
-  {const lt=(d.tbills||[])[0]||{};const rows=[['3 Months','91 Days',lt.m3],['6 Months','182 Days',lt.m6],['1 Year','364 Days',lt.m12]];
-   set('dyn-op-tbill3',rows.map(([t,dys,v])=>`<tr><td>${t}</td><td>${dys}</td><td style="color:#c8a84b">${dash(v)}</td></tr>`).join(''));}
-  {const s=d.spot||{};const row=(l,v)=>`<div class="fx-ov-row"><span class="lbl">${l}</span><span class="val">${dash(v)}</span></div>`;
-   set('dyn-op-fxov',row('Opening Spot',s.open)+row('Closing Spot',s.close)+row('Intraday Lowest Rate',s.low)+row('Intraday Highest Rate',s.high));}
-  set('dyn-op-secondary',(d.bondSecondary||[]).map(s=>`<div class="by-row"><span class="by-mat">${escHtml(s.maturity)}</span><span class="by-rate">${dash(s.bid)} / ${dash(s.ask)}</span></div>`).join(''));
-  set('dyn-op-fxsum',(d.fxSummary||[]).map(f=>{const bold=/total/i.test(f.tenor);return `<tr${bold?' style="font-weight:700"':''}><td>${escHtml(f.tenor)}</td><td>${dash(f.volume)}</td><td>${f.wa?dash(f.wa):''}</td></tr>`;}).join('')||'<tr><td colspan="3">—</td></tr>');
-  set('dyn-op-vd',(d.valueDates||[]).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3">—</td></tr>');
-  set('dyn-op-srr',(d.srr||[]).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${dash(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2">—</td></tr>');
-}
-
 function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
-
-// Compact "recent values" table under a chart: newest-first, with day-on-day change
-function recentTable(elId,labels,values,unit,dec,n){
-  const el=document.getElementById(elId);if(!el)return;
-  n=n||8;
-  const L=labels||[],V=(values||[]).map(v=>{const x=parseFloat(v);return isNaN(x)?null:x;});
-  const idx=[];for(let i=V.length-1;i>=0&&idx.length<n;i--){if(V[i]!=null)idx.push(i);}
-  if(idx.length<1){el.innerHTML="";return;}
-  const rows=idx.map(i=>{
-    const cur=V[i];let prev=null;for(let k=i-1;k>=0;k--){if(V[k]!=null){prev=V[k];break;}}
-    const diff=prev!=null?+(cur-prev).toFixed(dec):null;
-    const cls=diff==null||diff===0?"":diff>0?"chg-up":"chg-dn";
-    const arr=diff==null||diff===0?"":diff>0?"▲":"▼";
-    return `<tr><td>${escHtml(L[i]!=null?L[i]:i)}</td><td>${cur.toFixed(dec)}</td><td class="${cls}">${diff==null?"—":(arr+" "+Math.abs(diff).toFixed(dec))}</td></tr>`;
-  }).join("");
-  el.innerHTML=`<table><thead><tr><th>Date</th><th>${escHtml(unit||"")}</th><th>Δ</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
 
 function buildCharts(d){
   const gc="rgba(26,48,80,.5)",tc="#7fa3c8",tf={size:10};
@@ -1096,8 +1026,6 @@ function buildCharts(d){
   destroyChart("liq");
   const liqAg=aggregateIdx(d.liquidity?.labels||[],GRANS.liq);
   charts.liq=new Chart(document.getElementById("liqChart"),{type:"line",data:{labels:liqAg.labels,datasets:[{label:"Rs.Bn",data:pick(d.liquidity?.values||[],liqAg.idx),borderColor:"#c8a84b",backgroundColor:"rgba(200,168,75,0.2)",tension:0.35,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:xt,grid:{color:gc}}}}});
-  renderStatBar("liqStat",pick(d.liquidity?.values||[],liqAg.idx),liqAg.labels,"Rs.Bn",2);
-  recentTable("liqTbl",d.liquidity?.labels||[],d.liquidity?.values||[],"Rs.Bn",2);
   // ── STAT BARS ──────────────────────────────────────────────
   function renderStatBar(elId,values,labels,unit,decimals){
     const el=document.getElementById(elId);if(!el)return;
@@ -1132,14 +1060,12 @@ function buildCharts(d){
   const cbn=cbv.filter(v=>v!=null);
   charts.cbsl=new Chart(document.getElementById("cbslChart"),{type:"line",data:{labels:cbAg.labels,datasets:[{label:"Rs.Bn",data:cbv,borderColor:"#e08a3c",backgroundColor:"rgba(224,138,60,0.15)",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:cbn.length?(Math.min(...cbn)-2):undefined,max:cbn.length?(Math.max(...cbn)+2):undefined},x:{ticks:xt,grid:{color:gc}}}}});
   renderStatBar("cbslStat",cbv,cbAg.labels,"Rs.Bn",2);
-  recentTable("cbslTbl",d.cbsl?.labels||[],d.cbsl?.values||[],"Rs.Bn",2);
   destroyChart("fh");
   const fhAg=aggregateIdx(d.foreign?.labels||[],GRANS.fh);
   const fhv=pick(d.foreign?.values||[],fhAg.idx).map(v=>{const n=parseFloat(v);return isNaN(n)?null:n;});
   const fhn=fhv.filter(v=>v!=null);
   charts.fh=new Chart(document.getElementById("fhChart"),{type:"line",data:{labels:fhAg.labels,datasets:[{label:"Rs.Mn",data:fhv,borderColor:"#3cb6a8",backgroundColor:"rgba(60,182,168,0.15)",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:fhn.length?(Math.min(...fhn)-500):undefined,max:fhn.length?(Math.max(...fhn)+500):undefined},x:{ticks:xt,grid:{color:gc}}}}});
   renderStatBar("fhStat",fhv,fhAg.labels,"Rs.Mn",0);
-  recentTable("fhTbl",d.foreign?.labels||[],d.foreign?.values||[],"Rs.Mn",0);
   destroyChart("fx");
   const fxAg=aggregateIdx(d.usdlkr?.labels||[],GRANS.fx);
   const fxData=pick(d.usdlkr?.values||[],fxAg.idx);
@@ -1151,7 +1077,6 @@ function buildCharts(d){
   const fmtDY2=s=>{if(!s)return s;const t=String(s).trim();if(/\d{4}/.test(t))return t;return t+" "+new Date().getFullYear();};
   const tbAg=aggregateIdx(tbr.map(r=>fmtDY2(r.date)),GRANS.tbill);
   charts.tbill=new Chart(document.getElementById("tbillChart"),{type:"line",data:{labels:tbAg.labels,datasets:[{label:"3M",data:pick(tbr.map(r=>parseFloat(r.m3)||null),tbAg.idx),borderColor:"#4da3e8",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"6M",data:pick(tbr.map(r=>parseFloat(r.m6)||null),tbAg.idx),borderColor:"#c8a84b",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"12M",data:pick(tbr.map(r=>parseFloat(r.m12)||null),tbAg.idx),borderColor:"#6dd4a0",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:8}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:xt,grid:{color:gc}}}}});
-  renderStatBar("tbillStat",pick(tbr.map(r=>parseFloat(r.m12)||null),tbAg.idx),tbAg.labels,"% (12M)",2);
   destroyChart("yield");
   const yBHead=d.bonds?.headers||[], yBRows=d.bonds?.rows||[];
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1169,8 +1094,6 @@ function buildCharts(d){
   if(yCol>=0)yDS.push({label:"Yesterday ("+yBHead[yCol]+")",data:yestD,borderColor:"#4da3e8",backgroundColor:"transparent",tension:0.3,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:"#4da3e8",borderWidth:2,borderDash:[6,4],fill:false});
   yDS.push({label:"Today ("+(tCol>=0?yBHead[tCol]:"")+")",data:todayD,backgroundColor:"rgba(200,168,75,0.14)",tension:0.3,pointRadius:3.5,pointHoverRadius:7,pointBackgroundColor:"#c8a84b",pointBorderColor:"#fff",pointBorderWidth:1,borderColor:"#c8a84b",borderWidth:3,fill:true});
   charts.yield=new Chart(document.getElementById("yieldChart"),{type:"line",data:{labels:yLabels,datasets:yDS},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:10},boxWidth:18,usePointStyle:false,padding:12}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:8},maxRotation:45,minRotation:30},grid:{color:gc}}}}});
-  {const avg=a=>{const f=a.filter(v=>v!=null&&!isNaN(v));return f.length?+(f.reduce((x,y)=>x+y,0)/f.length).toFixed(2):null;};
-   renderStatBar("yieldStat",[avg(yestD),avg(todayD)],[yCol>=0?yBHead[yCol]:"Prev",tCol>=0?yBHead[tCol]:"Latest"],"% avg",2);}
 
   // ── NEW: Global Market — US 10Y Treasury Yield (aggregated by interval)
   destroyChart("g10");
@@ -1179,7 +1102,6 @@ function buildCharts(d){
   const g10n=g10raw.filter(v=>v!=null);
   charts.g10=new Chart(document.getElementById("g10Chart"),{type:"line",data:{labels:gAg.labels,datasets:[{label:"US 10Y %",data:g10raw,borderColor:"#a77ad4",backgroundColor:"rgba(167,122,212,0.15)",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:g10n.length?(Math.min(...g10n)-0.1):undefined,max:g10n.length?(Math.max(...g10n)+0.1):undefined},x:{ticks:xt,grid:{color:gc}}}}});
   renderStatBar("g10Stat",g10raw,gAg.labels,"%",3);
-  recentTable("g10Tbl",d.global10y?.labels||[],d.global10y?.values||[],"%",2);
 
   // ── NEW: Global Market commodity & FX-index charts (populate once data.json carries them) ──
   [["gold","goldChart","goldStat","goldNote","#c8a84b","USD/oz",2],
@@ -1195,7 +1117,6 @@ function buildCharts(d){
     if(note)note.style.display=nn.length?"none":"block";
     charts[key]=new Chart(el,{type:"line",data:{labels:labs,datasets:[{label:unit,data:vals,borderColor:color,backgroundColor:color+"22",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:nn.length?(Math.min(...nn)-(Math.max(...nn)-Math.min(...nn)||1)*0.1):undefined,max:nn.length?(Math.max(...nn)+(Math.max(...nn)-Math.min(...nn)||1)*0.1):undefined},x:{ticks:xt,grid:{color:gc}}}}});
     if(statId)renderStatBar(statId,vals,labs,unit,dec);
-    recentTable(key+"Tbl",labs,vals,unit,dec);
   });
 
   // ── NEW: Market Open Report charts — weekly view (last points) with markers, matching the printed report ──
