@@ -41,6 +41,8 @@ code{background:#081424;padding:1px 6px;border-radius:4px;color:#c8a84b;font-siz
 .fresh-item.ok{border-left-color:#1f7a4d}.fresh-item.pending{border-left-color:#b5862b}.fresh-item.pending .fi-msg{color:#f0c45a}
 .fresh-item.stale,.fresh-item.missing{border-left-color:#c0392b}.fresh-item.stale .fi-msg,.fresh-item.missing .fi-msg{color:#ef8e7a;font-weight:600}
 .fresh-item.info{border-left-color:#3a5a7a}
+.fresh-item .fi-go{font-size:9.5px;color:#c8a84b;margin-top:6px;font-weight:700}
+.fresh-item[onclick]:hover{border-color:#c8a84b;background:#0d1e38}
 /* section editor */
 .sec{background:#0b1830;border:1px solid #18304f;border-radius:11px;margin-bottom:12px;overflow:hidden}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 15px;background:#0d1e38;cursor:pointer}
@@ -126,7 +128,7 @@ let LOADED=null;        // working copy being edited
 let PUBLISHED=null;     // last-known published JSON (to mark live/draft)
 
 const SECTIONS=[
- {id:'dates',title:'Report Dates (leave blank = auto · today / yesterday, SL working days)',keys:['openingDate','closingDate','fxVolDate']},
+ {id:'dates',title:'Report Dates (blank = auto · SL working days)',keys:['openingDate','closingDate','secondaryDate']},
  {id:'mmrates',title:'Money Market & Repo Rates',keys:['callMarket','repoMarket']},
  {id:'windows',title:'Standing Facilities (SDF / SLF)',keys:['windows']},
  {id:'opr',title:'Policy Rate (OPR) History',keys:['opr']},
@@ -149,6 +151,9 @@ const SECTIONS=[
  {id:'srr',title:'Statutory Reserve Requirement (SRR)',keys:['srr']},
  {id:'tourism',title:'Tourism',keys:['tourism']},
  {id:'remittances',title:'Remittances',keys:['remittances']},
+ {id:'gdp',title:'Quarterly Real GDP Growth',keys:['gdpGrowth']},
+ {id:'bop',title:'Balance of Payment',keys:['bop']},
+ {id:'debtgdp',title:'Debt to GDP',keys:['debtGdp']},
  {id:'global10y',title:'US 10Y Treasury',keys:['global10y']},
  {id:'gold',title:'Gold (XAU/USD)',keys:['gold']},
  {id:'brent',title:'Brent Crude Oil',keys:['brent']},
@@ -156,6 +161,7 @@ const SECTIONS=[
  {id:'dxy',title:'US Dollar Index (DXY)',keys:['dxy']},
  {id:'fomc',title:'FOMC Decisions',keys:['fomc']},
  {id:'keydates',title:'Key Dates / Announcements (tick = show on live bar)',keys:['keyDates']},
+ {id:'results',title:'Latest Results (free-text market announcements)',keys:['marketNews']},
 ];
 const META_KEYS=['execSummary','date','marketNews'];
 
@@ -280,17 +286,26 @@ function renderSections(){
   host.innerHTML=SECTIONS.map(sec=>{
     const present=sec.keys.some(k=>LOADED[k]!=null);
     const pts=sec.keys.reduce((n,k)=>n+countPoints(k),0);
-    const body=sec.keys.map(k=>{
-      if(LOADED[k]==null)return `<div class="ed-sub"><div class="ed-sub-t">${k}</div><span class="muted">No data in this workbook.</span></div>`;
-      return `<div class="ed-sub"><div class="ed-sub-t">${k}</div>${renderNode(LOADED[k],k)}</div>`;
-    }).join('');
+    let body;
+    if(sec.id==='results'){
+      const cur=Array.isArray(LOADED.marketNews)?LOADED.marketNews:[];
+      const N=Math.max(6,cur.length+1);
+      let rows='';for(let i=0;i<N;i++){rows+=`<div style="margin-bottom:6px"><input class="ed" data-path="marketNews.${i}" data-kind="str" placeholder="Result / announcement ${i+1} (leave blank to skip)" value="${escAttr(cur[i]||'')}" style="width:100%"></div>`;}
+      body=`<div class="ed-sub"><div class="ed-sub-t">Latest results — shown on the dashboard Announcements tab &amp; live bar</div>${rows}</div>`;
+    } else {
+      body=sec.keys.map(k=>{
+        if(LOADED[k]==null)return `<div class="ed-sub"><div class="ed-sub-t">${k}</div><span class="muted">No data in this workbook.</span></div>`;
+        return `<div class="ed-sub"><div class="ed-sub-t">${k}</div>${renderNode(LOADED[k],k)}</div>`;
+      }).join('');
+    }
+    const presentEff=sec.id==='results'?true:present;
     return `<div class="sec" id="sec-${sec.id}">
       <div class="sec-head" onclick="document.getElementById('sec-${sec.id}').classList.toggle('open')">
         <div><div class="st">${sec.title}</div><div class="meta">${pts} data point${pts===1?'':'s'} · keys: ${sec.keys.join(', ')}</div></div>
         <div class="right"><span class="sec-pub-state draft" id="pst-${sec.id}">DRAFT</span><span style="color:#5a7a9a;font-size:11px">▾</span></div>
       </div>
       <div class="sec-body">
-        ${present?body:'<span class="muted">This section has no data in the imported workbook.</span>'}
+        ${presentEff?body:'<span class="muted">This section has no data in the imported workbook.</span>'}
         <div class="sec-foot"><div class="ps" id="ps-${sec.id}"></div>
           <button class="btn-green btn-sm" onclick="event.stopPropagation();publishKeys(${JSON.stringify(sec.keys)},'${sec.id}')">🚀 Publish this section</button>
         </div>
@@ -360,7 +375,7 @@ let toastT;function showToast(msg,type){const t=document.getElementById('toast')
 // ── FRESHNESS ────────────────────────────────────────────
 function analyzeFreshness(wb,XLSX,nowOverride){
   const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
-  const sheets=wb.SheetNames, find=name=>sheets.find(s=>s.toLowerCase().replace(/\s+/g,'').includes(name));
+  const sheets=wb.SheetNames, _IGN=/dailydata|weeklydata|monthlydata|others/, find=name=>sheets.find(s=>{const t=s.toLowerCase().replace(/\s+/g,"");return !_IGN.test(t)&&t.includes(name);});
   const MON3=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],MONF=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const US_HOL=new Set(["2026-01-01","2026-01-19","2026-02-16","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-10-12","2026-11-11","2026-11-26","2026-12-25"]);
   const iso=d=>d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,'0')+"-"+String(d.getUTCDate()).padStart(2,'0');
@@ -375,22 +390,22 @@ function analyzeFreshness(wb,XLSX,nowOverride){
   const latestDate=(rows,col,sr)=>{sr=sr||2;let mx=null;for(let i=sr;i<rows.length;i++){const v=rows[i]&&rows[i][col];if(v instanceof Date){if(!mx||v>mx)mx=v;}}return mx?new Date(Date.UTC(mx.getUTCFullYear(),mx.getUTCMonth(),mx.getUTCDate())):null;};
   const parseDM=s=>{const m=String(s||'').trim().match(/^(\d{1,2})[\s\-]([A-Za-z]{3})/);if(!m)return null;const mi=MON3.indexOf(m[2].toLowerCase());if(mi<0)return null;return new Date(Date.UTC(now.getFullYear(),mi,parseInt(m[1])));};
   const out=[];
-  const daily=(label,cal,last)=>{const ref=cal==='US'?usTodayUTC:todayUTC,exp=lastWork(ref,cal);
-    if(!last){out.push({label,cadence:'Daily',cal,status:'missing',msg:'No dates found in this section.'});return;}
-    if(last>=exp){out.push({label,cadence:'Daily',cal,status:'ok',msg:'Up to date — latest '+fmt(last)+'.'});return;}
-    const gap=wdBetween(last,exp,cal);out.push({label,cadence:'Daily',cal,status:gap>=2?'stale':'pending',msg:(gap>=2?'NOT updated — ':'Today still pending — ')+'latest '+fmt(last)+', expected '+fmt(exp)+' ('+gap+' working day'+(gap>1?'s':'')+' behind).'});};
-  const weekly=(label,cal,last)=>{const ref=cal==='US'?usTodayUTC:todayUTC;
-    if(!last){out.push({label,cadence:'Weekly',cal,status:'missing',msg:'No dates found.'});return;}
-    const days=Math.round((ref-last)/86400000);out.push({label,cadence:'Weekly',cal,status:days>9?'stale':(days>7?'pending':'ok'),msg:(days>9?'NOT updated — ':'')+'latest '+fmt(last)+' ('+days+' day'+(days===1?'':'s')+' ago).'});};
-  const mm=S(find('moneymorket')||find('moneymarket')||'');daily('Money Market & Liquidity','SL',latestDate(mm,7));
-  const fx=S(find('fx')||'');daily('USD/LKR & FX Spot','SL',latestDate(fx,0));
-  const fi=S(find('fixedincome')||'');{let bh=fi[1]||[],last=null;for(let c=3;c<=8;c++){const d=parseDM(bh[c]);if(d&&(!last||d>last))last=d;}daily('Daily Bond / Yield Rates','SL',last);}
-  const gl=S(find('globalmarket')||'');daily('US 10Y Treasury','US',latestDate(gl,0));daily('Gold (XAU/USD)','US',latestDate(gl,10));daily('Crude Oil (WTI / Brent)','US',latestDate(gl,3));daily('US Dollar Index (DXY)','US',latestDate(gl,7));
-  const mc=S(find('macroeconomy')||'');weekly('Foreign Holdings of Govt Securities','SL',latestDate(mc,0));weekly('T-Bill Auction (Primary)','SL',latestDate(fi,15));
+  const daily=(label,cal,last,secId)=>{const ref=cal==='US'?usTodayUTC:todayUTC,exp=lastWork(ref,cal);
+    if(!last){out.push({label,cadence:'Daily',cal,secId,status:'missing',msg:'No dates found in this section.'});return;}
+    if(last>=exp){out.push({label,cadence:'Daily',cal,secId,status:'ok',msg:'Up to date — latest '+fmt(last)+'.'});return;}
+    const gap=wdBetween(last,exp,cal);out.push({label,cadence:'Daily',cal,secId,status:gap>=2?'stale':'pending',msg:(gap>=2?'NOT updated — ':'Today still pending — ')+'latest '+fmt(last)+', expected '+fmt(exp)+' ('+gap+' working day'+(gap>1?'s':'')+' behind).'});};
+  const weekly=(label,cal,last,secId)=>{const ref=cal==='US'?usTodayUTC:todayUTC;
+    if(!last){out.push({label,cadence:'Weekly',cal,secId,status:'missing',msg:'No dates found.'});return;}
+    const days=Math.round((ref-last)/86400000);out.push({label,cadence:'Weekly',cal,secId,status:days>9?'stale':(days>7?'pending':'ok'),msg:(days>9?'NOT updated — ':'')+'latest '+fmt(last)+' ('+days+' day'+(days===1?'':'s')+' ago).'});};
+  const mm=S(find('moneymorket')||find('moneymarket')||'');daily('Money Market & Liquidity','SL',latestDate(mm,7),'liquidity');
+  const fx=S(find('fx')||'');daily('USD/LKR & FX Spot','SL',latestDate(fx,0),'usdlkr');
+  const fi=S(find('fixedincome')||'');{let bh=fi[1]||[],last=null;for(let c=3;c<=8;c++){const d=parseDM(bh[c]);if(d&&(!last||d>last))last=d;}daily('Daily Bond / Yield Rates','SL',last,'bonds');}
+  const gl=S(find('globalmarket')||'');daily('US 10Y Treasury','US',latestDate(gl,0),'global10y');daily('Gold (XAU/USD)','US',latestDate(gl,10),'gold');daily('Crude Oil (WTI / Brent)','US',latestDate(gl,3),'brent');daily('US Dollar Index (DXY)','US',latestDate(gl,7),'dxy');
+  const mc=S(find('macroeconomy')||'');weekly('Foreign Holdings of Govt Securities','SL',latestDate(mc,0),'foreign');weekly('T-Bill Auction (Primary)','SL',latestDate(fi,15),'tbills');
   const monthLbl=(mc[1]&&mc[1][11])?String(mc[1][11]).trim():'';
-  out.push({label:'Reserves · Inflation · Tourism · Remittances',cadence:'Monthly',cal:'SL',status:'info',msg:'Monthly series — latest column: '+(monthLbl||'n/a')+'. Update when the new month is released.'});
+  out.push({label:'Reserves · Inflation · Tourism · Remittances',cadence:'Monthly',cal:'SL',secId:'reserves',status:'info',msg:'Monthly series — latest column: '+(monthLbl||'n/a')+'. Update when the new month is released.'});
   const an=S(find('announcement')||'');let passed=[];for(let i=2;i<an.length;i++){const v=an[i]&&an[i][1];if(v){const m=String(v).match(/^(\d{1,2})(?:-\d{1,2})?[.\-/](\d{1,2})[.\-/](\d{4})/);if(m){const dt=new Date(Date.UTC(+m[3],+m[2]-1,+m[1]));if(dt<todayUTC)passed.push(String(an[i][0]).trim());}}}
-  out.push({label:'OPR · SRR · FOMC · Key Dates',cadence:'Fixed / Special',cal:'—',status:passed.length?'pending':'info',msg:passed.length?('A scheduled date has passed — update: '+passed.join(', ')):'Event-driven — update only when a new policy decision or date occurs.'});
+  out.push({label:'OPR · SRR · FOMC · Key Dates',cadence:'Fixed / Special',cal:'—',secId:'keydates',status:passed.length?'pending':'info',msg:passed.length?('A scheduled date has passed — update: '+passed.join(', ')):'Event-driven — update only when a new policy decision or date occurs.'});
   return out;
 }
 function renderFreshness(checks){
@@ -402,13 +417,23 @@ function renderFreshness(checks){
     else{banner.className='fresh-banner ok';banner.textContent='✓ All daily & weekly sections are up to date for the latest working day.';}}
   const cal=c=>c.cal==='—'?'':(c.cal==='US'?' · US days':' · SL days');
   grid.innerHTML=checks.map(c=>{const icon=c.status==='ok'?'✓':c.status==='info'?'ⓘ':c.status==='pending'?'●':'⚠';
-    return `<div class="fresh-item ${c.status}"><div class="fi-top"><span class="fi-name">${icon} ${c.label}</span><span class="fi-tag">${c.cadence}${cal(c)}</span></div><div class="fi-msg">${c.msg}</div></div>`;}).join('');
+    const clickable=c.secId&&(c.status==='stale'||c.status==='missing'||c.status==='pending');
+    const onclick=clickable?` onclick="gotoSection('${c.secId}')" style="cursor:pointer"`:'';
+    const hint=clickable?'<div class="fi-go">→ click to open &amp; edit this section</div>':'';
+    return `<div class="fresh-item ${c.status}"${onclick}><div class="fi-top"><span class="fi-name">${icon} ${c.label}</span><span class="fi-tag">${c.cadence}${cal(c)}</span></div><div class="fi-msg">${c.msg}</div>${hint}</div>`;}).join('');
+}
+function gotoSection(id){
+  const el=document.getElementById('sec-'+id);if(!el)return;
+  el.classList.add('open');
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  el.style.transition='box-shadow .3s';el.style.boxShadow='0 0 0 2px #c8a84b';
+  setTimeout(()=>{el.style.boxShadow='';},1800);
 }
 
 // ── PARSER ───────────────────────────────────────────────
 function parseWorkbook(wb,XLSX){
   const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
-  const sheets=wb.SheetNames, find=name=>sheets.find(s=>s.toLowerCase().replace(/\s+/g,'').includes(name));
+  const sheets=wb.SheetNames, _IGN=/dailydata|weeklydata|monthlydata|others/, find=name=>sheets.find(s=>{const t=s.toLowerCase().replace(/\s+/g,"");return !_IGN.test(t)&&t.includes(name);});
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const lbl=d=>d instanceof Date?d.getUTCDate()+" "+MON[d.getUTCMonth()]:(d==null?"":String(d).trim());
   const num=v=>{if(v==null||v==="")return null;const n=parseFloat(String(v).replace(/,/g,'').replace('%',''));return isNaN(n)?null:n;};
@@ -460,8 +485,12 @@ function parseWorkbook(wb,XLSX){
     let res=[];for(let i=2;i<mc.length;i++)if(mc[i][6]!=null)res.push({month:String(mc[i][6]).trim(),value:String(mc[i][7]).trim()});o.reserves=res;
     let inf=[];for(let i=2;i<mc.length;i++)if(mc[i][9]!=null)inf.push({metric:String(mc[i][9]).trim(),apr:pct(mc[i][10]),may:pct(mc[i][11])});o.inflation=inf;
     let srr=[];for(let i=2;i<mc.length;i++)if(mc[i][13]!=null)srr.push({date:String(mc[i][13]).trim(),rate:pct(mc[i][14])});o.srr=srr;
-    if(mc[2])o.tourism={apr:mc[2][17]==null?'':String(mc[2][17]).trim(),may:mc[2][18]==null?'':String(mc[2][18]).trim(),yoy:mc[2][19]==null?'':String(mc[2][19]).trim()};
-    if(mc[6])o.remittances={apr:mc[6][17]==null?'':String(mc[6][17]).trim(),may:mc[6][18]==null?'':String(mc[6][18]).trim(),yoy:mc[6][19]==null?'':String(mc[6][19]).trim()};
+    if(mc[2])o.tourism={apr:mc[2][17]==null?'':String(mc[2][17]).trim(),may:mc[2][18]==null?'':String(mc[2][18]).trim(),yoy:pct(mc[2][19])};
+    if(mc[6])o.remittances={apr:mc[6][17]==null?'':String(mc[6][17]).trim(),may:mc[6][18]==null?'':String(mc[6][18]).trim(),yoy:pct(mc[6][19])};
+    // New macro tables (each grows by row): GDP growth (21-22), Balance of Payment (24-25), Debt-to-GDP (27-28)
+    let gdp=[];for(let i=2;i<mc.length;i++)if(mc[i][21]!=null){let g=num(mc[i][22]);if(g!=null&&Math.abs(g)<=1.0001)g=g*100;gdp.push({period:String(mc[i][21]).trim(),growth:g==null?null:+g.toFixed(2)});}o.gdpGrowth=gdp;
+    let bop=[];for(let i=2;i<mc.length;i++)if(mc[i][24]!=null)bop.push({period:String(mc[i][24]).trim(),value:num(mc[i][25])});o.bop=bop;
+    let dgd=[];for(let i=2;i<mc.length;i++)if(mc[i][27]!=null){let r=num(mc[i][28]);if(r!=null&&Math.abs(r)<=3)r=r*100;dgd.push({period:String(mc[i][27]).trim(),ratio:r==null?null:+r.toFixed(1)});}o.debtGdp=dgd;
   }
   const gl=S(find('globalmarket')||'');
   if(gl.length){
@@ -475,7 +504,7 @@ function parseWorkbook(wb,XLSX){
   if(o.liquidity&&o.liquidity.current!=null&&o.liquidity.previous!=null){const dlt=+(o.liquidity.current-o.liquidity.previous).toFixed(2);o.execSummary.liqDir=dlt>=0?'increased':'decreased';o.execSummary.liqDelta=Math.abs(dlt);}
   o.marketNews=o.marketNews||[];o.date=new Date().toISOString().slice(0,10);
   // Report date overrides — leave blank to auto-show today / yesterday (SL bank working days) on the dashboard
-  o.openingDate="";o.closingDate="";o.fxVolDate="";
+  o.openingDate="";o.closingDate="";o.secondaryDate="";
   return o;
 }
 
