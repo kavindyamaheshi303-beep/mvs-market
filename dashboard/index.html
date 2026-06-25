@@ -32,6 +32,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#060f1e;color:#d4e4f4;mi
 .sign-out{background:transparent;color:#7fa3c8;border:1px solid #1a3050;border-radius:5px;padding:5px 10px;font-size:11px;cursor:pointer}
 .sign-out:hover{border-color:#c8a84b;color:#c8a84b}
 .grid-2x2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.grid-3col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+@media(max-width:760px){.grid-3col{grid-template-columns:1fr}}
 .grid-2x2>*{min-width:0}
 .panel{background:#0d1e38;border:1px solid #1a3050;border-radius:8px;padding:12px 14px;min-width:0;overflow:hidden;max-width:100%}
 .panel-title{font-size:11px;font-weight:700;color:#c8a84b;letter-spacing:1px;text-transform:uppercase;padding-bottom:8px;border-bottom:2px solid #1a3050;margin-bottom:10px}
@@ -143,6 +145,7 @@ canvas{max-width:100%!important}
 .fx-ov-row .lbl{font-size:11px;color:#9fb6d4;text-transform:uppercase;letter-spacing:.4px}
 .fx-ov-row .val{font-size:15px;font-weight:800;color:#c8a84b}
 .rpt-note{font-size:10px;color:#7a93b4;margin-top:8px}
+.close-date{font-size:9px;font-weight:600;color:#c8a84b;background:rgba(200,168,75,0.12);border:1px solid rgba(200,168,75,0.3);border-radius:5px;padding:1px 7px;margin-left:8px;white-space:nowrap;letter-spacing:.3px}
 .up-arrow{color:#6dd4a0;font-size:11px}
 .mini-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:4px}
 .mini-card{background:#0d1e38;border:1px solid #1a3050;border-radius:6px;padding:11px;text-align:center}
@@ -196,7 +199,6 @@ canvas{max-width:100%!important}
   <!-- PAGE NAV -->
   <div class="nav-bar">
     <button class="nav-btn active" onclick="showPage('page-open',this)">Opening Report</button>
-    <button class="nav-btn" onclick="showPage('page-close',this)">Closing Report</button>
     <button class="nav-btn" onclick="showPage('page-mm',this)">Money Market</button>
     <button class="nav-btn" onclick="showPage('page-fi',this)">Fixed Income</button>
     <button class="nav-btn" onclick="showPage('page-fx',this)">FX</button>
@@ -206,111 +208,8 @@ canvas{max-width:100%!important}
   </div>
 
   <!-- PAGE: MARKET OPEN REPORT (full Summary-report replica from get_data) -->
-  <div class="page" id="page-close">
-
-    <!-- Title -->
-    <div class="panel full-width">
-      <div class="panel-title" id="closing-report-title">Closing Report — <span id="closing-report-date"></span></div>
-    </div>
-
-    <!-- Row 1: Money & Repo Market  |  Foreign Exchange Market -->
-    <div class="grid-2x2">
-      <div class="panel">
-        <div class="panel-title">Money &amp; Repo Market</div>
-        <div class="op-split">
-          <div class="op-col">
-            <table style="font-size:11px">
-              <thead><tr><th></th><th>Call</th><th>Repo</th></tr></thead>
-              <tbody>
-                <tr><td>Minimum Rate(%)</td><td id="op-cmmin">—</td><td id="op-rmmin">—</td></tr>
-                <tr><td>Maximum Rate(%)</td><td id="op-cmmax">—</td><td id="op-rmmax">—</td></tr>
-                <tr><td>W.A Yield (%)</td><td id="op-cmwa">—</td><td id="op-rmwa">—</td></tr>
-                <tr><td>Gross Volume(Rs.Bn)</td><td id="op-cmvol">—</td><td id="op-rmvol">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="op-col op-chartcol">
-            <div class="op-chart-cap">Market Liquidity (Rs.Bn)</div>
-            <canvas id="op-liqChart" style="max-height:175px"></canvas><div class="chart-stat-bar" id="op-liqStat"></div>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">Foreign Exchange Market</div>
-        <div class="op-split">
-          <div class="op-col">
-            <table style="font-size:11px">
-              <thead><tr><th>SWAPS</th><th>Sell/Buy</th><th>Buy/Sell</th></tr></thead>
-              <tbody>
-                <tr><td>1 Week</td><td id="op-sw1ws">—</td><td id="op-sw1wb">—</td></tr>
-                <tr><td>1 Month</td><td id="op-sw1ms">—</td><td id="op-sw1mb">—</td></tr>
-                <tr><td>2 Months</td><td id="op-sw2ms">—</td><td id="op-sw2mb">—</td></tr>
-                <tr><td>3 Months</td><td id="op-sw3ms">—</td><td id="op-sw3mb">—</td></tr>
-                <tr><td>6 Months</td><td id="op-sw6ms">—</td><td id="op-sw6mb">—</td></tr>
-                <tr><td>1 Year</td><td id="op-sw1ys">—</td><td id="op-sw1yb">—</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="op-col op-chartcol">
-            <div class="op-chart-cap">USD/LKR Movement</div>
-            <canvas id="op-fxChart" style="max-height:175px"></canvas><div class="chart-stat-bar" id="op-fxStat"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Row 2: Treasury Bill (full width) -->
-    <div class="panel full-width">
-      <div class="panel-title">Government Securities — Treasury Bill</div>
-      <div class="op-split" style="align-items:flex-start">
-        <div class="op-col">
-          <canvas id="op-tbillChart" style="max-height:220px;margin-bottom:12px"></canvas>
-          <table style="font-size:11px"><thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
-          <tbody id="op-tbill-rows"></tbody></table>
-        </div>
-        <div class="op-col" style="flex:1.15">
-          <div style="font-size:10px;font-weight:700;color:#c8a84b;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">Auction Details</div>
-          <div class="tbill-auction-wrap">
-            <table class="tbill-auction-table">
-              <thead><tr><th>Auction Date</th><th>Maturity</th><th>Offered (Rs.Mn)</th><th>Accepted (Rs.Mn)</th><th>Accepted %</th></tr></thead>
-              <tbody id="op-auction-body"><tr><td colspan="5" style="text-align:center;color:#7fa3c8;padding:10px">—</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Row 3: Treasury Bond — yield curve chart + heat-map table side by side (compact) -->
-    <div class="panel full-width">
-      <div class="panel-title">Treasury Bond</div>
-      <div class="op-split" style="align-items:flex-start">
-        <div class="op-col" style="flex:1;min-width:300px">
-          <div class="op-chart-cap">Yield Curve Comparison</div>
-          <canvas id="op-yieldChart" style="max-height:230px"></canvas>
-        </div>
-        <div class="op-col" style="flex:1.25;min-width:300px">
-          <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Heat-map per maturity: <span style="color:#7ee0a8">low</span>&rarr;<span style="color:#ff8a78">high</span> yield &middot; &#9662; down / &#9652; up vs prev day</div>
-          <div style="overflow:auto;max-height:250px"><table style="font-size:9px">
-            <thead><tr id="op-bond-header"><th>Bond</th></tr></thead>
-            <tbody id="op-bond-rows"></tbody>
-          </table></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Executive Summary -->
-    <div class="exec-summary">
-      <div class="panel-title">Executive Summary</div>
-      <ul>
-        <li>USD/LKR Closed at <strong id="op-exusd">—</strong></li>
-        <li>System liquidity <strong id="op-exdir">—</strong> by <strong id="op-exdelta">—</strong> bn.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PAGE: CLOSING REPORT -->
   <div class="page" id="page-open" style="display:block">
-    <div class="panel full-width"><div class="panel-title" id="opening-report-title">Opening Report — Volume of FX Market &amp; Value Dates</div></div>
+    <div class="panel full-width"><div class="panel-title" id="opening-report-title">Opening Report</div></div>
     <div class="grid-2x2">
       <div class="panel">
         <div class="panel-title" id="op-fxsum-title">Volume of FX Market</div>
@@ -337,7 +236,7 @@ canvas{max-width:100%!important}
 
   <div class="grid-2x2">
     <div class="panel">
-      <div class="panel-title">Money &amp; Repo Market</div>
+      <div class="panel-title">Money &amp; Repo Market<span class="close-date" id="mm-close"></span></div>
       <table>
         <thead><tr><th></th><th>Call</th><th>Repo</th></tr></thead>
         <tbody>
@@ -347,23 +246,21 @@ canvas{max-width:100%!important}
           <tr><td>Gross Volume(Rs.Bn)</td><td id="cmvol">—</td><td id="rmvol">—</td></tr>
         </tbody>
       </table>
+      <div style="font-size:10px;font-weight:700;color:#c8a84b;letter-spacing:.8px;text-transform:uppercase;margin:12px 0 6px;border-top:1px solid #1a3050;padding-top:10px">Standing Facilities (Rs.Bn)</div>
+      <table style="font-size:12px">
+        <thead><tr><th>Instrument</th><th>Latest</th><th>Previous</th></tr></thead>
+        <tbody id="dyn-windows"></tbody>
+      </table>
     </div>
     <div class="panel"><div class="panel-title pt-row"><span>Market Liquidity (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('liq',7,this)" title="Last 7 working days">W</button><button class="mg-btn" onclick="setChartGran('liq',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('liq','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="liqChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="liqStat"></div><div class="mini-tbl" id="liqTbl"></div></div>
   </div>
 
   <div class="grid-2x2">
-    <div class="panel">
+    <div class="panel" style="grid-column:1/-1">
       <div class="panel-title">Policy Rate (OPR) History</div>
       <table style="font-size:12px">
         <thead><tr><th>Effective Date</th><th>OPR (%)</th></tr></thead>
         <tbody id="dyn-opr"></tbody>
-      </table>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Standing Facilities (Rs.Bn)</div>
-      <table style="font-size:12px">
-        <thead><tr><th>Instrument</th><th>Latest</th><th>Previous</th></tr></thead>
-        <tbody id="dyn-windows"></tbody>
       </table>
     </div>
   </div>
@@ -376,9 +273,8 @@ canvas{max-width:100%!important}
   <!-- GOVT SECURITIES SECTION -->
   <div class="full-grid">
     <div class="panel">
-      <div class="panel-title pt-row"><span>Treasury Bill</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('tbill',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('tbill','all',this)" title="Full year (all data)">Y</button></span></div>
-      <div class="series-toggle"><span class="st-lbl">Tenor:</span><button class="mg-btn active" onclick="setTbillSeries('all',this)" title="Show all tenors">All</button><button class="mg-btn" onclick="setTbillSeries('m3',this)">3M</button><button class="mg-btn" onclick="setTbillSeries('m6',this)">6M</button><button class="mg-btn" onclick="setTbillSeries('m12',this)">12M</button></div>
-      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas><div class="chart-stat-bar" id="tbillStat"></div>
+      <div class="panel-title"><span>Treasury Bill<span class="close-date" id="tbill-close"></span></span></div>
+      <canvas id="tbillChart" style="max-height:160px;margin-bottom:10px"></canvas>
       <table style="font-size:10px;margin-bottom:12px">
         <thead><tr><th>Auction Date</th><th>3M</th><th>6M</th><th>12M</th></tr></thead>
         <tbody id="tbillRows"></tbody>
@@ -405,9 +301,9 @@ canvas{max-width:100%!important}
       </div>
     </div>
     <div class="panel">
-      <div class="panel-title">Treasury Bond (Yield Curve)</div>
-      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas><div class="chart-stat-bar" id="yieldStat"></div>
-      <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Heat-map per maturity: <span style="color:#7ee0a8">low</span>→<span style="color:#ff8a78">high</span> yield · ▾ down / ▴ up vs prev day</div>
+      <div class="panel-title">Treasury Bond (Yield Curve)<span class="close-date" id="tbond-close"></span></div>
+      <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas>
+      <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Heat-map per maturity: <span style="color:#7ee0a8">low</span> → <span style="color:#ff8a78">high</span> yield · <span style="color:#ff8a78">▴ up</span> / <span style="color:#7ee0a8">▾ down</span> vs prev day</div>
       <div style="overflow-x:auto;max-width:100%">
         <table style="font-size:9px">
           <thead><tr id="bondHeaderRow"><th>Bond</th></tr></thead>
@@ -418,7 +314,7 @@ canvas{max-width:100%!important}
   </div>
 
   <div class="panel full-width">
-    <div class="panel-title">T-Bond Secondary Market Closing Yields</div>
+    <div class="panel-title">T-Bond Secondary Market Closing Yields<span class="close-date" id="secondary-close"></span></div>
     <div style="overflow-x:auto;max-height:320px;overflow-y:auto">
       <table style="font-size:10px">
         <thead><tr><th>Maturity Date</th><th>Bid (%)</th><th>Ask (%)</th></tr></thead>
@@ -437,7 +333,7 @@ canvas{max-width:100%!important}
   <div class="grid-2x2">
     <div class="panel"><div class="panel-title pt-row"><span>USD/LKR Movement</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('fx',7,this)" title="Last 7 data points">W</button><button class="mg-btn" onclick="setChartGran('fx',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('fx','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="fxChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="fxStat"></div></div>
     <div class="panel">
-      <div class="panel-title">FX Swaps (per day)</div>
+      <div class="panel-title">FX Swaps (per day)<span class="close-date" id="fx-close"></span></div>
       <table>
         <thead><tr><th>Tenor</th><th>Sell/Buy</th><th>Buy/Sell</th></tr></thead>
         <tbody>
@@ -488,7 +384,6 @@ canvas{max-width:100%!important}
           <thead><tr><th>Month</th><th>Reserve ($)</th></tr></thead>
           <tbody id="dyn-reserves"></tbody>
         </table>
-        <div class="rpt-note">Source: https://www.cbsl.gov.lk/</div>
       </div>
     </div>
     <div class="grid-2x2">
@@ -497,6 +392,7 @@ canvas{max-width:100%!important}
     </div>
     <div class="panel full-width">
       <div class="panel-title">Tourism &amp; Remittances</div>
+      <canvas id="tourRemChart" style="max-height:170px;margin:4px 0 12px"></canvas>
       <div class="grid-2x2" style="margin-top:0">
         <table style="font-size:11px">
           <thead><tr><th>Tourism (USD)</th><th>Apr 2026</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
@@ -506,6 +402,24 @@ canvas{max-width:100%!important}
           <thead><tr><th>Remittances (USD)</th><th>Apr 2025</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
           <tbody id="dyn-remit"></tbody>
         </table>
+      </div>
+    </div>
+
+    <div class="grid-3col">
+      <div class="panel">
+        <div class="panel-title">Quarterly Real GDP Growth</div>
+        <canvas id="gdpChart" style="max-height:170px;margin-bottom:8px"></canvas>
+        <div class="mini-tbl" id="gdpTbl"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Balance of Payment (USD bn)</div>
+        <canvas id="bopChart" style="max-height:170px;margin-bottom:8px"></canvas>
+        <div class="mini-tbl" id="bopTbl"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Debt to GDP (%)</div>
+        <canvas id="debtChart" style="max-height:170px;margin-bottom:8px"></canvas>
+        <div class="mini-tbl" id="debtTbl"></div>
       </div>
     </div>
   </div>
@@ -548,7 +462,7 @@ canvas{max-width:100%!important}
     <div class="panel full-width"><div class="panel-title">Upcoming Key Dates &amp; Announcements</div></div>
     <div id="events-grid" class="events-grid"></div>
     <div class="panel full-width" style="margin-top:14px">
-      <div class="panel-title">Latest Market Announcements</div>
+      <div class="panel-title">Latest Results</div>
       <div id="news-list" class="news-list"></div>
     </div>
   </div>
@@ -559,9 +473,8 @@ canvas{max-width:100%!important}
 
 <script>
 const DATA_URL="https://raw.githubusercontent.com/kavindyamaheshi303-beep/mvs-market/main/data.json";
-const POLL_INTERVAL = 30000;
+const POLL_INTERVAL = 20000;
 let charts={}, pollTimer=null;
-let _tbillSel='all';
 // Sri Lanka bank working day (Mon–Fri). back=0 -> today's working day, 1 -> previous working day…
 function slWorkDay(back){
   let d=new Date();
@@ -848,7 +761,7 @@ function render(d){
         let prev=null;for(let k=ci-1;k>=0;k--){if(mids[k]!=null){prev=mids[k];break;}}
         const delta=prev!=null?+(m-prev).toFixed(3):null;
         let arrow="",acol="";
-        if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";} }
+        if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#7ee0a8";}else{arrow="\u25b4";acol="#ff8a78";} }
         td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
         td.style.background=heatColor(m,rmn,rmx);   // per-row colour
         td.style.color="#eaf2fb";td.style.fontWeight="600";
@@ -916,7 +829,7 @@ function render(d){
           let prev=null;for(let k=ci-1;k>=0;k--){if(mids[k]!=null){prev=mids[k];break;}}
           const delta=prev!=null?+(m-prev).toFixed(3):null;
           let arrow="",acol="";
-          if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";}}
+          if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#7ee0a8";}else{arrow="\u25b4";acol="#ff8a78";}}
           td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
           td.style.background=heatColor(m,rmn,rmx);td.style.color="#eaf2fb";td.style.fontWeight="600";
         }else{td.textContent="—";td.style.color="#3a5575";}
@@ -936,12 +849,12 @@ function render(d){
   const lt=(d.tbills||[])[0]||{};
   setText("cl-3m",lt.m3);setText("cl-6m",lt.m6);setText("cl-12m",lt.m12);
   const cn=document.getElementById("cl-news");
-  if(cn){const items=(d.marketNews&&d.marketNews.length)?d.marketNews:[];cn.innerHTML=items.length?items.map(t=>"• "+escHtml(t)).join("<br>"):"—";}
+  if(cn){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());cn.innerHTML=items.length?items.map(t=>"• "+escHtml(t)).join("<br>"):"—";}
 
   // ── NEW: Latest Market Announcements ──
   renderEvents(d);
   const nl=document.getElementById("news-list");
-  if(nl){const items=(d.marketNews&&d.marketNews.length)?d.marketNews:[];nl.innerHTML=items.length?items.map((t,i)=>`<div class="news-card"><span class="news-idx">${i+1}.</span>${escHtml(t)}</div>`).join(""):'<div class="news-card">No announcements published.</div>';}
+  if(nl){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());nl.innerHTML=items.length?items.map((t,i)=>`<div class="news-card"><span class="news-idx">${i+1}.</span>${escHtml(t)}</div>`).join(""):'<div class="news-card">No announcements published.</div>';}
 
   renderExtras(d);
   buildCharts(d);
@@ -990,11 +903,13 @@ function renderExtras(d){
    const todayD=slWorkDay(0), yestD=slWorkDay(1);
    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
    const ot=document.getElementById("opening-report-title");
-   if(ot){const od=ov(d.openingDate)||fmtLong(todayD);ot.innerHTML="Opening Report ("+escHtml(od)+") — Volume of FX Market &amp; Value Dates";}
-   const cd=document.getElementById("closing-report-date");
-   if(cd){cd.innerHTML=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);}
+   if(ot){const od=ov(d.openingDate)||fmtLong(todayD);ot.innerHTML="Opening Report — "+escHtml(od);}
+   const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtLong(todayD);
+   ["mm-close","fx-close","tbill-close","tbond-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="Closing: "+cdEl;});
+   const secEl=ov(d.secondaryDate)?escHtml(ov(d.secondaryDate)):fmtLong(yestD);
+   {const e=document.getElementById("secondary-close");if(e)e.textContent="Closing: "+secEl;}
    const ft=document.getElementById("op-fxsum-title");
-   if(ft){const fv=ov(d.fxVolDate)||fmtShort(yestD);ft.textContent="Volume of FX Market ("+fv+")";}}
+   if(ft)ft.textContent="Volume of FX Market";}
   set('dyn-op-vd',(d.valueDates||[]).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   set('dyn-op-srr',(d.srr||[]).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${dash(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
 }
@@ -1084,28 +999,39 @@ function buildCharts(d){
         options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:10}},title:{display:true,text:"INFLATION (%)",color:"#c8a84b",font:{size:12,weight:"700"}}},scales:{x:{ticks:{color:tc,font:tf},grid:{color:gc},suggestedMin:-2,suggestedMax:6},y:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});
     }
   }
-  destroyChart("fx");
-  const fxAg=aggregateIdx(d.usdlkr?.labels||[],GRANS.fx);
-  const fxData=pick(d.usdlkr?.values||[],fxAg.idx);
+  // Tourism & Remittances — April vs May (USD Mn), no granularity buttons
+  destroyChart("tourRem");
+  if(document.getElementById("tourRemChart")){
+    const pn=s=>{if(s==null)return null;const n=parseFloat(String(s).replace(/,/g,'').replace(/[^0-9.\-]/g,''));return isNaN(n)?null:n;};
+    const t=d.tourism||{}, r=d.remittances||{};
+    const hasAny=[t.apr,t.may,r.apr,r.may].some(v=>pn(v)!=null);
+    if(hasAny){
+      charts.tourRem=new Chart(document.getElementById("tourRemChart"),{type:"bar",data:{labels:["Tourism","Remittances"],datasets:[
+        {label:"April",data:[pn(t.apr),pn(r.apr)],backgroundColor:"#c8a84b",borderRadius:4,maxBarThickness:34},
+        {label:"May",data:[pn(t.may),pn(r.may)],backgroundColor:"#e0443a",borderRadius:4,maxBarThickness:34}]},
+        options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:10}},title:{display:true,text:"TOURISM & REMITTANCES (USD Mn)",color:"#c8a84b",font:{size:11,weight:"700"}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}});
+    }
+  }
+  // New macro tables — each a simple bar chart + recent table (no granularity buttons)
+  const barChart=(key,rows,labelKey,valKey,color,unit,dec)=>{
+    destroyChart(key);
+    const cv=document.getElementById(key+"Chart");if(!cv)return;
+    const r=(rows||[]).filter(x=>x&&x[valKey]!=null);
+    if(!r.length){const t=document.getElementById(key+"Tbl");if(t)t.innerHTML='<div class="np">Not published yet</div>';return;}
+    charts[key]=new Chart(cv,{type:"bar",data:{labels:r.map(x=>x[labelKey]),datasets:[{label:unit,data:r.map(x=>x[valKey]),backgroundColor:r.map(x=>x[valKey]<0?"#e0443a":color),borderRadius:4,maxBarThickness:30}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});
+    recentTable(key+"Tbl",r.map(x=>x[labelKey]),r.map(x=>x[valKey]),unit,dec,r.length);
+  };
+  barChart("gdp",d.gdpGrowth,"period","growth","#4da3e8","%",2);
+  barChart("bop",d.bop,"period","value","#c8a84b","USD bn",3);
+  barChart("debt",d.debtGdp,"period","ratio","#9b8cff","%",1);
   const fv=fxData.filter(v=>v>0);
   charts.fx=new Chart(document.getElementById("fxChart"),{type:"line",data:{labels:fxAg.labels,datasets:[{label:"LKR",data:fxData,borderColor:"#4da3e8",backgroundColor:"rgba(77,163,232,0.1)",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:fv.length?Math.floor(Math.min(...fv)-2):undefined,max:fv.length?Math.ceil(Math.max(...fv)+2):undefined},x:{ticks:xt,grid:{color:gc}}}}});
   renderStatBar("fxStat",fxData,fxAg.labels,"LKR",2);
   destroyChart("tbill");
   const tbr=[...(d.tbills||[])].reverse();
   const fmtDY2=s=>{if(!s)return s;const t=String(s).trim();if(/\d{4}/.test(t))return t;return t+" "+new Date().getFullYear();};
-  const tbAg=aggregateIdx(tbr.map(r=>fmtDY2(r.date)),GRANS.tbill);
+  const tbAg={labels:tbr.map(r=>fmtDY2(r.date)),idx:tbr.map((_,i)=>i)};
   charts.tbill=new Chart(document.getElementById("tbillChart"),{type:"line",data:{labels:tbAg.labels,datasets:[{label:"3M",data:pick(tbr.map(r=>parseFloat(r.m3)||null),tbAg.idx),borderColor:"#4da3e8",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"6M",data:pick(tbr.map(r=>parseFloat(r.m6)||null),tbAg.idx),borderColor:"#c8a84b",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"12M",data:pick(tbr.map(r=>parseFloat(r.m12)||null),tbAg.idx),borderColor:"#6dd4a0",tension:0.3,pointRadius:0,pointHoverRadius:5,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:8}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:xt,grid:{color:gc}}}}});
-  renderStatBar("tbillStat",pick(tbr.map(r=>parseFloat(r.m12)||null),tbAg.idx),tbAg.labels,"% (12M)",2);
-  {const _tbm={labels:tbAg.labels,m3:pick(tbr.map(r=>parseFloat(r.m3)||null),tbAg.idx),m6:pick(tbr.map(r=>parseFloat(r.m6)||null),tbAg.idx),m12:pick(tbr.map(r=>parseFloat(r.m12)||null),tbAg.idx)};
-    function applyTbillSel(){
-      if(!charts.tbill)return;const ds=charts.tbill.data.datasets,map={m3:0,m6:1,m12:2};
-      const el=document.getElementById("tbillStat");
-      if(_tbillSel==="all"){ds.forEach(x=>x.hidden=false);charts.tbill.update();if(el)el.innerHTML="";return;}
-      const idx=map[_tbillSel];ds.forEach((x,i)=>x.hidden=(i!==idx));charts.tbill.update();
-      renderStatBar("tbillStat",_tbm[_tbillSel],_tbm.labels,{m3:"% (3M)",m6:"% (6M)",m12:"% (12M)"}[_tbillSel],2);
-    }
-    window.setTbillSeries=function(sel,btn){_tbillSel=sel;if(btn){btn.parentNode.querySelectorAll(".mg-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}applyTbillSel();};
-    applyTbillSel();}
   destroyChart("yield");
   const yBHead=d.bonds?.headers||[], yBRows=d.bonds?.rows||[];
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1123,8 +1049,6 @@ function buildCharts(d){
   if(yCol>=0)yDS.push({label:"Yesterday ("+yBHead[yCol]+")",data:yestD,borderColor:"#4da3e8",backgroundColor:"transparent",tension:0.3,pointRadius:2.5,pointHoverRadius:6,pointBackgroundColor:"#4da3e8",borderWidth:2,borderDash:[6,4],fill:false});
   yDS.push({label:"Today ("+(tCol>=0?yBHead[tCol]:"")+")",data:todayD,backgroundColor:"rgba(200,168,75,0.14)",tension:0.3,pointRadius:3.5,pointHoverRadius:7,pointBackgroundColor:"#c8a84b",pointBorderColor:"#fff",pointBorderWidth:1,borderColor:"#c8a84b",borderWidth:3,fill:true});
   charts.yield=new Chart(document.getElementById("yieldChart"),{type:"line",data:{labels:yLabels,datasets:yDS},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:10},boxWidth:18,usePointStyle:false,padding:12}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:8},maxRotation:45,minRotation:30},grid:{color:gc}}}}});
-  {const avg=a=>{const f=a.filter(v=>v!=null&&!isNaN(v));return f.length?+(f.reduce((x,y)=>x+y,0)/f.length).toFixed(2):null;};
-   renderStatBar("yieldStat",[avg(yestD),avg(todayD)],[yCol>=0?yBHead[yCol]:"Prev",tCol>=0?yBHead[tCol]:"Latest"],"% avg",2);}
 
   // ── NEW: Global Market — US 10Y Treasury Yield (aggregated by interval)
   destroyChart("g10");
@@ -1156,35 +1080,18 @@ function buildCharts(d){
   const OPEN_PTS=7;
   const lastN=(a,n)=>(a&&a.length>n)?a.slice(a.length-n):(a||[]);
   const vlab={id:'vlab',afterDatasetsDraw(ch){const ctx=ch.ctx,ca=ch.chartArea;ctx.save();ctx.font='700 9px Segoe UI,Arial';ctx.fillStyle='#eaf2fb';ctx.textBaseline='bottom';const placed=[];ch.data.datasets.forEach((ds,di)=>{const meta=ch.getDatasetMeta(di);meta.data.forEach((pt,i)=>{const val=ds.data[i];if(val==null||isNaN(val))return;const txt=(+val).toFixed(2);const w=ctx.measureText(txt).width;ctx.textAlign='center';let x=pt.x;if(x-w/2<ca.left+1)x=ca.left+1+w/2;if(x+w/2>ca.right-1)x=ca.right-1-w/2;let y=pt.y-6;let g=0;while(g<5&&placed.some(p=>Math.abs(p.x-x)<(p.w+w)/2+2&&Math.abs(p.y-y)<11)){y-=11;g++;}if(y-9<ca.top)y=pt.y+15;placed.push({x:x,y:y,w:w});ctx.fillText(txt,x,y);});});ctx.restore();}};
-  const liqL=lastN(d.liquidity?.labels||[],OPEN_PTS), liqV=lastN(d.liquidity?.values||[],OPEN_PTS);  destroyChart("opLiq");
-  if(document.getElementById("op-liqChart"))charts.opLiq=new Chart(document.getElementById("op-liqChart"),{type:"line",data:{labels:liqL,datasets:[{label:"Rs.Bn",data:liqV,borderColor:"#c8a84b",backgroundColor:"rgba(200,168,75,0.2)",tension:0.3,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:"#c8a84b",borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,layout:{padding:{top:18,right:16,left:4}},plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:xt,grid:{color:gc}}}},plugins:[vlab]});
-  renderStatBar("op-liqStat",liqV,liqL,"Rs.Bn",2);
   // Opening Report — FX Market Summary volume by tenor (excludes subtotal/grand-total rows)
   destroyChart("opFxSum");
   if(document.getElementById("opFxSumChart")){
     const fsRows=(d.fxSummary||[]).filter(r=>!/total/i.test(r.tenor)&&r.volume!=null);
     charts.opFxSum=new Chart(document.getElementById("opFxSumChart"),{type:"bar",data:{labels:fsRows.map(r=>r.tenor),datasets:[{label:"Volume (USD Mn)",data:fsRows.map(r=>parseFloat(r.volume)||0),backgroundColor:"#4da3e8",borderRadius:4,maxBarThickness:34}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});
   }
-  const ofxL=lastN(d.usdlkr?.labels||[],OPEN_PTS), ofxV=lastN(d.usdlkr?.values||[],OPEN_PTS), ofv=ofxV.filter(v=>v>0);
-  destroyChart("opFx");
-  if(document.getElementById("op-fxChart"))charts.opFx=new Chart(document.getElementById("op-fxChart"),{type:"line",data:{labels:ofxL,datasets:[{label:"LKR",data:ofxV,borderColor:"#4da3e8",backgroundColor:"rgba(77,163,232,0.1)",tension:0.3,pointRadius:3,pointHoverRadius:6,pointBackgroundColor:"#4da3e8",borderWidth:2,fill:true}]},options:{responsive:true,maintainAspectRatio:true,layout:{padding:{top:18,right:16,left:4}},plugins:{legend:{display:false}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc},min:ofv.length?Math.floor(Math.min(...ofv)-1):undefined,max:ofv.length?Math.ceil(Math.max(...ofv)+1):undefined},x:{ticks:xt,grid:{color:gc}}}},plugins:[vlab]});
-  renderStatBar("op-fxStat",ofxV,ofxL,"LKR",2);
-  destroyChart("opTbill");
-  const otb=lastN(tbr,OPEN_PTS);
-  if(document.getElementById("op-tbillChart"))charts.opTbill=new Chart(document.getElementById("op-tbillChart"),{type:"line",data:{labels:otb.map(r=>fmtDY2(r.date)),datasets:[{label:"3M",data:otb.map(r=>parseFloat(r.m3)||null),borderColor:"#4da3e8",tension:0.3,pointRadius:2.5,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"6M",data:otb.map(r=>parseFloat(r.m6)||null),borderColor:"#c8a84b",tension:0.3,pointRadius:2.5,pointHoverRadius:5,borderWidth:1.5,fill:false},{label:"12M",data:otb.map(r=>parseFloat(r.m12)||null),borderColor:"#6dd4a0",tension:0.3,pointRadius:2.5,pointHoverRadius:5,borderWidth:1.5,fill:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:8}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:xt,grid:{color:gc}}}}});
-  destroyChart("opYield");
-  if(document.getElementById("op-yieldChart")){const oyDS=yDS.map(s=>Object.assign({},s));charts.opYield=new Chart(document.getElementById("op-yieldChart"),{type:"line",data:{labels:yLabels,datasets:oyDS},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:14,padding:8}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:7},maxRotation:45,minRotation:30},grid:{color:gc}}}}});}
 }
 
 // no login required — load immediately
 loadData();
 startPolling();
 
-// Initial closing report date fallback (render() refines with any editor override)
-(function(){
-  const el=document.getElementById("closing-report-date");
-  if(el) el.innerHTML=fmtOrd(slWorkDay(0));
-})();
 
 </script>
 </body>
