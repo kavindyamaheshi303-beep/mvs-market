@@ -390,21 +390,6 @@ canvas{max-width:100%!important}
       <div class="panel"><div class="panel-title pt-row"><span>CBSL Holdings of Government Securities (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('cbsl',7,this)" title="Last 7 data points">W</button><button class="mg-btn" onclick="setChartGran('cbsl',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('cbsl','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="cbslChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="cbslStat"></div><div class="mini-tbl" id="cbslTbl"></div></div>
       <div class="panel"><div class="panel-title pt-row"><span>Foreign Holdings of Government Securities (Rs.Mn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('fh',4,this)" title="Last 4 data points">M</button><button class="mg-btn active" onclick="setChartGran('fh','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="fhChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="fhStat"></div><div class="mini-tbl" id="fhTbl"></div></div>
     </div>
-    <div class="panel full-width">
-      <div class="panel-title">Tourism &amp; Remittances</div>
-      <canvas id="tourRemChart" style="max-height:170px;margin:4px 0 12px"></canvas>
-      <div class="grid-2x2" style="margin-top:0">
-        <table style="font-size:11px">
-          <thead><tr><th>Tourism (USD)</th><th>Apr 2026</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
-          <tbody id="dyn-tourism"></tbody>
-        </table>
-        <table style="font-size:11px">
-          <thead><tr><th>Remittances (USD)</th><th>Apr 2025</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
-          <tbody id="dyn-remit"></tbody>
-        </table>
-      </div>
-    </div>
-
     <div class="grid-3col">
       <div class="panel">
         <div class="panel-title">Quarterly Real GDP Growth</div>
@@ -420,6 +405,20 @@ canvas{max-width:100%!important}
         <div class="panel-title">Debt to GDP (%)</div>
         <canvas id="debtChart" style="max-height:170px;margin-bottom:8px"></canvas>
         <div class="mini-tbl" id="debtTbl"></div>
+      </div>
+    </div>
+
+    <div class="panel full-width">
+      <div class="panel-title">Tourism &amp; Remittances</div>
+      <div class="grid-2x2" style="margin-top:4px">
+        <table style="font-size:11px">
+          <thead><tr><th>Tourism (USD)</th><th>Apr 2026</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
+          <tbody id="dyn-tourism"></tbody>
+        </table>
+        <table style="font-size:11px">
+          <thead><tr><th>Remittances (USD)</th><th>Apr 2025</th><th>May 2026</th><th>Y-o-Y</th></tr></thead>
+          <tbody id="dyn-remit"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -702,10 +701,9 @@ function renderTbillAuction(data,targetId){
 
 function render(d){
   lastData=d;
-  const td=new Date(),dy=td.getDate();
-  const sx=dy===1||dy===21||dy===31?'st':dy===2||dy===22?'nd':dy===3||dy===23?'rd':'th';
+  const td=new Date();
   const ml=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  setText("dateDisplay",dy+sx+' '+ml[td.getMonth()]+' '+td.getFullYear());
+  {const el=document.getElementById("dateDisplay");if(el)el.innerHTML=fmtOrd(td);}
   const lu=document.getElementById("last-updated");
   if(lu)lu.textContent="Updated: "+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 
@@ -903,11 +901,9 @@ function renderExtras(d){
    const todayD=slWorkDay(0), yestD=slWorkDay(1);
    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
    const ot=document.getElementById("opening-report-title");
-   if(ot){const od=ov(d.openingDate)||fmtLong(todayD);ot.innerHTML="Opening Report — "+escHtml(od);}
-   const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtLong(todayD);
-   ["mm-close","fx-close","tbill-close","tbond-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="Closing: "+cdEl;});
-   const secEl=ov(d.secondaryDate)?escHtml(ov(d.secondaryDate)):fmtLong(yestD);
-   {const e=document.getElementById("secondary-close");if(e)e.textContent="Closing: "+secEl;}
+   if(ot){const od=ov(d.openingDate)||fmtOrd(todayD);ot.innerHTML="Opening Report — "+od;}
+   const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);
+   ["mm-close","fx-close","tbill-close","tbond-close","secondary-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="Closing: "+cdEl;});
    const ft=document.getElementById("op-fxsum-title");
    if(ft)ft.textContent="Volume of FX Market";}
   set('dyn-op-vd',(d.valueDates||[]).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
@@ -999,19 +995,7 @@ function buildCharts(d){
         options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:10}},title:{display:true,text:"INFLATION (%)",color:"#c8a84b",font:{size:12,weight:"700"}}},scales:{x:{ticks:{color:tc,font:tf},grid:{color:gc},suggestedMin:-2,suggestedMax:6},y:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});
     }
   }
-  // Tourism & Remittances — April vs May (USD Mn), no granularity buttons
-  destroyChart("tourRem");
-  if(document.getElementById("tourRemChart")){
-    const pn=s=>{if(s==null)return null;const n=parseFloat(String(s).replace(/,/g,'').replace(/[^0-9.\-]/g,''));return isNaN(n)?null:n;};
-    const t=d.tourism||{}, r=d.remittances||{};
-    const hasAny=[t.apr,t.may,r.apr,r.may].some(v=>pn(v)!=null);
-    if(hasAny){
-      charts.tourRem=new Chart(document.getElementById("tourRemChart"),{type:"bar",data:{labels:["Tourism","Remittances"],datasets:[
-        {label:"April",data:[pn(t.apr),pn(r.apr)],backgroundColor:"#c8a84b",borderRadius:4,maxBarThickness:34},
-        {label:"May",data:[pn(t.may),pn(r.may)],backgroundColor:"#e0443a",borderRadius:4,maxBarThickness:34}]},
-        options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:10}},title:{display:true,text:"TOURISM & REMITTANCES (USD Mn)",color:"#c8a84b",font:{size:11,weight:"700"}}},scales:{y:{ticks:{color:tc,font:tf},grid:{color:gc}},x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}}}}});
-    }
-  }
+  // Tourism & Remittances — table only, no chart
   // New macro tables — each a simple bar chart + recent table (no granularity buttons)
   const barChart=(key,rows,labelKey,valKey,color,unit,dec)=>{
     destroyChart(key);
