@@ -388,7 +388,7 @@ let toastT;function showToast(msg,type){const t=document.getElementById('toast')
 
 // ── FRESHNESS ────────────────────────────────────────────
 function analyzeFreshness(wb,XLSX,nowOverride){
-  const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:null}):[];};
+  const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
   const sheets=wb.SheetNames, _IGN=/dailydata|weeklydata|monthlydata|others/, find=name=>sheets.find(s=>{const t=s.toLowerCase().replace(/\s+/g,"");return !_IGN.test(t)&&t.includes(name);});
   const MON3=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],MONF=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const US_HOL=new Set(["2026-01-01","2026-01-19","2026-02-16","2026-05-25","2026-06-19","2026-07-03","2026-09-07","2026-10-12","2026-11-11","2026-11-26","2026-12-25"]);
@@ -447,7 +447,7 @@ function gotoSection(id){
 
 // ── PARSER ───────────────────────────────────────────────
 function parseWorkbook(wb,XLSX){
-  const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:null}):[];};
+  const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
   const sheets=wb.SheetNames, _IGN=/dailydata|weeklydata|monthlydata|others/, find=name=>sheets.find(s=>{const t=s.toLowerCase().replace(/\s+/g,"");return !_IGN.test(t)&&t.includes(name);});
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const xlDate=v=>{if(v instanceof Date)return v;if(typeof v==='number'&&v>40000&&v<60000){const d=new Date(Math.round((v-(v>59?25569:25568))*86400*1000));return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}if(typeof v==='string'){const s=v.trim();const m1=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m1)return new Date(+m1[3],+m1[1]-1,+m1[2]);const m2=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);if(m2)return new Date(+m2[1],+m2[2]-1,+m2[3]);}return null;};
@@ -486,13 +486,18 @@ function parseWorkbook(wb,XLSX){
   if(fx.length){
     let L=[],V=[];for(let i=2;i<fx.length;i++)if(fx[i][0]!=null&&fx[i][1]!=null){L.push(lbl(fx[i][0]));V.push(num(fx[i][1]));}
     const swMap={'1 week':'1w','1 month':'1m','2 month':'2m','3 month':'3m','6 month':'6m','1 year':'1y'};
-    let sw={};for(let i=2;i<fx.length;i++){const k=fx[i][6];if(k==null)continue;const key=swMap[String(k).toLowerCase().trim()];if(key)sw[key]={sell:num(fx[i][7]),buy:num(fx[i][8])};}
-    let spot={};for(let i=2;i<fx.length;i++){const it=fx[i][10];if(it==null)continue;const t=String(it).toLowerCase();if(t.includes('opening'))spot.open=String(fx[i][11]).trim();else if(t.includes('closing'))spot.close=String(fx[i][11]).trim();else if(t.includes('lowest'))spot.low=String(fx[i][11]).trim();else if(t.includes('highest'))spot.high=String(fx[i][11]).trim();}
-    let fsum=[];for(let i=2;i<fx.length;i++)if(fx[i][13]!=null)fsum.push({tenor:String(fx[i][13]).trim(),volume:num(fx[i][14]),wa:num(fx[i][15]),show:true});
-    let vd=[];for(let i=2;i<fx.length;i++)if(fx[i][17]!=null)vd.push({tenor:String(fx[i][17]).trim(),date:String(fx[i][18]).trim(),nod:fx[i][19]==null?'':String(fx[i][19]).trim(),show:true});
-    let cross=[];for(let i=2;i<fx.length;i++)if(fx[i][21]!=null)cross.push({pair:String(fx[i][21]).trim(),buy:num(fx[i][22]),sell:num(fx[i][23]),show:true});
+    let sw={};for(let i=2;i<fx.length;i++){const k=fx[i][3];if(k==null)continue;const key=swMap[String(k).toLowerCase().trim()];if(key)sw[key]={sell:num(fx[i][4]),buy:num(fx[i][5])};}
+    let spot={};for(let i=2;i<fx.length;i++){const it=fx[i][7];if(it==null)continue;const t=String(it).toLowerCase();if(t.includes('opening'))spot.open=String(fx[i][8]).trim();else if(t.includes('closing'))spot.close=String(fx[i][8]).trim();else if(t.includes('lowest'))spot.low=String(fx[i][8]).trim();else if(t.includes('highest'))spot.high=String(fx[i][8]).trim();}
+    let cross=[];for(let i=2;i<fx.length;i++)if(fx[i][11]!=null)cross.push({pair:String(fx[i][11]).trim(),buy:num(fx[i][12]),sell:num(fx[i][13]),show:true});
     o.usdlkr={labels:L,values:V,close:spot.close||(V.length?V[V.length-1]:null)};
-    o.fxSwaps=sw;o.spot=spot;o.fxSummary=fsum;o.valueDates=vd;o.crossRates=cross;
+    o.fxSwaps=sw;o.spot=spot;o.crossRates=cross;
+  }
+  // FX Market Summary + Value Dates now live in the Opening Report sheet (cols 0-2 and 4-6)
+  const orp=S(find('opening')||'');
+  o.fxSummary=[];o.valueDates=[];
+  if(orp.length){
+    for(let i=2;i<orp.length;i++)if(orp[i][0]!=null)o.fxSummary.push({tenor:String(orp[i][0]).trim(),volume:num(orp[i][1]),wa:num(orp[i][2])});
+    for(let i=2;i<orp.length;i++)if(orp[i][4]!=null)o.valueDates.push({tenor:String(orp[i][4]).trim(),date:orp[i][5]instanceof Date?lbl(orp[i][5]):(orp[i][5]==null?'':String(orp[i][5]).trim()),nod:orp[i][6]==null?'':String(orp[i][6]).trim(),show:true});
   }
   const mc=S(find('macroeconomy')||'');
   if(mc.length){
