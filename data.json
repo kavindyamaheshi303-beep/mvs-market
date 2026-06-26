@@ -3083,5 +3083,8 @@
  "openingDate": "",
  "closingDate": "",
  "secondaryDate": "",
- "fxVolDate": ""
+ "fxVolDate": "",
+ "hidden": {
+  "secondary": true
+ }
 }
