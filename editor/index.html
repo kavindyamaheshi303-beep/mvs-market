@@ -102,6 +102,7 @@ code{background:#081424;padding:1px 6px;border-radius:4px;color:#c8a84b;font-siz
   <div class="row">
     <button class="btn-blue" onclick="document.getElementById('xl-input').click()">⬆ Import MarketData.xlsx</button>
     <input type="file" id="xl-input" accept=".xlsx,.xls" style="display:none" onchange="importExcel(event)">
+    <button class="btn-gold" id="watch-btn" onclick="toggleWatch()">🔗 Link Excel (auto-watch)</button>
     <button class="btn-red" onclick="clearAll()">✕ Clear All Data</button>
     <button class="btn-ghost" onclick="loadPublished()">↻ Reload Published</button>
   </div>
@@ -205,27 +206,58 @@ async function getPublished(cfg){
 }
 
 // ── EXCEL IMPORT ─────────────────────────────────────────
-function importExcel(ev){
-  const f=ev.target.files[0];if(!f)return;
-  const st=document.getElementById('import-status');st.style.color='#c8a84b';st.textContent='Reading '+f.name+'…';
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
-      window._lastWB=wb;
-      LOADED=parseWorkbook(wb,XLSX);
-      try{renderFreshness(analyzeFreshness(wb,XLSX));}catch(fe){}
-      renderSections();
-      saveLocal();   // keep this import across editor page refreshes
-      const L=LOADED.liquidity||{},U=LOADED.usdlkr||{};
-      const liqN=(L.values||[]).length,liqLast=(L.labels||[]).slice(-1)[0]||'—',fxLast=(U.labels||[]).slice(-1)[0]||'—';
-      st.style.color='#6dd4a0';
-      st.textContent='✓ Imported '+f.name+' — Liquidity '+liqN+' rows (last '+liqLast+') · USD/LKR last '+fxLast+'.  If a new row is missing here, the file you picked is an older copy.';
-      showToast('✓ Excel imported');
-    }catch(err){st.style.color='#e8917a';st.textContent='✗ '+err.message;showToast('Import failed: '+err.message,'err');}
-    ev.target.value='';
-  };
-  r.readAsBinaryString(f);
+function ingestFile(file,auto){
+  const st=document.getElementById('import-status');
+  if(!auto){st.style.color='#c8a84b';st.textContent='Reading '+file.name+'…';}
+  return file.arrayBuffer().then(buf=>{
+    const wb=XLSX.read(new Uint8Array(buf),{type:'array',cellDates:true});
+    window._lastWB=wb;
+    LOADED=parseWorkbook(wb,XLSX);
+    try{renderFreshness(analyzeFreshness(wb,XLSX));}catch(fe){}
+    renderSections();
+    saveLocal();   // keep this import across editor page refreshes
+    const L=LOADED.liquidity||{},U=LOADED.usdlkr||{};
+    const liqN=(L.values||[]).length,liqLast=(L.labels||[]).slice(-1)[0]||'—',fxLast=(U.labels||[]).slice(-1)[0]||'—';
+    st.style.color='#6dd4a0';
+    st.textContent=(auto?'⟳ Auto-imported ':'✓ Imported ')+file.name+' — Liquidity '+liqN+' rows (last '+liqLast+') · USD/LKR last '+fxLast+(auto?'  ·  watching for changes…':'.  If a new row is missing here, the file you picked is an older copy.');
+    showToast(auto?'⟳ Auto-imported on save':'✓ Excel imported');
+  }).catch(err=>{st.style.color='#e8917a';st.textContent='✗ '+err.message;showToast('Import failed: '+err.message,'err');});
+}
+function importExcel(ev){const f=ev.target.files[0];if(!f)return;ingestFile(f,false);ev.target.value='';}
+
+// ── Auto-watch: link the Excel file and re-import automatically whenever it's saved (Chrome/Edge) ──
+let _fsHandle=null,_fsTimer=null,_fsLastMod=0;
+function toggleWatch(){ if(_fsHandle) unlinkExcel(); else linkExcel(); }
+async function linkExcel(){
+  if(!window.showOpenFilePicker){
+    const st=document.getElementById('import-status');st.style.color='#e8917a';
+    st.textContent='Auto-watch needs Google Chrome or Microsoft Edge. In other browsers use the Import button instead.';
+    showToast('Auto-watch needs Chrome/Edge','err');return;
+  }
+  try{
+    const [handle]=await window.showOpenFilePicker({types:[{description:'Excel workbook',accept:{'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':['.xlsx'],'application/vnd.ms-excel':['.xls']}}]});
+    _fsHandle=handle;_fsLastMod=0;
+    await watchTick(true);   // import immediately
+    startWatch();updateWatchBtn(true);
+  }catch(e){/* user cancelled the picker */}
+}
+function startWatch(){stopWatch();_fsTimer=setInterval(()=>watchTick(false),3000);}
+function stopWatch(){if(_fsTimer){clearInterval(_fsTimer);_fsTimer=null;}}
+async function watchTick(initial){
+  if(!_fsHandle)return;
+  try{
+    const file=await _fsHandle.getFile();
+    if(file.lastModified!==_fsLastMod){_fsLastMod=file.lastModified;await ingestFile(file,!initial);}
+  }catch(e){
+    stopWatch();_fsHandle=null;updateWatchBtn(false);
+    const st=document.getElementById('import-status');if(st){st.style.color='#e8917a';st.textContent='Auto-watch stopped (file moved or permission lost). Click "Link Excel" again to resume.';}
+  }
+}
+function unlinkExcel(){stopWatch();_fsHandle=null;updateWatchBtn(false);showToast('Auto-watch stopped');}
+function updateWatchBtn(on){
+  const b=document.getElementById('watch-btn');if(!b)return;
+  if(on){b.textContent='🔗 Watching — click to stop';b.classList.remove('btn-gold');b.classList.add('btn-green');}
+  else{b.textContent='🔗 Link Excel (auto-watch)';b.classList.remove('btn-green');b.classList.add('btn-gold');}
 }
 function clearAll(){
   LOADED=null;
