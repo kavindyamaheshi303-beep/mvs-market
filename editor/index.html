@@ -401,7 +401,8 @@ function analyzeFreshness(wb,XLSX,nowOverride){
   const now=nowOverride||new Date();
   const todayUTC=new Date(now.getFullYear(),now.getMonth(),now.getDate());
   const usNow=new Date(now.getTime()-10.5*3600*1000);const usTodayUTC=new Date(usNow.getFullYear(),usNow.getMonth(),usNow.getDate());
-  const latestDate=(rows,col,sr)=>{sr=sr||2;let mx=null;for(let i=sr;i<rows.length;i++){const v=rows[i]&&rows[i][col];if(v instanceof Date){if(!mx||v>mx)mx=v;}}return mx?new Date(mx.getFullYear(),mx.getMonth(),mx.getDate()):null;};
+  const xlDate=v=>{if(v instanceof Date)return new Date(v.getFullYear(),v.getMonth(),v.getDate());if(typeof v==='number'&&v>40000&&v<60000){const d=new Date(Math.round((v-(v>59?25569:25568))*86400*1000));return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}return null;};
+  const latestDate=(rows,col,sr)=>{sr=sr||2;let mx=null;for(let i=sr;i<rows.length;i++){const v=rows[i]&&rows[i][col];const d=xlDate(v);if(d&&(!mx||d>mx))mx=d;}return mx;};
   const parseDM=s=>{const m=String(s||'').trim().match(/^(\d{1,2})[\s\-]([A-Za-z]{3})/);if(!m)return null;const mi=MON3.indexOf(m[2].toLowerCase());if(mi<0)return null;return new Date(now.getFullYear(),mi,parseInt(m[1]));};
   const out=[];
   const daily=(label,cal,last,secId)=>{const ref=cal==='US'?usTodayUTC:todayUTC,exp=lastWork(ref,cal);
@@ -449,7 +450,8 @@ function parseWorkbook(wb,XLSX){
   const S=n=>{const ws=wb.Sheets[n];return ws?XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null}):[];};
   const sheets=wb.SheetNames, _IGN=/dailydata|weeklydata|monthlydata|others/, find=name=>sheets.find(s=>{const t=s.toLowerCase().replace(/\s+/g,"");return !_IGN.test(t)&&t.includes(name);});
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const lbl=d=>d instanceof Date?d.getDate()+" "+MON[d.getMonth()]:(d==null?"":String(d).trim());
+  const xlDate=v=>{if(v instanceof Date)return v;if(typeof v==='number'&&v>40000&&v<60000){const d=new Date(Math.round((v-(v>59?25569:25568))*86400*1000));return new Date(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());}return null;};
+  const lbl=d=>{const dt=xlDate(d);if(dt)return dt.getDate()+" "+MON[dt.getMonth()];return d==null?"":String(d).trim();};
   const num=v=>{if(v==null||v==="")return null;const n=parseFloat(String(v).replace(/,/g,'').replace('%',''));return isNaN(n)?null:n;};
   const pct=v=>{if(v==null||v==="")return"";let n=parseFloat(String(v).replace('%',''));if(isNaN(n))return String(v);if(Math.abs(n)<=1.0001)n=n*100;return n.toFixed(2).replace(/\.00$/,'.0')+"%";};
   const toISO=s=>{s=String(s).trim();const m=s.match(/^(\d{1,2})(?:-\d{1,2})?[.\-/](\d{1,2})[.\-/](\d{4})/);return m?(m[3]+"-"+String(m[2]).padStart(2,'0')+"-"+String(m[1]).padStart(2,'0')):s;};
@@ -468,14 +470,14 @@ function parseWorkbook(wb,XLSX){
   if(fi.length){
     // Bond column dates: try row1 col3-8 as dates first, else use text
     const parseDMlocal=s=>{const MON3l=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];const m=String(s||'').trim().match(/^(\d{1,2})[\s\-]([A-Za-z]{3})/i);if(!m)return null;const mi=MON3l.indexOf(m[2].toLowerCase());if(mi<0)return null;const yr=new Date().getFullYear();return new Date(yr,mi,parseInt(m[1]));};
-    let bh=[];for(let c=3;c<=8;c++){const v=fi[1][c];if(v==null)continue;bh.push(v instanceof Date?lbl(v):(parseDMlocal(v)?lbl(parseDMlocal(v)):String(v).trim()));}
+    let bh=[];for(let c=3;c<=8;c++){const v=fi[1][c];if(v==null)continue;const dtx=xlDate(v);bh.push(dtx?lbl(dtx):(parseDMlocal(v)?lbl(parseDMlocal(v)):String(v).trim()));}
     let br=[];for(let i=2;i<fi.length;i++)if(fi[i][0]){const vals=[];for(let c=3;c<=8;c++)vals.push(fi[i][c]);br.push({bond:String(fi[i][0]).trim(),eoy:fi[i][1],eom:fi[i][2],values:vals});}
     o.bonds={headers:bh,rows:br};
     let tcL=[],t3=[],t6=[],t12=[];for(let i=2;i<fi.length;i++)if(fi[i][10]!=null){tcL.push(lbl(fi[i][10]));t3.push(num(fi[i][11]));t6.push(num(fi[i][12]));t12.push(num(fi[i][13]));}
     o.tbillCurve={labels:tcL,m3:t3,m6:t6,m12:t12};
-    let tb=[],tref={};for(let i=2;i<fi.length;i++){const a=fi[i][15];if(a==null)continue;if(a instanceof Date)tb.push({date:lbl(a),m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18]),show:true});else{const t=String(a).toLowerCase();if(t.includes('last month'))tref.lastMonth={m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18])};else if(t.includes('last year'))tref.lastYear={m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18])};}}
+    let tb=[],tref={};for(let i=2;i<fi.length;i++){const a=fi[i][15];if(a==null)continue;const dtx=xlDate(a);if(dtx)tb.push({date:lbl(dtx),m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18]),show:true});else{const t=String(a).toLowerCase();if(t.includes('last month'))tref.lastMonth={m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18])};else if(t.includes('last year'))tref.lastYear={m3:num(fi[i][16]),m6:num(fi[i][17]),m12:num(fi[i][18])};}}
     o.tbills=tb;o.tbillRef=tref;
-    let auc=[];for(let i=2;i<fi.length;i++){const d=fi[i][20],mat=fi[i][21];if(mat==null)continue;if(d instanceof Date)auc.push({date:lbl(d),maturities:[]});if(auc.length)auc[auc.length-1].maturities.push({maturity:String(mat).trim(),offered:num(fi[i][22]),accepted:num(fi[i][23]),yield:num(fi[i][24])});}
+    let auc=[];for(let i=2;i<fi.length;i++){const d=fi[i][20],mat=fi[i][21];if(mat==null)continue;const dtx=xlDate(d);if(dtx)auc.push({date:lbl(dtx),maturities:[]});if(auc.length)auc[auc.length-1].maturities.push({maturity:String(mat).trim(),offered:num(fi[i][22]),accepted:num(fi[i][23]),yield:num(fi[i][24])});}
     o.tbillAuction=auc;
     let sec=[];for(let i=2;i<fi.length;i++)if(fi[i][26]!=null)sec.push({maturity:String(fi[i][26]).trim(),bid:num(fi[i][27]),ask:num(fi[i][28]),show:true});
     o.bondSecondary=sec;
