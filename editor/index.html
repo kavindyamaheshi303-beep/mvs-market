@@ -178,7 +178,7 @@ const SECTIONS=[
  {id:'results',title:'Latest Results (free-text market announcements)',keys:['marketNews']},
 ];
 const META_KEYS=['execSummary','date','marketNews'];
-const NO_HIDE=new Set(['dates','srr']); // sections with no standalone panel on the dashboard
+const NO_HIDE=new Set(['dates']); // sections with no standalone panel on the dashboard
 
 // ── CONFIG / GITHUB ──────────────────────────────────────
 function loadConfig(){return{token:localStorage.getItem('mvs_gh_token')||'',owner:localStorage.getItem('mvs_gh_owner')||'',repo:localStorage.getItem('mvs_gh_repo')||'',branch:localStorage.getItem('mvs_gh_branch')||'main',path:localStorage.getItem('mvs_gh_path')||'data.json'};}
