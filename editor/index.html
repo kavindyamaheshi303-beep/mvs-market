@@ -285,6 +285,7 @@ async function loadPublished(){
 
 // ── SECTION ENGINE ───────────────────────────────────────
 function escAttr(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function inp(path,val,kind){return `<input class="ed" data-path="${escAttr(path)}" data-kind="${kind}" value="${escAttr(val)}">`;}
 function renderNode(value,path){
   if(value===null||value===undefined)return inp(path,'','null');
