@@ -156,7 +156,8 @@
    "22 Jun",
    "23 Jun",
    "24 Jun",
-   "25 Jun"
+   "25 Jun",
+   "26 Jun"
   ],
   "values": [
    128.14,
@@ -275,14 +276,15 @@
    44.16,
    64.26,
    61.04,
-   65.36
+   65.36,
+   60
   ],
-  "current": 65.36,
-  "previous": 61.04
+  "current": 60,
+  "previous": 65.36
  },
  "bonds": {
   "headers": [
-   "Day 1",
+   "5/6/2026",
    "Day 2",
    "Day 3",
    "Day 4",
@@ -3066,8 +3068,8 @@
  ],
  "execSummary": {
   "usdlkr": "337.10 / 337.30",
-  "liqDir": "increased",
-  "liqDelta": 4.32
+  "liqDir": "decreased",
+  "liqDelta": 5.36
  },
  "marketNews": [],
  "date": "2026-06-26",
@@ -3075,7 +3077,5 @@
  "closingDate": "",
  "secondaryDate": "",
  "fxVolDate": "",
- "hidden": {
-  "bonds": true
- }
+ "hidden": {}
 }
