@@ -271,12 +271,19 @@ canvas{max-width:100%!important}
     <div class="panel"><div class="panel-title pt-row" data-sec="liquidity"><span>Market Liquidity (Rs.Bn)</span><span class="mini-gran"><button class="mg-btn" onclick="setChartGran('liq',7,this)" title="Last 7 working days">W</button><button class="mg-btn" onclick="setChartGran('liq',30,this)" title="Last 30 data points">M</button><button class="mg-btn active" onclick="setChartGran('liq','all',this)" title="Full year (all data)">Y</button></span></div><canvas id="liqChart" style="max-height:200px"></canvas><div class="chart-stat-bar" id="liqStat"></div><div class="mini-tbl" id="liqTbl"></div></div>
   </div>
 
-  <div style="display:flex;justify-content:flex-start;margin-bottom:14px">
+  <div style="display:flex;justify-content:flex-start;gap:14px;margin-bottom:14px">
     <div class="panel" style="width:320px;flex-shrink:0">
       <div class="panel-title" data-sec="opr">Policy Rate (OPR) History</div>
       <table style="font-size:12px">
         <thead><tr><th>Effective Date</th><th>OPR (%)</th></tr></thead>
         <tbody id="dyn-opr"></tbody>
+      </table>
+    </div>
+    <div class="panel" style="width:320px;flex-shrink:0">
+      <div class="panel-title" data-sec="srr">Statutory Reserve Requirement (SRR)</div>
+      <table style="font-size:12px">
+        <thead><tr><th>Effective Date</th><th>SRR (%)</th></tr></thead>
+        <tbody id="dyn-srr"></tbody>
       </table>
     </div>
   </div>
@@ -289,7 +296,7 @@ canvas{max-width:100%!important}
   <!-- GOVT SECURITIES SECTION -->
   <div class="full-grid">
     <div class="panel">
-      <div class="panel-title"><span>Treasury Bill<span class="close-date" id="tbill-close"></span></span></div>
+      <div class="panel-title"><span>Treasury Bill</span></div>
       <div data-sec-self="tbillcurve"><div class="series-toggle"><span class="st-lbl">Lines:</span><button class="mg-btn active" onclick="setTbillSel('all')">All</button><button class="mg-btn" onclick="setTbillSel('m3')">3M</button><button class="mg-btn" onclick="setTbillSel('m6')">6M</button><button class="mg-btn" onclick="setTbillSel('m12')">12M</button></div>
       <canvas id="tbillChart" style="max-height:160px;margin-bottom:6px"></canvas>
       <div class="chart-stat-bar" id="tbillStat"></div></div>
@@ -321,7 +328,7 @@ canvas{max-width:100%!important}
     <div class="panel">
       <div class="panel-title" data-sec="bonds">Treasury Bond (Yield Curve)<span class="close-date" id="tbond-close"></span></div>
       <canvas id="yieldChart" style="max-height:160px;margin-bottom:10px"></canvas>
-      <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Cells shaded by change vs previous day · <span style="color:#7ee0a8">▴ up (green)</span> / <span style="color:#ff8a78">▾ down (red)</span></div>
+      <div style="font-size:8px;color:#7a93b4;margin-bottom:4px">Heat-map per maturity (row): <span style="color:#ff8a78">low</span> → <span style="color:#7ee0a8">high</span> · arrows = move vs prev day (<span style="color:#7ee0a8">▴ up</span> / <span style="color:#ff8a78">▾ down</span>)</div>
       <div style="overflow-x:auto;max-width:100%">
         <table style="font-size:9px">
           <thead><tr id="bondHeaderRow"><th>Bond</th></tr></thead>
@@ -566,7 +573,7 @@ function heatColor(v,min,max){
   if(v==null||!(max>min))return "transparent";
   const t=Math.max(0,Math.min(1,(v-min)/(max-min)));
   const hue=t*140;           // low yield = red (0), high yield = green (140)
-  return "hsla("+hue.toFixed(0)+",75%,50%,"+(0.18+t*0.22).toFixed(2)+")";  // transparent, deeper for higher
+  return "hsla("+hue.toFixed(0)+",78%,52%,"+(0.30+t*0.26).toFixed(2)+")";  // brighter, deeper for higher yields
 }
 // Colour a cell by the DIRECTION of yield change vs the previous day: down = green, up = red.
 function changeColor(delta){
@@ -801,7 +808,7 @@ function render(d){
         let arrow="",acol="";
         if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";} }
         td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
-        td.style.background=(delta==null||delta===0)?"transparent":(delta>0?"rgba(126,224,168,0.34)":"rgba(255,140,122,0.34)");   // shade by change vs previous day (up=green, down=red)
+        td.style.background=heatColor(m,rmn,rmx);   // heat-map per row (per maturity): low=red → high=green
         td.style.color="#eaf2fb";td.style.fontWeight="600";
         if(delta!=null&&delta!==0)td.title=(delta<0?"Yield down ":"Yield up ")+Math.abs(delta).toFixed(2)+" vs previous";
       }else{td.textContent="—";td.style.color="#3a5575";}
@@ -870,7 +877,7 @@ function render(d){
           let arrow="",acol="";
           if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";}}
           td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
-          td.style.background=(delta==null||delta===0)?"transparent":(delta>0?"rgba(126,224,168,0.34)":"rgba(255,140,122,0.34)");td.style.color="#eaf2fb";td.style.fontWeight="600";
+          td.style.background=heatColor(m,rmn,rmx);td.style.color="#eaf2fb";td.style.fontWeight="600";
         }else{td.textContent="—";td.style.color="#3a5575";}
         tr.appendChild(td);
       });
@@ -895,9 +902,9 @@ function render(d){
   const nl=document.getElementById("news-list");
   if(nl){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());nl.innerHTML=items.length?items.map((t,i)=>`<div class="news-card"><span class="news-idx">${i+1}.</span>${escHtml(t)}</div>`).join(""):'<div class="news-card">No announcements published.</div>';}
 
+  applyHidden(d);
   renderExtras(d);
   buildCharts(d);
-  applyHidden(d);
 }
 // Hide/show sections on the dashboard based on the editor's per-section toggles (d.hidden map)
 function applyHidden(d){
@@ -928,6 +935,7 @@ function renderExtras(d){
   set('dyn-cross',(d.crossRates||[]).filter(c=>c.show!==false).map(c=>`<tr><td>${escHtml(c.pair)}</td><td>${n2(c.buy)}</td><td>${n2(c.sell)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   // Money Market — OPR + standing facilities
   {const o=(d.opr||[]).filter(r=>r.show!==false);set('dyn-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${n2(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
+  {const sr=(d.srr||[]).filter(r=>r.show!==false);set('dyn-srr',sr.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===sr.length-1?' style="color:#c8a84b;font-weight:700"':''}>${x.rate?escHtml(x.rate):'—'}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
   {const w=d.windows||{};set('dyn-windows',`<tr><td>Standing Deposit (SDF)</td><td>${n2(w.sdf&&w.sdf.cur)}</td><td style="color:#7fa3c8">${n2(w.sdf&&w.sdf.prev)}</td></tr><tr><td>Standing Lending (SLF)</td><td>${n2(w.slf&&w.slf.cur)}</td><td style="color:#7fa3c8">${n2(w.slf&&w.slf.prev)}</td></tr>`);}
   // FI — secondary yields (table)
   set('dyn-secondary',(d.bondSecondary||[]).filter(s=>s.show!==false).map(s=>`<tr><td>${escHtml(s.maturity)}</td><td>${n2(s.bid)}</td><td>${n2(s.ask)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
@@ -953,7 +961,7 @@ function renderExtras(d){
    const ot=document.getElementById("opening-report-title");
    if(ot){const od=ov(d.openingDate)||fmtOrd(todayD);ot.innerHTML="Opening Report — "+od;}
    const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(slClosingDay());
-   ["mm-close","fx-close","tbill-close","tbond-close","secondary-close","fxov-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="Closing: "+cdEl;});
+   ["mm-close","fx-close","tbond-close","secondary-close","fxov-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="Closing: "+cdEl;});
    const ft=document.getElementById("op-fxsum-title");
    if(ft)ft.innerHTML="Volume of FX Market ("+(ov(d.fxVolDate)?escHtml(ov(d.fxVolDate)):fmtOrd(yestD))+")";}
   set('dyn-op-vd',(d.valueDates||[]).filter(v=>v.show!==false).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
