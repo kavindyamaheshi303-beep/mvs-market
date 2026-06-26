@@ -702,7 +702,6 @@ function renderTbillAuction(data,targetId){
 function render(d){
   lastData=d;
   const td=new Date();
-  const ml=['January','February','March','April','May','June','July','August','September','October','November','December'];
   {const el=document.getElementById("dateDisplay");if(el)el.innerHTML=fmtOrd(td);}
   const lu=document.getElementById("last-updated");
   if(lu)lu.textContent="Updated: "+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -844,7 +843,7 @@ function render(d){
   // ── NEW: Closing Report ──
   setText("cl-usd",d.usdlkr?.close||d.execSummary?.usdlkr);
   setText("cl-liq",d.liquidity?.current);
-  const lt=(d.tbills||[])[0]||{};
+  const lt=((d.tbills||[]).filter(r=>r.show!==false))[0]||{};
   setText("cl-3m",lt.m3);setText("cl-6m",lt.m6);setText("cl-12m",lt.m12);
   const cn=document.getElementById("cl-news");
   if(cn){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());cn.innerHTML=items.length?items.map(t=>"• "+escHtml(t)).join("<br>"):"—";}
@@ -864,23 +863,23 @@ function renderExtras(d){
   const dash=v=>(v==null||String(v).trim()===''||String(v).trim()==='0')?'—':v;
   const set=(id,html)=>{const el=E(id);if(el)el.innerHTML=html;};
   // Macro — inflation
-  set('dyn-inflation',(d.inflation||[]).map(r=>`<tr><td>${escHtml(r.metric)}</td><td>${dash(r.apr)}</td><td style="color:#c8a84b">${dash(r.may)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-inflation',(d.inflation||[]).filter(r=>r.show!==false).map(r=>`<tr><td>${escHtml(r.metric)}</td><td>${dash(r.apr)}</td><td style="color:#c8a84b">${dash(r.may)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   // Macro — reserves (highlight last)
-  {const r=d.reserves||[];set('dyn-reserves',r.map((x,i)=>`<tr><td>${escHtml(x.month)}</td><td${i===r.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.value)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
+  {const r=(d.reserves||[]).filter(x=>x.show!==false);set('dyn-reserves',r.map((x,i)=>`<tr><td>${escHtml(x.month)}</td><td${i===r.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.value)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
   // Macro — tourism & remittances
   {const t=d.tourism||{};set('dyn-tourism',`<tr><td>Earnings</td><td>${dash(t.apr)}</td><td>${dash(t.may)}</td><td style="color:#6dd4a0;font-weight:700">${dash(t.yoy)}</td></tr>`);}
   {const r=d.remittances||{};set('dyn-remit',`<tr><td>Inflows</td><td>${dash(r.apr)}</td><td>${dash(r.may)}</td><td style="color:#6dd4a0;font-weight:700">${dash(r.yoy)}</td></tr>`);}
   // Global — FOMC
-  set('dyn-fomc',(d.fomc||[]).map(r=>`<tr><td>${escHtml(r.date)}</td><td>${escHtml(r.range)}</td><td>${dash(r.repo)}</td><td>${dash(r.rrepo)}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-fomc',(d.fomc||[]).filter(r=>r.show!==false).map(r=>`<tr><td>${escHtml(r.date)}</td><td>${escHtml(r.range)}</td><td>${dash(r.repo)}</td><td>${dash(r.rrepo)}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   {const fk=(d.keyDates||[]).find(k=>/fomc/i.test(k.label));if(fk&&E('dyn-fomc-next')){const i=eventDayInfo(fk.date);E('dyn-fomc-next').textContent='Next FOMC Meeting: '+i.dstr+(i.daysTxt?'  ('+i.daysTxt+')':'');}}
   // FX — spot overview + cross rates
   {const s=d.spot||{};set('dyn-spot',`<tr><td>Opening Spot</td><td style="text-align:right">${dash(s.open)}</td></tr><tr><td>Closing Spot</td><td style="text-align:right;color:#c8a84b;font-weight:700">${dash(s.close)}</td></tr><tr><td>Intraday Lowest</td><td style="text-align:right">${dash(s.low)}</td></tr><tr><td>Intraday Highest</td><td style="text-align:right">${dash(s.high)}</td></tr>`);}
-  set('dyn-cross',(d.crossRates||[]).map(c=>`<tr><td>${escHtml(c.pair)}</td><td>${dash(c.buy)}</td><td>${dash(c.sell)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-cross',(d.crossRates||[]).filter(c=>c.show!==false).map(c=>`<tr><td>${escHtml(c.pair)}</td><td>${dash(c.buy)}</td><td>${dash(c.sell)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   // Money Market — OPR + standing facilities
-  {const o=d.opr||[];set('dyn-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
+  {const o=(d.opr||[]).filter(r=>r.show!==false);set('dyn-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
   {const w=d.windows||{};set('dyn-windows',`<tr><td>Standing Deposit (SDF)</td><td>${dash(w.sdf&&w.sdf.cur)}</td><td style="color:#7fa3c8">${dash(w.sdf&&w.sdf.prev)}</td></tr><tr><td>Standing Lending (SLF)</td><td>${dash(w.slf&&w.slf.cur)}</td><td style="color:#7fa3c8">${dash(w.slf&&w.slf.prev)}</td></tr>`);}
   // FI — secondary yields (table)
-  set('dyn-secondary',(d.bondSecondary||[]).map(s=>`<tr><td>${escHtml(s.maturity)}</td><td>${dash(s.bid)}</td><td>${dash(s.ask)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-secondary',(d.bondSecondary||[]).filter(s=>s.show!==false).map(s=>`<tr><td>${escHtml(s.maturity)}</td><td>${dash(s.bid)}</td><td>${dash(s.ask)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
 
   // ── Opening Report mirror tables ──
   {const w=d.windows||{},lq=d.liquidity||{};
@@ -890,13 +889,13 @@ function renderExtras(d){
   {const c=d.callMarket||{},r=d.repoMarket||{};
    set('dyn-op-mm',`<tr><td>Call Money</td><td>${dash(c.max)}</td><td>${dash(c.min)}</td><td style="color:#c8a84b">${dash(c.wa)}</td><td>${dash(c.vol)}</td></tr>`+
      `<tr><td>Repo</td><td>${dash(r.max)}</td><td>${dash(r.min)}</td><td style="color:#c8a84b">${dash(r.wa)}</td><td>${dash(r.vol)}</td></tr>`);}
-  {const o=d.opr||[];set('dyn-op-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
+  {const o=(d.opr||[]).filter(r=>r.show!==false);set('dyn-op-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${dash(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
   {const lt=(d.tbills||[])[0]||{};const rows=[['3 Months','91 Days',lt.m3],['6 Months','182 Days',lt.m6],['1 Year','364 Days',lt.m12]];
    set('dyn-op-tbill3',rows.map(([t,dys,v])=>`<tr><td>${t}</td><td>${dys}</td><td style="color:#c8a84b">${dash(v)}</td></tr>`).join(''));}
   {const s=d.spot||{};const row=(l,v)=>`<div class="fx-ov-row"><span class="lbl">${l}</span><span class="val">${dash(v)}</span></div>`;
    set('dyn-op-fxov',row('Opening Spot',s.open)+row('Closing Spot',s.close)+row('Intraday Lowest Rate',s.low)+row('Intraday Highest Rate',s.high));}
-  set('dyn-op-secondary',(d.bondSecondary||[]).map(s=>`<div class="by-row"><span class="by-mat">${escHtml(s.maturity)}</span><span class="by-rate">${dash(s.bid)} / ${dash(s.ask)}</span></div>`).join(''));
-  set('dyn-op-fxsum',(d.fxSummary||[]).map(f=>{const bold=/total/i.test(f.tenor);return `<tr${bold?' style="font-weight:700"':''}><td>${escHtml(f.tenor)}</td><td>${dash(f.volume)}</td><td>${f.wa?dash(f.wa):''}</td></tr>`;}).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-op-secondary',(d.bondSecondary||[]).filter(s=>s.show!==false).map(s=>`<div class="by-row"><span class="by-mat">${escHtml(s.maturity)}</span><span class="by-rate">${dash(s.bid)} / ${dash(s.ask)}</span></div>`).join(''));
+  set('dyn-op-fxsum',(d.fxSummary||[]).filter(f=>f.show!==false).map(f=>{const bold=/total/i.test(f.tenor);return `<tr${bold?' style="font-weight:700"':''}><td>${escHtml(f.tenor)}</td><td>${dash(f.volume)}</td><td>${f.wa?dash(f.wa):''}</td></tr>`;}).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   {// Auto report dates (Sri Lanka bank working days) with optional editor overrides
    const todayD=slWorkDay(0), yestD=slWorkDay(1);
    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
@@ -905,9 +904,9 @@ function renderExtras(d){
    const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);
    ["mm-close","fx-close","tbill-close","tbond-close","secondary-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="Closing: "+cdEl;});
    const ft=document.getElementById("op-fxsum-title");
-   if(ft)ft.textContent="Volume of FX Market";}
-  set('dyn-op-vd',(d.valueDates||[]).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
-  set('dyn-op-srr',(d.srr||[]).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${dash(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+   if(ft)ft.textContent="Volume of FX Market — "+fmtLong(yestD);}
+  set('dyn-op-vd',(d.valueDates||[]).filter(v=>v.show!==false).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
+  set('dyn-op-srr',(d.srr||[]).filter(s=>s.show!==false).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${dash(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
 }
 
 function destroyChart(k){if(charts[k]){charts[k].destroy();delete charts[k];}}
@@ -997,7 +996,7 @@ function buildCharts(d){
   }
   // Tourism & Remittances — table only, no chart
   // New macro tables — each a simple bar chart + recent table (no granularity buttons)
-  const barChart=(key,rows,labelKey,valKey,color,unit,dec)=>{
+  const barChart=(key,rows,labelKey,valKey,color,unit,dec)=>{rows=(rows||[]).filter(r=>r.show!==false);
     destroyChart(key);
     const cv=document.getElementById(key+"Chart");if(!cv)return;
     const r=(rows||[]).filter(x=>x&&x[valKey]!=null);
