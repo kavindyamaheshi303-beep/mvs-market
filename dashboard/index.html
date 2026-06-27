@@ -124,8 +124,12 @@ canvas{max-width:100%!important}
 .nav-btn.active{background:linear-gradient(135deg,#c8a84b,#a8893a);color:#060f1e;border-color:#c8a84b;}
 .page{display:none;}
 .big-stat{font-size:34px;font-weight:800;color:#c8a84b;text-align:center;padding:18px 0;letter-spacing:1px;}
-.news-list{display:flex;flex-direction:column;gap:10px;}
-.news-card{background:#0d1e38;border:1px solid #1a3050;border-left:3px solid #c8a84b;border-radius:7px;padding:13px 16px;font-size:13px;line-height:1.6;color:#d4e4f4;}
+.news-list{display:flex;flex-direction:column;gap:0;}
+.news-card{background:transparent;border:none;border-radius:0;padding:0;font-size:13px;line-height:1.8;color:#d4e4f4;}
+.news-card div{padding:9px 12px;border-bottom:1px solid rgba(200,168,75,0.15);transition:background .15s;}
+.news-card div:last-child{border-bottom:none;}
+.news-card div:before{content:"◆";color:#c8a84b;font-size:8px;margin-right:10px;vertical-align:middle;}
+.news-card div:hover{background:rgba(200,168,75,0.06);}
 .news-card .news-idx{color:#c8a84b;font-weight:700;margin-right:8px;}
 .op-split{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;}
 .op-col{flex:1;min-width:190px;}
@@ -465,12 +469,14 @@ canvas{max-width:100%!important}
 
   <!-- PAGE: LATEST MARKET ANNOUNCEMENTS -->
   <div class="page" id="page-news">
-    <div class="panel full-width"><div class="panel-title">Upcoming Key Dates &amp; Announcements</div></div>
-    <div id="events-grid" class="events-grid"></div>
-    <div class="panel full-width" style="margin-top:14px">
-      <div class="panel-title">Latest Results</div>
+    <div class="panel full-width" style="border:1px solid #c8a84b;background:linear-gradient(135deg,#0d1e38,#152a45)">
+      <div class="panel-title" style="font-size:13px;letter-spacing:1.5px;color:#c8a84b;border-bottom:2px solid #c8a84b;padding-bottom:10px;margin-bottom:12px">📋 Latest Results</div>
       <div id="news-list" class="news-list"></div>
     </div>
+    <div class="panel full-width" style="margin-top:14px">
+      <div class="panel-title">Upcoming Key Dates &amp; Announcements</div>
+    </div>
+    <div id="events-grid" class="events-grid" style="margin-top:10px"></div>
   </div>
 
     <div class="footer">MVS Money Brokers Limited — Confidential. For authorised recipients only.</div>
@@ -891,7 +897,7 @@ function render(d){
 function renderExtras(d){
   const E=id=>document.getElementById(id);
   const dash=v=>(v==null||String(v).trim()===''||String(v).trim()==='0')?'—':v;
-  const fmt2=v=>{if(v==null||String(v).trim()===''||String(v).trim()==='0')return'—';const s=String(v).trim();if(/%$/.test(s)){const n=parseFloat(s);return isNaN(n)?s:n.toFixed(2)+'%';}const n=parseFloat(s.replace(/,/g,''));if(isNaN(n))return s;return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});};
+  const fmt2=v=>{if(v==null||String(v).trim()===''||String(v).trim()==='0')return'—';const s=String(v).trim();if(/%$/.test(s)){const n=parseFloat(s);return isNaN(n)?s:n.toFixed(2)+'%';}const n=parseFloat(s.replace(/,/g,''));if(isNaN(n))return s;const parts=n.toFixed(2).split('.');return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',')+'.'+parts[1];};
   const set=(id,html)=>{const el=E(id);if(el)el.innerHTML=html;};
   // Macro — inflation
   set('dyn-inflation',(d.inflation||[]).filter(r=>r.show!==false).map(r=>`<tr><td>${escHtml(r.metric)}</td><td>${fmt2(r.apr)}</td><td style="color:#c8a84b">${fmt2(r.may)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
@@ -908,6 +914,7 @@ function renderExtras(d){
   set('dyn-cross',(d.crossRates||[]).filter(c=>c.show!==false).map(c=>`<tr><td>${escHtml(c.pair)}</td><td>${fmt2(c.buy)}</td><td>${fmt2(c.sell)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   // Money Market — OPR + standing facilities
   {const o=(d.opr||[]).filter(r=>r.show!==false);set('dyn-opr',o.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===o.length-1?' style="color:#c8a84b;font-weight:700"':''}>${fmt2(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
+  {const sr=(d.srr||[]).filter(r=>r.show!==false);set('dyn-srr',sr.map((x,i)=>`<tr><td>${escHtml(x.date)}</td><td${i===sr.length-1?' style="color:#c8a84b;font-weight:700"':''}>${fmt2(x.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');}
   {const w=d.windows||{};set('dyn-windows',`<tr><td>Standing Deposit (SDF)</td><td>${fmt2(w.sdf&&w.sdf.cur)}</td><td style="color:#7fa3c8">${fmt2(w.sdf&&w.sdf.prev)}</td></tr><tr><td>Standing Lending (SLF)</td><td>${fmt2(w.slf&&w.slf.cur)}</td><td style="color:#7fa3c8">${fmt2(w.slf&&w.slf.prev)}</td></tr>`);}
   // FI — secondary yields (table)
   set('dyn-secondary',(d.bondSecondary||[]).filter(s=>s.show!==false).map(s=>`<tr><td>${escHtml(s.maturity)}</td><td>${fmt2(s.bid)}</td><td>${fmt2(s.ask)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
@@ -933,7 +940,7 @@ function renderExtras(d){
    const ot=document.getElementById("opening-report-title");
    if(ot){const od=ov(d.openingDate)||fmtOrd(todayD);ot.innerHTML="Opening Report — "+od;}
    const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(todayD);
-   ["mm-close","fx-close","tbill-close","tbond-close","secondary-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML="Closing: "+cdEl;});
+   ["mm-close","fx-close","tbill-close","tbond-close","secondary-close","fxov-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=cdEl?"Closing: "+cdEl:"";});
    const ft=document.getElementById("op-fxsum-title");
    if(ft)ft.textContent="Volume of FX Market — "+fmtLong(yestD);}
   set('dyn-op-vd',(d.valueDates||[]).filter(v=>v.show!==false).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
