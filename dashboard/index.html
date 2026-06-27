@@ -880,7 +880,7 @@ function render(d){
   // ── NEW: Latest Market Announcements ──
   renderEvents(d);
   const nl=document.getElementById("news-list");
-  if(nl){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());nl.innerHTML=items.length?`<div class="news-card" style="line-height:2">${items.map((t,i)=>`<div><span class="news-idx">${i+1}.</span>${escHtml(t)}</div>`).join('')}</div>`:'<div class="news-card">No announcements published.</div>';}
+  if(nl){const items=(d.marketNews||[]).filter(t=>String(t==null?"":t).trim());nl.innerHTML=items.length?`<div class="news-card" style="line-height:2">${items.map((t,i)=>`<div style="padding:3px 0">${escHtml(t)}</div>`).join('')}</div>`:'<div class="news-card">No announcements published.</div>';}
 
   applyHidden(d);
   renderExtras(d);
