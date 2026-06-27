@@ -712,7 +712,7 @@
  ],
  "bondSecondary": [
   {
-   "maturity": "7/3/2026 12:00:00 AM",
+   "maturity": "7/3/2026 ",
    "bid": 9.6,
    "ask": 9.9,
    "show": true
