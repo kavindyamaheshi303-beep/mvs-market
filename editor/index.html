@@ -226,13 +226,15 @@ function clearAll(){
   document.getElementById('import-status').textContent='';
   showToast('All data cleared');
 }
-async function loadPublished(){
+async function loadPublished(forceLoad){
   const cfg=loadConfig();if(!(cfg.owner&&cfg.repo&&cfg.path))return false;
   try{
     const url=`https://raw.githubusercontent.com/${cfg.owner}/${cfg.repo}/${cfg.branch||'main'}/${cfg.path}?t=`+Date.now();
     const res=await fetch(url,{cache:'no-store'});if(!res.ok)return false;
     PUBLISHED=await res.json();
-    if(!LOADED){LOADED=JSON.parse(JSON.stringify(PUBLISHED));renderSections();
+    // Only replace the working copy when the user explicitly clicks "Reload Published"
+    // (forceLoad=true), or when there's truly nothing loaded yet (first-ever visit, no saved work).
+    if(forceLoad||!LOADED){LOADED=JSON.parse(JSON.stringify(PUBLISHED));renderSections();saveLocal();
       document.getElementById('import-status').style.color='#9fb6d4';
       document.getElementById('import-status').textContent='Loaded currently-published data. Re-import the Excel to update it.';}
     else markPublishStates();
@@ -337,7 +339,7 @@ function recomputeMeta(p){
   p.date=new Date().toISOString().slice(0,10);
   const es={usdlkr:(p.spot&&p.spot.close)||(p.usdlkr&&p.usdlkr.close)||'',liqDir:'',liqDelta:''};
   if(p.liquidity&&p.liquidity.current!=null&&p.liquidity.previous!=null){const dl=+(p.liquidity.current-p.liquidity.previous).toFixed(2);es.liqDir=dl>=0?'increased':'decreased';es.liqDelta=Math.abs(dl);}
-  p.execSummary=es;if(!Array.isArray(p.marketNews))p.marketNews=[];
+  p.execSummary=es;
 }
 
 // ── PUBLISH (per-section merge, or all) ──────────────────
@@ -368,6 +370,9 @@ async function publishKeys(keys,secId){
       const {json,sha}=await getPublished(cfg);
       let published=isAll?JSON.parse(JSON.stringify(LOADED)):(json&&typeof json==='object'?json:{});
       if(!isAll){keys.forEach(k=>{if(LOADED[k]!=null)published[k]=LOADED[k];});}
+      // marketNews (Latest Results) only changes when you publish the Results section itself —
+      // never overwritten by "Publish ALL" or any other section's publish.
+      if(secId!=='results'&&json&&Array.isArray(json.marketNews)){published.marketNews=json.marketNews;}
       recomputeMeta(published);
       await ghPut(cfg.owner,cfg.repo,cfg.branch,cfg.path,cfg.token,JSON.stringify(published,null,1),sha||null);
       PUBLISHED=published;markPublishStates();
