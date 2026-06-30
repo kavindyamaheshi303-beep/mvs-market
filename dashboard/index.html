@@ -223,7 +223,7 @@ canvas{max-width:100%!important}
         </table>
       </div>
       <div class="panel">
-        <div class="panel-title">Value Dates</div>
+        <div class="panel-title" id="vd-title">Value Dates</div>
         <div style="max-height:430px;overflow-y:auto"><table style="font-size:11px">
           <thead><tr><th>Tenor</th><th>Value Date</th><th>NOD</th></tr></thead>
           <tbody id="dyn-op-vd"></tbody>
@@ -569,6 +569,19 @@ function bondMid(v){
   if(s.indexOf("/")>-1){const p=s.split("/");const a=parseFloat(p[0]),b=parseFloat(p[1]);if(isNaN(a))return null;return isNaN(b)?a:+(((a+b)/2).toFixed(3));}
   const n=parseFloat(s);return isNaN(n)?null:n;
 }
+// Display value exactly as entered: "10.50/11.25" stays as-is (formatted to 2dp each side), single numbers get 2dp
+function bondDisplay(v){
+  if(v==null)return null;
+  const s=String(v).trim();
+  if(!s||s==="0"||s==="—")return null;
+  if(s.indexOf("/")>-1){
+    const p=s.split("/");
+    const a=parseFloat(p[0]),b=parseFloat(p[1]);
+    if(isNaN(a))return null;
+    return isNaN(b)?a.toFixed(2):(a.toFixed(2)+"/"+b.toFixed(2));
+  }
+  const n=parseFloat(s);return isNaN(n)?null:n.toFixed(2);
+}
 function heatColor(v,min,max){
   if(v==null||!(max>min))return "transparent";
   const t=Math.max(0,Math.min(1,(v-min)/(max-min)));
@@ -796,6 +809,7 @@ function render(d){
   })();
   bHeaders.forEach((_,ci)=>{const th=document.createElement("th");th.textContent=autoLabels[ci]||bHeaders[ci];bhr.appendChild(th);});
   const midMatrix=bRows.map(r=>dateIdx.map(i=>bondMid((r.values||[])[i])));
+  const rawMatrix=bRows.map(r=>dateIdx.map(i=>bondDisplay((r.values||[])[i])));
   const bb=document.getElementById("bondRows");bb.innerHTML="";
   bRows.forEach((r,ri)=>{
     const tr=document.createElement("tr");
@@ -807,6 +821,7 @@ function render(d){
     const tdY=document.createElement("td");tdY.textContent=fmt2(eoyVal);tdY.style.color="#c8a84b";tdY.style.fontSize="9px";tr.appendChild(tdY);
     const tdM=document.createElement("td");tdM.textContent=fmt2(eomVal);tdM.style.color="#9fb6d4";tdM.style.fontSize="9px";tr.appendChild(tdM);
     const mids=midMatrix[ri]||[];
+    const raws=rawMatrix[ri]||[];
     // per-row heat scale: this bond's own low (green) → high (red) across the dates
     const rv=mids.filter(m=>m!=null);
     const rmn=rv.length?Math.min(...rv):0, rmx=rv.length?Math.max(...rv):1;
@@ -818,7 +833,7 @@ function render(d){
         const delta=prev!=null?+(m-prev).toFixed(3):null;
         let arrow="",acol="";
         if(delta!=null&&delta!==0){ if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";} }
-        td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
+        td.innerHTML=(raws[ci]||m.toFixed(2))+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
         td.style.background=heatColor(m,rmn,rmx);   // per-row colour
         td.style.color="#eaf2fb";td.style.fontWeight="600";
         if(delta!=null&&delta!==0)td.title=(delta<0?"Yield down ":"Yield up ")+Math.abs(delta).toFixed(2)+" vs previous";
@@ -877,6 +892,7 @@ function render(d){
       const tdY=document.createElement("td");tdY.textContent=f2(eoyV);tdY.style.color="#c8a84b";tdY.style.fontSize="9px";tr.appendChild(tdY);
       const tdM=document.createElement("td");tdM.textContent=f2(eomV);tdM.style.color="#9fb6d4";tdM.style.fontSize="9px";tr.appendChild(tdM);
       const mids=midMatrix[ri]||[];
+      const raws=rawMatrix[ri]||[];
       const rv=mids.filter(m=>m!=null);
       const rmn=rv.length?Math.min(...rv):0, rmx=rv.length?Math.max(...rv):1;
       mids.forEach((m,ci)=>{
@@ -886,7 +902,7 @@ function render(d){
           const delta=prev!=null?+(m-prev).toFixed(3):null;
           let arrow="",acol="";
           if(delta!=null&&delta!==0){if(delta<0){arrow="\u25be";acol="#ff8a78";}else{arrow="\u25b4";acol="#7ee0a8";}}
-          td.innerHTML=m.toFixed(2)+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
+          td.innerHTML=(raws[ci]||m.toFixed(2))+(arrow?' <span style="font-size:9px;color:'+acol+'">'+arrow+'</span>':'');
           td.style.background=heatColor(m,rmn,rmx);td.style.color="#eaf2fb";td.style.fontWeight="600";
         }else{td.textContent="—";td.style.color="#3a5575";}
         tr.appendChild(td);
@@ -967,7 +983,9 @@ function renderExtras(d){
    ["mm-close","fx-close","tbill-close","tbond-close","secondary-close","fxov-close","cross-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=cdEl?"Closing: "+cdEl:"";});
 
    const ft=document.getElementById("op-fxsum-title");
-   if(ft)ft.innerHTML="Volume of FX Market"+(yestD?'<span class="close-date">'+fmtOrd(yestD)+"</span>":"");}
+   if(ft)ft.innerHTML="Volume of FX Market"+(cdEl?'<span class="close-date">'+cdEl+"</span>":"");
+   const vdt=document.getElementById("vd-title");
+   if(vdt)vdt.innerHTML="Value Dates"+(cdEl?'<span class="close-date">'+cdEl+"</span>":"");}
   set('dyn-op-vd',(d.valueDates||[]).filter(v=>v.show!==false).map(v=>`<tr><td>${escHtml(v.tenor)}</td><td>${escHtml(v.date)}</td><td style="color:#9fb6d4">${escHtml(v.nod||'')}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
   set('dyn-op-srr',(d.srr||[]).filter(s=>s.show!==false).map(s=>`<tr><td>${escHtml(s.date)}</td><td>${fmt2(s.rate)}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#5a7a9a;font-style:italic;padding:10px">Not published yet</td></tr>');
 }
