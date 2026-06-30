@@ -3121,7 +3121,12 @@
   "liqDir": "decreased",
   "liqDelta": 3.74
  },
- "marketNews": [],
+ "marketNews": [
+  "Treasury Bond Auction Results",
+  "The accepted weighted average yields were:",
+  "15 Oct 2030 Maturity: 11.44%",
+  "15 Mar 2035 Maturity: 11.88%"
+ ],
  "date": "2026-06-30",
  "openingDate": "",
  "closingDate": "",
