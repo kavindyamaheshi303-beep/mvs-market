@@ -552,11 +552,14 @@ function _addDaysMF(spot,days){
 }
 function calcValueDate(tenorRaw){
   const t=String(tenorRaw||"").toLowerCase().trim();
-  const today=new Date();
-  const spot=_spotDate(today);
+  // Everything anchors from the same "Cash" date (slValueDay) — before 4 PM that's today's
+  // SL working day; after 4 PM it's the next SL working day. Tom/Spot/forward tenors all
+  // count forward from this single anchor so the whole table stays internally consistent.
+  const anchor=slValueDay();
+  const spot=_addWorkDays(anchor,2,_isBothWork);
   let result=null;
-  if(/cash|^today/.test(t))result=slValueDay();   // Cash always matches the Value Dates title date
-  else if(/^tom/.test(t))result=_addWorkDays(today,1,_isBothWork);
+  if(/cash|^today/.test(t))result=anchor;
+  else if(/^tom/.test(t))result=_addWorkDays(anchor,1,_isBothWork);
   else if(/^spot$/.test(t))result=spot;
   else if(/^snn$/.test(t))result=_addWorkDays(spot,2,_isBothWork);   // Spot/Next/Next = Spot + 2 working days
   else if(/^sn$/.test(t))result=_addWorkDays(spot,1,_isBothWork);    // Spot/Next = Spot + 1 working day
@@ -575,15 +578,13 @@ function calcNOD(tenorRaw){
   const t=String(tenorRaw||"").toLowerCase().trim();
   const d=calcValueDate(tenorRaw);if(!d)return"";
   const dd=new Date(d);dd.setHours(0,0,0,0);
-  // Cash always shows NOD=0 — its date and base both follow the same Value Dates page date (slValueDay).
-  // Tom/Spot count from today; forward tenors (SN, SNN, 1 Week, 1 Month etc.) count from the Spot date.
+  // Cash/Tom/Spot count from the Cash anchor date; forward tenors (SN, SNN, 1 Week, 1 Month etc.)
+  // count from the Spot date instead, so NOD reflects days-from-spot for forward tenors.
   let base;
-  if(/cash|^today/.test(t)){
+  if(/cash|^today/.test(t)||/^tom/.test(t)||/^spot$/.test(t)){
     base=slValueDay();base.setHours(0,0,0,0);
-  }else if(/^tom/.test(t)||/^spot$/.test(t)){
-    base=new Date();base.setHours(0,0,0,0);
   }else{
-    base=_spotDate(new Date());base.setHours(0,0,0,0);
+    base=_addWorkDays(slValueDay(),2,_isBothWork);base.setHours(0,0,0,0);
   }
   return Math.round((dd-base)/86400000);
 }
@@ -876,25 +877,26 @@ function render(d){
   const lmIdx=bHeadersAll.findIndex(h=>{const t=String(h||'').toLowerCase().trim();return t==='last month'||t==='end of month';});
   const dateIdx=bHeadersAll.map((h,i)=>i).filter(i=>!isRef(bHeadersAll[i]));   // real date columns only
   const bHeaders=dateIdx.map(i=>bHeadersAll[i]);
-  // Auto-generate SL banking working day labels for bond date columns
-  const SL_HOL=new Set(["2026-01-01","2026-01-14","2026-01-15","2026-02-04","2026-02-26","2026-04-03","2026-04-13","2026-04-14","2026-05-01","2026-05-22","2026-06-30","2026-07-29","2026-08-20","2026-09-23","2026-10-20","2026-10-26","2026-11-11","2026-12-25"]);
-  const isSLWork=d=>{const g=d.getDay();if(g===0||g===6)return false;const iso=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");return !SL_HOL.has(iso);};
+  // Bond date columns: the LAST column always matches the same Closing date shown elsewhere on the page;
+  // earlier columns auto-fill backwards through Sri Lanka bank working days (official CBSL calendar).
+  const isSLWork=x=>{const g=x.getDay();if(g===0||g===6)return false;
+    const iso=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+    return !SL_FX_HOL_SET.has(iso);};
   const MON_B=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const ordB=n=>{const v=n%100;const o=["th","st","nd","rd"][(v-20)%10]||["th","st","nd","rd"][v]||"th";return n+o;};
-  const fmtBH=d=>ordB(d.getDate())+" "+MON_B[d.getMonth()];
+  const fmtBH=x=>ordB(x.getDate())+" "+MON_B[x.getMonth()];
   const autoLabels=(()=>{
-    // Use SL time (UTC+5:30) to decide if today's bond data is ready (after 3 PM)
-    const slNow=new Date(Date.now()+330*60000);
-    const slHour=slNow.getUTCHours();
-    const slDow=slNow.getUTCDay();
-    const todayReady=(slDow>=1&&slDow<=5)&&slHour>=15;
-    // Start from today if ready, else from previous SL working day
-    let d=new Date();
-    if(!todayReady||!isSLWork(d)){do{d.setDate(d.getDate()-1);}while(!isSLWork(d));}
+    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
+    const ovClose=ov(d.closingDate);
+    let last;
+    if(ovClose){const m=String(ovClose).match(/(\d{1,2})\D+([A-Za-z]+)\D+(\d{4})/);
+      if(m){const mi=MON_B.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());if(mi>=0)last=new Date(+m[3],mi,+m[1]);}}
+    if(!last)last=slWorkDay(0);
     const labels=[];
+    let x=new Date(last.getFullYear(),last.getMonth(),last.getDate());
     for(let i=0;i<bHeaders.length;i++){
-      labels.unshift(fmtBH(d));
-      do{d.setDate(d.getDate()-1);}while(!isSLWork(d));
+      labels.unshift(fmtBH(x));
+      do{x.setDate(x.getDate()-1);}while(!isSLWork(x));
     }
     return labels;
   })();
@@ -1210,24 +1212,22 @@ function buildCharts(d){
   const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const fmtBond=b=>{const p=String(b).split(".");if(p.length===3){const m=parseInt(p[1])-1,y=parseInt(p[2]);if(!isNaN(m)&&!isNaN(y)&&m>=0&&m<=11)return MON[m]+" "+y;}return b;};
   const yLabels=yBRows.map(r=>fmtBond(r.bond));
-  // Re-derive the same auto-generated SL working-day date labels used for the bond table headers,
-  // so the chart legend shows real dates ("30th Jun") instead of raw Excel headers ("Day 6").
+  // Re-derive the same auto-generated SL working-day date labels used for the bond table headers
+  // (last column = same Closing date as elsewhere on the page), so the chart legend shows real
+  // dates ("30th Jun") instead of raw Excel headers ("Day 6").
   const autoLabels=(()=>{
-    const SL_HOL2=new Set(["2026-01-03","2026-01-15","2026-02-01","2026-02-04",
-      "2026-02-15","2026-03-02","2026-03-21","2026-04-01","2026-04-03","2026-04-13",
-      "2026-04-14","2026-05-01","2026-05-02","2026-05-28","2026-05-30","2026-06-29",
-      "2026-07-29","2026-08-26","2026-08-27","2026-09-26","2026-10-25","2026-11-08",
-      "2026-11-24","2026-12-23","2026-12-25"]);
     const isSLW=x=>{const g=x.getDay();if(g===0||g===6)return false;
       const iso=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
-      return !SL_HOL2.has(iso);};
+      return !SL_FX_HOL_SET.has(iso);};
     const ordA=n=>{const v=n%100;const o=["th","st","nd","rd"][(v-20)%10]||["th","st","nd","rd"][v]||"th";return n+o;};
     const fmtA=x=>ordA(x.getDate())+" "+MON[x.getMonth()];
-    const slNow=new Date(Date.now()+330*60000);
-    const slHour=slNow.getUTCHours(), slDow=slNow.getUTCDay();
-    const todayReady=(slDow>=1&&slDow<=5)&&slHour>=15;
-    let x=new Date();
-    if(!todayReady||!isSLW(x)){do{x.setDate(x.getDate()-1);}while(!isSLW(x));}
+    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
+    const ovClose=ov(d.closingDate);
+    let last;
+    if(ovClose){const m=String(ovClose).match(/(\d{1,2})\D+([A-Za-z]+)\D+(\d{4})/);
+      if(m){const mi=MON.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());if(mi>=0)last=new Date(+m[3],mi,+m[1]);}}
+    if(!last)last=slWorkDay(0);
+    let x=new Date(last.getFullYear(),last.getMonth(),last.getDate());
     const labels=[];
     for(let i=0;i<yBHead.length;i++){labels.unshift(fmtA(x));do{x.setDate(x.getDate()-1);}while(!isSLW(x));}
     return labels;
