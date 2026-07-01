@@ -138,9 +138,16 @@ code{background:#081424;padding:1px 6px;border-radius:4px;color:#c8a84b;font-siz
 <div class="toast" id="toast"></div>
 
 <script>
-let LOADED=null;        // working copy being edited
-let PUBLISHED=null;     // last-known published JSON (to mark live/draft)
+<script>
 
+// FIX: missing helper function
+function val(id){
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+let LOADED=null;
+let PUBLISHED=null;
 const SECTIONS=[
  {id:'dates',title:'Report Dates (blank = auto · SL working days)',keys:['openingDate','closingDate','secondaryDate','fxVolDate']},
  {id:'mmrates',title:'Money Market & Repo Rates',keys:['callMarket','repoMarket']},
