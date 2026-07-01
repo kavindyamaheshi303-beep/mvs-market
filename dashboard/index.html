@@ -511,9 +511,18 @@ function slWorkDay(back){
 // After 8:30 AM, it shifts to the working day before that (since today's update just happened).
 function slOpeningDay(){
   const slNow=new Date(Date.now()+330*60000);
-  const slHour=slNow.getUTCHours(), slMin=slNow.getUTCMinutes();
-  const after830=(slHour>8)||(slHour===8&&slMin>=30);
-  return after830?slWorkDay(2):slWorkDay(1);
+  const slHour=slNow.getUTCHours();
+  const slMin=slNow.getUTCMinutes();
+
+  const after830 =
+    (slHour > 8) ||
+    (slHour === 8 && slMin >= 30);
+
+  if(after830){
+    return slWorkDay(1);
+  }
+
+  return slWorkDay(2);
 }
 // Value Dates: from today's 4 PM SL time until the next working day's 4 PM, show the NEXT SL working day.
 // Before 4 PM today: shows today's SL working day. After 4 PM: shows the next SL working day.
