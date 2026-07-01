@@ -226,8 +226,28 @@ function ingestFile(file,auto){
   if(!auto){st.style.color='#c8a84b';st.textContent='Reading '+file.name+'…';}
   return file.arrayBuffer().then(buf=>{
     const wb=XLSX.read(new Uint8Array(buf),{type:'array',cellDates:true});
-    window._lastWB=wb;
-    LOADED=parseWorkbook(wb,XLSX);
+window._lastWB=wb;
+
+// Preserve manually entered Latest Results
+const oldNews =
+  LOADED && Array.isArray(LOADED.marketNews)
+    ? [...LOADED.marketNews]
+    : [];
+
+const oldHidden =
+  LOADED && LOADED.hidden
+    ? JSON.parse(JSON.stringify(LOADED.hidden))
+    : {};
+
+LOADED = parseWorkbook(wb, XLSX);
+
+// Restore Latest Results after import
+if (oldNews.length) {
+  LOADED.marketNews = oldNews;
+}
+
+// Restore hidden settings
+LOADED.hidden = oldHidden;
     try{const ph=JSON.parse(localStorage.getItem('mvs_editor_hidden')||'null');if(ph&&typeof ph==='object')LOADED.hidden=ph;}catch(e){}
     try{const _ck=analyzeFreshness(wb,XLSX);renderFreshness(_ck);try{localStorage.setItem('mvs_editor_freshness',JSON.stringify(_ck));}catch(_e){}}catch(fe){}
     renderSections();
@@ -628,7 +648,11 @@ function parseWorkbook(wb,XLSX){
   if(an.length){let kd=[];for(let i=2;i<an.length;i++)if(an[i][0]!=null&&an[i][1]!=null)kd.push({label:String(an[i][0]).trim(),date:toISO(an[i][1]),show:true});o.keyDates=kd;}
   o.execSummary={usdlkr:(o.spot&&o.spot.close)||(o.usdlkr&&o.usdlkr.close)||'',liqDir:'',liqDelta:''};
   if(o.liquidity&&o.liquidity.current!=null&&o.liquidity.previous!=null){const dlt=+(o.liquidity.current-o.liquidity.previous).toFixed(2);o.execSummary.liqDir=dlt>=0?'increased':'decreased';o.execSummary.liqDelta=Math.abs(dlt);}
-  o.marketNews=o.marketNews||[];o.date=new Date().toISOString().slice(0,10);
+  
+if (!Array.isArray(o.marketNews)) {
+  o.marketNews = [];
+}
+o.date=new Date().toISOString().slice(0,10);
   // Report dates — leave blank so dashboard auto-uses SL working days
   o.openingDate="";o.closingDate="";o.secondaryDate="";o.fxVolDate="";
   return o;
