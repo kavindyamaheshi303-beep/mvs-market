@@ -1183,8 +1183,8 @@ function buildCharts(d){
     const pv=s=>{if(s==null)return null;const n=parseFloat(String(s).replace('%',''));return isNaN(n)?null:n;};
     if(inf.length){
       charts.infl=new Chart(document.getElementById("inflChart"),{type:"bar",data:{labels:inf.map(r=>r.metric),datasets:[
-        {label:"April 2026",data:inf.map(r=>pv(r.apr)),backgroundColor:"#c8a84b",borderRadius:3,maxBarThickness:13},
-        {label:"May 2026",data:inf.map(r=>pv(r.may)),backgroundColor:"#e0443a",borderRadius:3,maxBarThickness:13}]},
+        {label:"Previous",data:inf.map(r=>pv(r.apr)),backgroundColor:"#c8a84b",borderRadius:3,maxBarThickness:13},
+        {label:"Latest",data:inf.map(r=>pv(r.may)),backgroundColor:"#e0443a",borderRadius:3,maxBarThickness:13}]},
         options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{color:tc,font:{size:9},boxWidth:10}},title:{display:true,text:"INFLATION (%)",color:"#c8a84b",font:{size:12,weight:"700"}}},scales:{x:{ticks:{color:tc,font:tf},grid:{color:gc},suggestedMin:-2,suggestedMax:6},y:{ticks:{color:tc,font:{size:9}},grid:{color:gc}}}}});
     }
   }
