@@ -20,13 +20,13 @@
   "min": 8.4,
   "max": 9.25,
   "wa": 9.23,
-  "vol": 31.46
+  "vol": 44.82
  },
  "repoMarket": {
-  "min": 9.22,
+  "min": 9.23,
   "max": 9.25,
   "wa": 9.25,
-  "vol": 81.14
+  "vol": 86.61
  },
  "windows": {
   "sdf": {
@@ -34,8 +34,8 @@
    "prev": 22
   },
   "slf": {
-   "cur": 102.43,
-   "prev": 82.48
+   "cur": 99.43,
+   "prev": 102.43
   }
  },
  "liquidity": {
@@ -281,9 +281,9 @@
    65.36,
    61.62,
    82.56,
-   85
+   89.83
   ],
-  "current": 85,
+  "current": 89.83,
   "previous": 82.56
  },
  "bonds": {
@@ -630,21 +630,21 @@
    "maturities": [
     {
      "maturity": "3M",
-     "offered": null,
-     "accepted": null,
-     "yield": null
+     "offered": 50000,
+     "accepted": 72975,
+     "yield": 145.95
     },
     {
      "maturity": "6M",
-     "offered": null,
-     "accepted": null,
-     "yield": null
+     "offered": 35000,
+     "accepted": 19059,
+     "yield": 54.45428571428571
     },
     {
      "maturity": "12M",
-     "offered": null,
-     "accepted": null,
-     "yield": null
+     "offered": 15000,
+     "accepted": 7966,
+     "yield": 53.10666666666667
     }
    ]
   },
@@ -1146,8 +1146,8 @@
  "spot": {
   "open": "336.15/ 336.35",
   "close": "336.20 / 336.35",
-  "low": "336.2",
-  "high": "336.3"
+  "low": "336.20",
+  "high": "336.30"
  },
  "crossRates": [
   {
@@ -1491,8 +1491,7 @@
    "24 Jun",
    "25 Jun",
    "26 Jun",
-   "30 Jun",
-   "1 Jul"
+   "30 Jun"
   ],
   "values": [
    2508.92,
@@ -1593,7 +1592,6 @@
    2507.92,
    2507.92,
    2507.92,
-   2498.12,
    2498.12,
    2498.12,
    2498.12,
@@ -3123,7 +3121,7 @@
   },
   {
    "label": "Next T-Bill Auction Day",
-   "date": "2026-07-01",
+   "date": "2026-07-08",
    "show": true
   },
   {
@@ -3145,7 +3143,7 @@
  "execSummary": {
   "usdlkr": "336.20 / 336.35",
   "liqDir": "increased",
-  "liqDelta": 2.44
+  "liqDelta": 7.27
  },
  "marketNews": [
   "Treasury Bill Auction Results",
