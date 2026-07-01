@@ -843,6 +843,11 @@ function renderTbillAuction(data,targetId){
 
 function render(d){
   lastData=d;
+  // Compute the closing-date anchor ONCE here so the bond table header (last column)
+  // and all the "Closing: …" panel badges always show exactly the same date.
+  // Rule: before 4 PM SL time → yesterday's SL working day; from 4 PM onward → today's.
+  const _slNow_cd=new Date(Date.now()+330*60000);
+  const cdAuto=_slNow_cd.getUTCHours()>=16?slWorkDay(0):slWorkDay(1);
   const td=new Date();
   {const el=document.getElementById("dateDisplay");if(el)el.innerHTML=fmtOrd(td);}
   const lu=document.getElementById("last-updated");
@@ -891,7 +896,7 @@ function render(d){
     let last;
     if(ovClose){const m=String(ovClose).match(/(\d{1,2})\D+([A-Za-z]+)\D+(\d{4})/);
       if(m){const mi=MON_B.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());if(mi>=0)last=new Date(+m[3],mi,+m[1]);}}
-    if(!last)last=slWorkDay(0);
+    if(!last){last=cdAuto;}  // last column = same closing date shown on all panels
     const labels=[];
     let x=new Date(last.getFullYear(),last.getMonth(),last.getDate());
     for(let i=0;i<bHeaders.length;i++){
@@ -1072,9 +1077,7 @@ function renderExtras(d){
    const ov=v=>(v!=null&&String(v).trim()!=="")?String(v).trim():null;
    const ot=document.getElementById("opening-report-title");
    if(ot){const od=ov(d.openingDate)||fmtOrd(slOpeningDay());ot.innerHTML="Opening Report — "+od;}
-   // Closing date: before 4 PM SL → yesterday (T-1); after 4 PM SL → today (T)
-   const slNow_cd=new Date(Date.now()+330*60000);
-   const cdAuto=slNow_cd.getUTCHours()>=16?slWorkDay(0):slWorkDay(1);
+   // Closing date: shared cdAuto computed once at the top of render() — before 4 PM SL → T-1, from 4 PM → T
    const cdEl=ov(d.closingDate)?escHtml(ov(d.closingDate)):fmtOrd(cdAuto);
    ["mm-close","fx-close","tbill-close","tbond-close","secondary-close","fxov-close","cross-close"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=cdEl?"Closing: "+cdEl:"";});
 
@@ -1231,7 +1234,7 @@ function buildCharts(d){
     let last;
     if(ovClose){const m=String(ovClose).match(/(\d{1,2})\D+([A-Za-z]+)\D+(\d{4})/);
       if(m){const mi=MON.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());if(mi>=0)last=new Date(+m[3],mi,+m[1]);}}
-    if(!last)last=slWorkDay(0);
+    if(!last){last=cdAuto;}  // last column = same closing date shown on all panels
     let x=new Date(last.getFullYear(),last.getMonth(),last.getDate());
     const labels=[];
     for(let i=0;i<yBHead.length;i++){labels.unshift(fmtA(x));do{x.setDate(x.getDate()-1);}while(!isSLW(x));}
