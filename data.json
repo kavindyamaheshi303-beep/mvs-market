@@ -158,7 +158,8 @@
    "24 Jun",
    "25 Jun",
    "26 Jun",
-   "30 Jun"
+   "30 Jun",
+   "1 Jul"
   ],
   "values": [
    128.14,
@@ -279,7 +280,8 @@
    61.04,
    65.36,
    61.62,
-   82.56
+   82.56,
+   85
   ],
   "current": 85,
   "previous": 82.56
@@ -1111,9 +1113,9 @@
    337.3,
    336.4,
    336.25,
-   336.25
+   336.3
   ],
-  "close": "336.20 / 336.40"
+  "close": "336.20 / 336.35"
  },
  "fxSwaps": {
   "1w": {
@@ -1143,7 +1145,7 @@
  },
  "spot": {
   "open": "336.15/ 336.35",
-  "close": "336.20 / 336.40",
+  "close": "336.20 / 336.35",
   "low": "336.2",
   "high": "336.3"
  },
@@ -3141,15 +3143,18 @@
   }
  ],
  "execSummary": {
-  "usdlkr": "336.20 / 336.40",
+  "usdlkr": "336.20 / 336.35",
   "liqDir": "increased",
   "liqDelta": 2.44
  },
  "marketNews": [
-  "Treasury Bond Auction Results",
+  "Treasury Bill Auction Results",
   "The accepted weighted average yields were:",
-  "15 Oct 2030 Maturity: 11.44%",
-  "15 Mar 2035 Maturity: 11.88%"
+  "91-Day Treasury Bill (LKA09126J029): 10.23%",
+  "182-Day Treasury Bill (LKA18227A015): 10.30%",
+  "364-Day Treasury Bill (LKA36427G024): 10.20%",
+  "Total Amount Accepted: Rs. 100.0 Billion",
+  "Auction Date: 01 July 2026"
  ],
  "date": "2026-07-01",
  "openingDate": "",
