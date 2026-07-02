@@ -601,7 +601,7 @@ function slValueDay(){
   const slNow=new Date(Date.now()+330*60000);
   const slHour=slNow.getUTCHours();
   const after4pm=slHour>=16;
-  if(!after4pm)return _addWorkDays(slWorkDay(0),1,_isSLFXWork);
+  if(!after4pm)return slWorkDay(0);
   // After 4 PM: step forward from today's SL working day to the next SL working day
   let base=slWorkDay(0);
   let nxt=new Date(base.getFullYear(),base.getMonth(),base.getDate()+1);
